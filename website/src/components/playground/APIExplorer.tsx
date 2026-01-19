@@ -80,7 +80,7 @@ export default function APIExplorer({ onSelectAPI, selectedAPI }: APIExplorerPro
         <h3 className="text-lg font-bold flex items-center gap-2 mb-3">
           <span>📚</span>
           <span>API Explorer</span>
-          <span className="text-xs bg-indigo-600 px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-blue-600 px-2 py-0.5 rounded-full">
             {TOTAL_API_COUNT} APIs
           </span>
         </h3>
@@ -92,7 +92,7 @@ export default function APIExplorer({ onSelectAPI, selectedAPI }: APIExplorerPro
             placeholder="Search APIs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:border-indigo-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:border-cyan-500"
           />
           <svg
             className="absolute left-3 top-2.5 w-4 h-4 text-gray-500"
@@ -146,7 +146,7 @@ export default function APIExplorer({ onSelectAPI, selectedAPI }: APIExplorerPro
                     onClick={() => onSelectAPI(api, category)}
                     className={`block w-full text-left px-3 py-2 text-sm rounded transition-colors ${
                       isSelected(category, api)
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-blue-600 text-white'
                         : 'hover:bg-gray-800 text-gray-300'
                     }`}
                   >
@@ -197,7 +197,7 @@ export default function APIExplorer({ onSelectAPI, selectedAPI }: APIExplorerPro
                         key={api.name}
                         className={`group flex items-center rounded transition-colors ${
                           isSelected(category, api)
-                            ? 'bg-indigo-600'
+                            ? 'bg-blue-600'
                             : 'hover:bg-gray-800'
                         }`}
                       >
@@ -236,7 +236,7 @@ export default function APIExplorer({ onSelectAPI, selectedAPI }: APIExplorerPro
             <p>No APIs found for "{searchQuery}"</p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-indigo-400 mt-2 text-sm"
+              className="text-cyan-400 mt-2 text-sm"
             >
               Clear search
             </button>

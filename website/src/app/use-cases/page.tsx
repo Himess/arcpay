@@ -37,7 +37,7 @@ export default function UseCasesPage() {
 
             <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
               <p className="text-gray-300 text-lg mb-4">
-                User speaks: <span className="text-indigo-400">"Hire a writer to create a blog post, budget 50 dollars"</span>
+                User speaks: <span className="text-cyan-400">"Hire a writer to create a blog post, budget 50 dollars"</span>
               </p>
             </div>
 
@@ -45,12 +45,12 @@ export default function UseCasesPage() {
               {/* Step 1 */}
               <div className="bg-gray-800/30 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold">1</div>
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">1</div>
                   <h3 className="font-semibold">Voice Input</h3>
                 </div>
                 <div className="space-y-2 text-sm text-gray-400">
                   <p>👤 Human speaks command</p>
-                  <p className="text-purple-400">↓ Gemini AI parses & executes</p>
+                  <p className="text-cyan-400">↓ Gemini AI parses & executes</p>
                   <p>🤖 Agent A receives request</p>
                 </div>
               </div>
@@ -58,7 +58,7 @@ export default function UseCasesPage() {
               {/* Step 2 */}
               <div className="bg-gray-800/30 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold">2</div>
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">2</div>
                   <h3 className="font-semibold">Agent Hiring</h3>
                 </div>
                 <div className="space-y-2 text-sm text-gray-400">
@@ -85,7 +85,7 @@ export default function UseCasesPage() {
             <div className="mt-6 text-center">
               <Link
                 href="/playground"
-                className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition-colors"
+                className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
               >
                 Try in Playground →
               </Link>
@@ -113,7 +113,7 @@ export default function UseCasesPage() {
                   <div className="bg-gray-700/50 rounded-lg p-4 text-center">
                     <p className="text-4xl mb-2">📋</p>
                     <p className="text-gray-400">Invoice #2026-0042</p>
-                    <p className="text-2xl font-bold text-indigo-400 my-2">$150.00</p>
+                    <p className="text-2xl font-bold text-cyan-400 my-2">$150.00</p>
                     <p className="text-gray-500 text-sm">Acme Corp</p>
                     <p className="text-gray-500 text-sm">0x9f2...abc</p>
                   </div>
@@ -122,21 +122,21 @@ export default function UseCasesPage() {
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-gray-400">
-                  <span className="text-purple-400">↓</span>
+                  <span className="text-cyan-400">↓</span>
                   <span>Gemini Vision analyzes image</span>
                 </div>
 
                 <div className="bg-gray-800/50 rounded-xl p-4">
                   <p className="text-sm text-gray-500 mb-2">Extracted:</p>
                   <ul className="space-y-1 text-sm">
-                    <li>• Amount: <span className="text-indigo-400">$150</span></li>
-                    <li>• Recipient: <span className="text-indigo-400">0x9f2...</span></li>
-                    <li>• Due: <span className="text-indigo-400">Jan 30</span></li>
+                    <li>• Amount: <span className="text-cyan-400">$150</span></li>
+                    <li>• Recipient: <span className="text-cyan-400">0x9f2...</span></li>
+                    <li>• Due: <span className="text-cyan-400">Jan 30</span></li>
                   </ul>
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-400">
-                  <span className="text-purple-400">↓</span>
+                  <span className="text-cyan-400">↓</span>
                   <span>User confirms payment</span>
                 </div>
 
@@ -150,7 +150,7 @@ export default function UseCasesPage() {
             <div className="mt-6 text-center">
               <Link
                 href="/playground"
-                className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition-colors"
+                className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
               >
                 Try in Playground →
               </Link>
@@ -209,7 +209,7 @@ export default function UseCasesPage() {
                   <span className="text-gray-400">At front door</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-indigo-400">95%</span>
+                  <span className="text-cyan-400">95%</span>
                   <span className="text-gray-400">Confidence</span>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default function UseCasesPage() {
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-4 flex justify-between items-center">
                     <span className="text-gray-400">Per Second</span>
-                    <span className="font-semibold text-indigo-400">$0.00193 USDC</span>
+                    <span className="font-semibold text-cyan-400">$0.00193 USDC</span>
                   </div>
                   <div className="bg-emerald-900/30 rounded-lg p-4 flex justify-between items-center">
                     <span className="text-gray-400">Withdrawable Now</span>
@@ -335,7 +335,7 @@ await arc.privacy.sendStealth({
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/playground"
-              className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold transition-colors"
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
             >
               🎮 Try Playground
             </Link>

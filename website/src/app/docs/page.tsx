@@ -121,12 +121,12 @@ await pay('ahmed', '50'); // Use names, not 0x!`,
 // Feature grid data
 const FEATURES = [
   { icon: '💳', title: 'Payments', code: 'pay("0x...", "100")', saved: '15+ → 2', color: 'from-blue-500 to-cyan-500' },
-  { icon: '🔒', title: 'Escrow', code: 'escrow("0x...", "500", 7)', saved: '50+ → 1', color: 'from-purple-500 to-pink-500' },
+  { icon: '🔒', title: 'Escrow', code: 'escrow("0x...", "500", 7)', saved: '50+ → 1', color: 'from-cyan-500 to-blue-500' },
   { icon: '💸', title: 'Streaming', code: 'stream("0x...", "5000", 30)', saved: '100+ → 1', color: 'from-green-500 to-emerald-500' },
   { icon: '📇', title: 'Contacts', code: 'pay("ahmed", "50")', saved: 'N/A → 2', color: 'from-amber-500 to-orange-500' },
   { icon: '📅', title: 'Subscriptions', code: 'payAllDueBills()', saved: 'N/A → 1', color: 'from-red-500 to-rose-500' },
-  { icon: '🎤', title: 'Voice', code: '"Send 50 to ahmed"', saved: '200+ → 0', color: 'from-indigo-500 to-violet-500' },
-  { icon: '🤖', title: 'AI Agents', code: 'agent.executeTask()', saved: 'Complex → Simple', color: 'from-pink-500 to-fuchsia-500' },
+  { icon: '🎤', title: 'Voice', code: '"Send 50 to ahmed"', saved: '200+ → 0', color: 'from-blue-500 to-cyan-500' },
+  { icon: '🤖', title: 'AI Agents', code: 'agent.executeTask()', saved: 'Complex → Simple', color: 'from-cyan-500 to-blue-500' },
   { icon: '🕵️', title: 'Privacy', code: 'stealthPay("0x...", "100")', saved: '300+ → 1', color: 'from-slate-500 to-gray-500' },
   { icon: '⚡', title: 'Channels', code: 'microPay("0x...", "0.01")', saved: '150+ → 1', color: 'from-yellow-500 to-lime-500' },
 ];
@@ -224,15 +224,15 @@ export default function DocsPage() {
                   className={`w-full text-left px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all ${
                     activeSection === section.id
                       ? section.isHighlight
-                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                        : 'bg-indigo-600 text-white'
+                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
+                        : 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:bg-gray-800/50'
                   }`}
                 >
                   <span>{section.icon}</span>
                   <span className="font-medium">{section.label}</span>
                   {section.isNew && (
-                    <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">NEW</span>
+                    <span className="ml-auto text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">NEW</span>
                   )}
                 </button>
               ))}
@@ -258,7 +258,7 @@ export default function DocsPage() {
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
                         Build Payment Apps<br />in Minutes, Not Weeks
                       </h1>
                       <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
@@ -307,7 +307,7 @@ export default function DocsPage() {
                     <div className="flex flex-wrap justify-center gap-4">
                       <button
                         onClick={() => setActiveSection('getting-started')}
-                        className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
                       >
                         Get Started
                       </button>
@@ -374,7 +374,7 @@ export default function DocsPage() {
                                 </div>
                                 <Link
                                   href="/playground"
-                                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                                  className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
                                 >
                                   Try in Playground →
                                 </Link>
@@ -418,7 +418,7 @@ export default function DocsPage() {
                             </span>
                             <Link
                               href="/playground"
-                              className="text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="text-xs text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               Try it →
                             </Link>
@@ -474,7 +474,7 @@ export default function DocsPage() {
                     <div className="flex flex-wrap justify-center gap-4">
                       <button
                         onClick={() => setActiveSection('getting-started')}
-                        className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
                       >
                         Read the Docs
                       </button>
@@ -547,10 +547,10 @@ await pay('0x...', '100');                      // Send payment
 await escrow('0x...', '500', 7);               // Create escrow (7 days)
 await stream('0x...', '5000', 30);             // Start stream (30 days)`} />
 
-                    <div className="mt-8 p-6 bg-indigo-500/10 border border-indigo-500/30 rounded-xl">
-                      <h3 className="text-lg font-semibold text-indigo-400 mb-2">💡 Pro Tip</h3>
+                    <div className="mt-8 p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-xl">
+                      <h3 className="text-lg font-semibold text-cyan-400 mb-2">💡 Pro Tip</h3>
                       <p className="text-gray-300">
-                        Try the <Link href="/playground" className="text-indigo-400 hover:underline">Playground</Link> to test
+                        Try the <Link href="/playground" className="text-cyan-400 hover:underline">Playground</Link> to test
                         these commands interactively without writing any code!
                       </p>
                     </div>
@@ -640,7 +640,7 @@ await arc.channels.close(channel.id);`} />
                   <section>
                     <div className="flex items-center gap-3 mb-4">
                       <h1 className="text-4xl font-bold">Contacts & Subscriptions</h1>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">NEW</span>
+                      <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm">NEW</span>
                     </div>
                     <p className="text-gray-400 mb-8">
                       Pay by name, track bills, never miss a due date.
@@ -741,7 +741,7 @@ console.log(\`You spend $\${total}/month on subscriptions\`);`} />
                   <section>
                     <div className="flex items-center gap-3 mb-4">
                       <h1 className="text-4xl font-bold">AI & Voice</h1>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">NEW</span>
+                      <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm">NEW</span>
                     </div>
                     <p className="text-gray-400 mb-8">
                       Powered by Gemini - voice commands, image payments, and AI function calling.
@@ -883,7 +883,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x0a982E2250F1C66487b88286e14D965025dD89D2"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x0a982E2250F1C66487b88286e14D965025dD89D2
                               </a>
@@ -897,7 +897,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x3FF7bC1C52e7DdD2B7B915bDAdBe003037B0FA2E"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x3FF7bC1C52e7DdD2B7B915bDAdBe003037B0FA2E
                               </a>
@@ -911,7 +911,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x4678D992De548bddCb5Cd4104470766b5207A855"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x4678D992De548bddCb5Cd4104470766b5207A855
                               </a>
@@ -925,7 +925,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B
                               </a>
@@ -939,7 +939,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x5E3ef9A91AD33270f84B32ACFF91068Eea44c5ee"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x5E3ef9A91AD33270f84B32ACFF91068Eea44c5ee
                               </a>
@@ -953,7 +953,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x3600000000000000000000000000000000000000"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x3600000000000000000000000000000000000000
                               </a>
@@ -967,7 +967,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a
                               </a>
@@ -981,7 +981,7 @@ await arc.fx.swap({
                                 href="https://testnet.arcscan.app/address/0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-mono text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+                                className="font-mono text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
                               >
                                 0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C
                               </a>
@@ -1009,7 +1009,7 @@ const addresses = getContractAddresses(5042002); // Arc Testnet`} />
                         href="https://testnet.arcscan.app"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300"
+                        className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
                       >
                         View all contracts on ArcScan
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

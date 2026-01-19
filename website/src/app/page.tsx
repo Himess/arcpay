@@ -86,7 +86,7 @@ export default function Home() {
               { label: 'TypeScript', color: 'blue' },
               { label: 'Arc Network', color: 'cyan' },
               { label: 'USDC', color: 'green' },
-              { label: 'Gemini AI', color: 'purple' },
+              { label: 'Gemini AI', color: 'blue' },
               { label: 'ERC-4337', color: 'orange' },
             ].map((badge) => (
               <span
@@ -95,7 +95,7 @@ export default function Home() {
                   badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
                   badge.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
                   badge.color === 'green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                  badge.color === 'purple' ? 'bg-purple-500/10 text-cyan-400 border-purple-500/20' :
+                  badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
                   'bg-orange-500/10 text-orange-400 border-orange-500/20'
                 }`}
               >
@@ -339,7 +339,7 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/use-cases" className="text-cyan-400 hover:text-indigo-300 transition-colors">
+            <Link href="/use-cases" className="text-cyan-400 hover:text-cyan-300 transition-colors">
               See All AI Capabilities →
             </Link>
           </div>
@@ -537,7 +537,7 @@ await agent.payInvoice(img);
               href="https://testnet.arcscan.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-indigo-300 transition-colors"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors"
             >
               View Contracts on ArcScan →
             </a>
