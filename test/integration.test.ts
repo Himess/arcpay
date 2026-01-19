@@ -20,7 +20,7 @@ const arcTestnet = {
 };
 
 // Test wallet - uses the funded wallet from .env
-const TEST_PRIVATE_KEY = '0x0beef695a3a30c5eb3a7c3ca656e1d8ec6f9c3a98349959326fe11e4a410dbc6';
+const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY!;
 const TEST_RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
 
 // ABIs for testing (JSON format)

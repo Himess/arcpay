@@ -46,8 +46,9 @@ import {
 } from '../src';
 
 // Test wallets from .env
-const WALLET_A_KEY = process.env.PRIVATE_KEY || '0x0beef695a3a30c5eb3a7c3ca656e1d8ec6f9c3a98349959326fe11e4a410dbc6';
-const WALLET_B_KEY = process.env.PRIVATE_KEY_B || '0xbba623c945c9e7ef9458450e53a83751acf90e65554ad033815720d7bb392d79';
+// Test wallets - set PRIVATE_KEY and PRIVATE_KEY_B in .env
+const WALLET_A_KEY = process.env.PRIVATE_KEY!;
+const WALLET_B_KEY = process.env.PRIVATE_KEY_B!;
 
 const accountA = privateKeyToAccount(WALLET_A_KEY as `0x${string}`);
 const accountB = privateKeyToAccount(WALLET_B_KEY as `0x${string}`);

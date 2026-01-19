@@ -25,9 +25,9 @@ const arcTestnet = {
 
 // Test wallets
 // Wallet A - Main funded test wallet
-const WALLET_A_KEY = '0x0beef695a3a30c5eb3a7c3ca656e1d8ec6f9c3a98349959326fe11e4a410dbc6';
+const WALLET_A_KEY = process.env.PRIVATE_KEY!;
 // Wallet B - New test wallet (not compromised Hardhat wallet)
-const WALLET_B_KEY = '0xbba623c945c9e7ef9458450e53a83751acf90e65554ad033815720d7bb392d79';
+const WALLET_B_KEY = process.env.PRIVATE_KEY_B!;
 
 // ABIs
 const ESCROW_ABI = [
