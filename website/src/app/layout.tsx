@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -6,6 +7,10 @@ export const metadata: Metadata = {
   description: 'Voice commands, image payments, and AI agents. Talk to pay. Show an invoice. Let AI handle the rest.',
   keywords: ['arc', 'usdc', 'micropayments', 'ai', 'gemini', 'voice', 'escrow', 'streaming', 'agents', 'blockchain', 'sdk'],
   authors: [{ name: 'Himess' }],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: 'ArcPay - AI-Powered Payments',
     description: 'Talk to pay. Show an invoice. Let AI handle the rest.',
@@ -25,8 +30,15 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
-                <a href="/" className="flex items-center space-x-2">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-arc-400 to-circle-400 bg-clip-text text-transparent">
+                <a href="/" className="flex items-center space-x-3">
+                  <Image
+                    src="/logo.png"
+                    alt="ArcPay Logo"
+                    width={36}
+                    height={36}
+                    className="rounded-lg"
+                  />
+                  <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     arcpay
                   </span>
                 </a>
@@ -53,7 +65,7 @@ export default function RootLayout({
                   href="https://www.npmjs.com/package/arcpay"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-arc-600 hover:bg-arc-700 rounded-lg font-medium transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg font-medium transition-all"
                 >
                   npm install
                 </a>
