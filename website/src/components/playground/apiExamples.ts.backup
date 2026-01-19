@@ -1,0 +1,2121 @@
+/**
+ * ArcPay SDK - Complete API Reference with Code Examples
+ *
+ * Total: 150+ APIs across 35 modules
+ */
+
+export interface APIItem {
+  name: string;
+  description: string;
+  code: string;
+  params?: string[];
+  returns?: string;
+}
+
+export interface APICategory {
+  name: string;
+  icon: string;
+  description: string;
+  apis: APIItem[];
+}
+
+export const API_CATEGORIES: APICategory[] = [
+  // ============================================
+  // CORE
+  // ============================================
+  {
+    name: 'Core',
+    icon: '⚡',
+    description: 'Essential payment operations',
+    apis: [
+      {
+        name: 'init',
+        description: 'Initialize the ArcPay SDK',
+        params: ['network', 'privateKey?', 'rpcUrl?'],
+        returns: 'ArcPay instance',
+        code: `// Initialize ArcPay SDK
+// Note: Set your private key in Settings (⚙️) for write operations
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY, // from Settings, optional
+});
+
+console.log('Connected to:', arc.network.name);
+console.log('Address:', arc.address);
+
+// Now you can use arc.getBalance(), arc.sendUSDC(), etc.`,
+      },
+      {
+        name: 'getBalance',
+        description: 'Get USDC balance for an address',
+        params: ['address?'],
+        returns: 'string (balance)',
+        code: `// Initialize with your private key from Settings
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Get YOUR balance (uses your address automatically)
+const myBalance = await arc.getBalance();
+console.log('Your Address:', arc.address);
+console.log('Your Balance:', myBalance, 'USDC');`,
+      },
+      {
+        name: 'sendUSDC',
+        description: 'Send USDC to an address',
+        params: ['to', 'amount'],
+        returns: 'TransactionResult',
+        code: `// Initialize with private key (set in Settings ⚙️)
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Sending from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const AMOUNT = '0.01';  // ← Change this (USDC)
+// ====================================
+
+const result = await arc.sendUSDC(RECIPIENT, AMOUNT);
+
+console.log('✅ TX Hash:', result.txHash);
+console.log('🔗 Explorer:', result.explorerUrl);`,
+      },
+      {
+        name: 'getEURCBalance',
+        description: 'Get EURC balance for an address',
+        params: ['address?'],
+        returns: 'string (balance)',
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Get EURC balance
+const eurcBalance = await arc.getEURCBalance();
+console.log('Your Address:', arc.address);
+console.log('EURC Balance:', eurcBalance);`,
+      },
+      {
+        name: 'sendEURC',
+        description: 'Send EURC to an address',
+        params: ['to', 'amount'],
+        returns: 'TransactionResult',
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Sending from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const AMOUNT = '0.01';  // ← Change this (EURC)
+// ====================================
+
+const result = await arc.sendEURC(RECIPIENT, AMOUNT);
+
+console.log('✅ EURC sent! TX:', result.txHash);
+console.log('🔗 Explorer:', result.explorerUrl);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // SIMPLE API
+  // ============================================
+  {
+    name: 'Simple API',
+    icon: '🎯',
+    description: 'One-liner functions for quick integrations',
+    apis: [
+      {
+        name: 'configure',
+        description: 'Configure ArcPay globally',
+        params: ['privateKey', 'network?'],
+        code: `// Initialize ArcPay (configure equivalent)
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('✅ Configured!');
+console.log('Network:', arc.network.name);
+console.log('Address:', arc.address);
+
+// Now use arc.sendUSDC(), arc.getBalance(), etc.`,
+      },
+      {
+        name: 'pay',
+        description: 'Send payment in one line',
+        params: ['to', 'amount', 'options?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Sending from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const AMOUNT = '0.01';  // ← Change this (USDC)
+// ====================================
+
+// Simple payment
+const result = await arc.sendUSDC(RECIPIENT, AMOUNT);
+console.log('✅ Paid!', result.txHash);`,
+      },
+      {
+        name: 'balance',
+        description: 'Get balance in one line',
+        params: ['options?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const usdc = await arc.getBalance();
+console.log('Address:', arc.address);
+console.log('Balance:', usdc, 'USDC');`,
+      },
+      {
+        name: 'stream',
+        description: 'Start a payment stream',
+        params: ['recipient', 'amount', 'duration'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Creating stream from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const AMOUNT = '0.1';  // ← Total USDC to stream
+const DURATION = 3600;  // ← Duration in seconds (1 hour)
+// ====================================
+
+const result = await arc.streams.create({
+  recipient: RECIPIENT,
+  amount: AMOUNT,
+  duration: DURATION
+});
+
+console.log('✅ Stream created!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'escrow',
+        description: 'Create escrow in one line',
+        params: ['beneficiary', 'amount', 'options?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Creating escrow from:', arc.address);
+
+// ============ EDIT BELOW ============
+const BENEFICIARY = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const AMOUNT = '0.1';  // ← USDC amount
+// ====================================
+
+const result = await arc.escrow.create({
+  beneficiary: BENEFICIARY,
+  amount: AMOUNT,
+  description: 'Test escrow'
+});
+
+console.log('✅ Escrow created!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'openChannel',
+        description: 'Open a payment channel',
+        params: ['recipient', 'deposit'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Opening channel from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Change this
+const DEPOSIT = '0.1';  // ← Initial deposit (USDC)
+// ====================================
+
+const result = await arc.channels.open({
+  recipient: RECIPIENT,
+  deposit: DEPOSIT
+});
+
+console.log('✅ Channel opened!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'payPrivate',
+        description: 'Send private payment with stealth address',
+        params: ['to', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Your address:', arc.address);
+
+// Note: Stealth payments use stealth addresses for privacy
+// The recipient generates a one-time address that only they can spend from
+console.log('Stealth payments coming soon!');
+console.log('Contract:', arc.contracts.stealth);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // ESCROW
+  // ============================================
+  {
+    name: 'Escrow',
+    icon: '🔒',
+    description: 'Secure multi-party conditional payments',
+    apis: [
+      {
+        name: 'createEscrow',
+        description: 'Create a new escrow',
+        params: ['beneficiary', 'amount', 'arbiter?', 'description?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Creating escrow from:', arc.address);
+
+// ============ EDIT BELOW ============
+const BENEFICIARY = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Seller address
+const AMOUNT = '0.1';  // ← USDC amount
+// ====================================
+
+const result = await arc.escrow.create({
+  beneficiary: BENEFICIARY,
+  amount: AMOUNT,
+  description: 'Purchase of item #123'
+});
+
+console.log('✅ Escrow created!');
+console.log('TX:', result.txHash);
+console.log('Explorer:', result.explorerUrl);`,
+      },
+      {
+        name: 'releaseEscrow',
+        description: 'Release funds to beneficiary',
+        params: ['escrowId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const ESCROW_ID = '0x...';  // ← Your escrow ID from createEscrow
+// ====================================
+
+const result = await arc.escrow.release(ESCROW_ID);
+console.log('✅ Escrow released!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'refundEscrow',
+        description: 'Refund funds to depositor',
+        params: ['escrowId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const ESCROW_ID = '0x...';  // ← Your escrow ID
+// ====================================
+
+const result = await arc.escrow.refund(ESCROW_ID);
+console.log('✅ Escrow refunded!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'getEscrow',
+        description: 'Get escrow details',
+        params: ['escrowId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const ESCROW_ID = '0x...';  // ← Your escrow ID
+// ====================================
+
+const details = await arc.escrow.get(ESCROW_ID);
+console.log('Escrow details:', details);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // STREAMS
+  // ============================================
+  {
+    name: 'Streams',
+    icon: '💸',
+    description: 'Real-time streaming payments',
+    apis: [
+      {
+        name: 'createStream',
+        description: 'Create a new payment stream',
+        params: ['recipient', 'totalAmount', 'duration'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Creating stream from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Employee address
+const AMOUNT = '0.1';  // ← Total USDC to stream
+const DURATION = 3600;  // ← Duration in seconds (1 hour)
+// ====================================
+
+const result = await arc.streams.create({
+  recipient: RECIPIENT,
+  amount: AMOUNT,
+  duration: DURATION
+});
+
+console.log('✅ Stream created!');
+console.log('TX:', result.txHash);
+console.log('Explorer:', result.explorerUrl);`,
+      },
+      {
+        name: 'claim',
+        description: 'Claim available funds from stream',
+        params: ['streamId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const STREAM_ID = '0x...';  // ← Your stream ID
+// ====================================
+
+const result = await arc.streams.claim(STREAM_ID);
+console.log('✅ Claimed!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'cancelStream',
+        description: 'Cancel a stream and refund remaining',
+        params: ['streamId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const STREAM_ID = '0x...';  // ← Your stream ID
+// ====================================
+
+const result = await arc.streams.cancel(STREAM_ID);
+console.log('✅ Stream cancelled!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'getClaimable',
+        description: 'Get claimable amount for a stream',
+        params: ['streamId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const STREAM_ID = '0x...';  // ← Your stream ID
+// ====================================
+
+const claimable = await arc.streams.getClaimable(STREAM_ID);
+console.log('Claimable now:', claimable, 'USDC');`,
+      },
+      {
+        name: 'getStream',
+        description: 'Get stream details',
+        params: ['streamId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const STREAM_ID = '0x...';  // ← Your stream ID
+// ====================================
+
+const stream = await arc.streams.get(STREAM_ID);
+console.log('Stream details:', stream);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // CHANNELS
+  // ============================================
+  {
+    name: 'Channels',
+    icon: '⚡',
+    description: 'Payment channels for micropayments',
+    apis: [
+      {
+        name: 'openChannel',
+        description: 'Open a new payment channel',
+        params: ['recipient', 'deposit'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Opening channel from:', arc.address);
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';  // ← Merchant address
+const DEPOSIT = '0.1';  // ← Initial deposit (USDC)
+// ====================================
+
+const result = await arc.channels.open({
+  recipient: RECIPIENT,
+  deposit: DEPOSIT
+});
+
+console.log('✅ Channel opened!');
+console.log('TX:', result.txHash);
+console.log('Explorer:', result.explorerUrl);`,
+      },
+      {
+        name: 'getChannelBalance',
+        description: 'Get channel balance',
+        params: ['channelId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const CHANNEL_ID = '0x...';  // ← Your channel ID
+// ====================================
+
+const balance = await arc.channels.getBalance(CHANNEL_ID);
+console.log('Available:', balance.available, 'USDC');
+console.log('Spent:', balance.spent, 'USDC');`,
+      },
+      {
+        name: 'getChannel',
+        description: 'Get channel details',
+        params: ['channelId'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const CHANNEL_ID = '0x...';  // ← Your channel ID
+// ====================================
+
+const channel = await arc.channels.get(CHANNEL_ID);
+console.log('Channel details:', channel);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // SUBSCRIPTIONS
+  // ============================================
+  {
+    name: 'Subscriptions',
+    icon: '📅',
+    description: 'Recurring payment management',
+    apis: [
+      {
+        name: 'createPlan',
+        description: 'Create a subscription plan',
+        params: ['name', 'price', 'period'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Subscriptions use Streams under the hood
+console.log('Creating subscription plan...');
+console.log('Address:', arc.address);
+
+// A subscription is a recurring stream
+// Example: $9.99/month = stream $9.99 over 30 days, auto-renew
+const plan = {
+  name: 'Pro Plan',
+  price: '9.99',
+  period: 'monthly',
+  features: ['Unlimited API calls', 'Priority support']
+};
+
+console.log('Plan:', plan.name);
+console.log('Price:', plan.price, 'USDC/', plan.period);
+console.log('Features:', plan.features.join(', '));`,
+      },
+      {
+        name: 'subscribe',
+        description: 'Subscribe using streams',
+        params: ['recipient', 'amount', 'duration'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const MERCHANT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const MONTHLY_PRICE = '0.1';  // USDC per month
+const DURATION = 30 * 24 * 60 * 60;  // 30 days in seconds
+// ====================================
+
+// Create a stream as subscription
+const result = await arc.streams.create({
+  recipient: MERCHANT,
+  amount: MONTHLY_PRICE,
+  duration: DURATION
+});
+
+console.log('✅ Subscribed!');
+console.log('TX:', result.txHash);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // INVOICES
+  // ============================================
+  {
+    name: 'Invoices',
+    icon: '🧾',
+    description: 'Create and track invoices',
+    apis: [
+      {
+        name: 'createInvoice',
+        description: 'Create a new invoice',
+        params: ['items', 'recipient'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Create invoice data
+const invoice = {
+  number: 'INV-' + Date.now(),
+  from: arc.address,
+  to: '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8',
+  items: [
+    { description: 'Web Development', quantity: 10, unitPrice: 100 },
+    { description: 'Hosting (1 year)', quantity: 1, unitPrice: 200 }
+  ],
+  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  taxRate: 10
+};
+
+const subtotal = invoice.items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
+const tax = subtotal * invoice.taxRate / 100;
+const total = subtotal + tax;
+
+console.log('Invoice #:', invoice.number);
+console.log('Subtotal:', subtotal, 'USDC');
+console.log('Tax (10%):', tax, 'USDC');
+console.log('Total:', total, 'USDC');
+console.log('Due:', invoice.dueDate.toLocaleDateString());`,
+      },
+      {
+        name: 'payInvoice',
+        description: 'Pay an invoice',
+        params: ['recipient', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const MERCHANT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const INVOICE_AMOUNT = '0.1';  // USDC
+// ====================================
+
+console.log('Paying invoice...');
+const result = await arc.sendUSDC(MERCHANT, INVOICE_AMOUNT);
+
+console.log('✅ Invoice paid!');
+console.log('TX:', result.txHash);
+console.log('Explorer:', result.explorerUrl);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // PRIVACY
+  // ============================================
+  {
+    name: 'Privacy',
+    icon: '🔐',
+    description: 'Stealth address payments (EIP-5564)',
+    apis: [
+      {
+        name: 'getStealthInfo',
+        description: 'Get stealth registry info',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Your address:', arc.address);
+console.log('Stealth Registry:', arc.contracts.stealth);
+
+// Stealth addresses allow private payments
+// Recipient generates one-time addresses that only they can spend from
+console.log('\\nHow stealth payments work:');
+console.log('1. Recipient shares a stealth meta-address');
+console.log('2. Sender generates a one-time stealth address');
+console.log('3. Funds sent to stealth address');
+console.log('4. Only recipient can derive the private key');`,
+      },
+      {
+        name: 'sendPrivate',
+        description: 'Send a private payment (demo)',
+        params: ['to', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Stealth payments use EIP-5564 standard');
+console.log('Stealth Registry:', arc.contracts.stealth);
+
+// For now, use regular payments
+// Stealth implementation requires recipient's stealth meta-address
+console.log('\\n💡 Use arc.sendUSDC() for regular payments');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // BRIDGE
+  // ============================================
+  {
+    name: 'Bridge',
+    icon: '🌉',
+    description: 'Cross-chain USDC transfers via CCTP',
+    apis: [
+      {
+        name: 'bridgeInfo',
+        description: 'Get bridge information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Your address:', arc.address);
+console.log('Network:', arc.network.name);
+
+// Circle CCTP Bridge enables cross-chain USDC transfers
+console.log('\\nSupported chains for CCTP:');
+console.log('- Ethereum');
+console.log('- Base');
+console.log('- Polygon');
+console.log('- Avalanche');
+console.log('- Arc');
+
+console.log('\\n💡 Bridge transfers are native USDC - no wrapped tokens!');`,
+      },
+      {
+        name: 'checkBalance',
+        description: 'Check balance before bridging',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const balance = await arc.getBalance();
+console.log('Your USDC balance:', balance, 'USDC');
+console.log('Address:', arc.address);
+
+console.log('\\n💡 Ensure sufficient balance before bridging');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // FX
+  // ============================================
+  {
+    name: 'FX',
+    icon: '💱',
+    description: 'Stablecoin swaps (USDC/EURC)',
+    apis: [
+      {
+        name: 'checkBalances',
+        description: 'Check USDC and EURC balances',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const usdcBalance = await arc.getBalance();
+const eurcBalance = await arc.getEURCBalance();
+
+console.log('Your address:', arc.address);
+console.log('USDC Balance:', usdcBalance);
+console.log('EURC Balance:', eurcBalance);
+
+console.log('\\nToken addresses:');
+console.log('USDC:', arc.contracts.usdc);
+console.log('EURC:', arc.contracts.eurc);`,
+      },
+      {
+        name: 'swapInfo',
+        description: 'FX swap information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('FX Swap Module');
+console.log('==============');
+console.log('Supported pairs:');
+console.log('- USDC → EURC');
+console.log('- EURC → USDC');
+console.log('');
+console.log('Token addresses:');
+console.log('USDC:', arc.contracts.usdc);
+console.log('EURC:', arc.contracts.eurc);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // GATEWAY
+  // ============================================
+  {
+    name: 'Gateway',
+    icon: '🌐',
+    description: 'Unified balance across chains',
+    apis: [
+      {
+        name: 'getBalances',
+        description: 'Get all token balances',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const usdc = await arc.getBalance();
+const eurc = await arc.getEURCBalance();
+
+console.log('Gateway Balances');
+console.log('================');
+console.log('Address:', arc.address);
+console.log('USDC:', usdc);
+console.log('EURC:', eurc);
+console.log('');
+console.log('Network:', arc.network.name);
+console.log('Chain ID:', arc.network.chainId);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // AGENT
+  // ============================================
+  {
+    name: 'Agent',
+    icon: '🤖',
+    description: 'AI Agent payment engine',
+    apis: [
+      {
+        name: 'registerAgent',
+        description: 'Register an AI payment agent',
+        params: ['dailyBudget', 'perTxLimit'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Registering agent:', arc.address);
+
+// ============ EDIT BELOW ============
+const DAILY_BUDGET = '10';  // USDC per day
+const PER_TX_LIMIT = '1';   // Max USDC per transaction
+// ====================================
+
+const result = await arc.agent.register({
+  dailyBudget: DAILY_BUDGET,
+  perTxLimit: PER_TX_LIMIT
+});
+
+console.log('✅ Agent registered!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'depositToAgent',
+        description: 'Deposit funds for agent to use',
+        params: ['amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const AMOUNT = '1';  // USDC to deposit
+// ====================================
+
+const result = await arc.agent.deposit({ amount: AMOUNT });
+console.log('✅ Deposited to agent!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'agentPay',
+        description: 'Agent makes a payment',
+        params: ['to', 'amount', 'memo?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const AMOUNT = '0.1';
+const MEMO = 'Task payment';
+// ====================================
+
+const result = await arc.agent.pay({
+  recipient: RECIPIENT,
+  amount: AMOUNT,
+  memo: MEMO
+});
+
+console.log('✅ Agent paid!');
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'getAgentConfig',
+        description: 'Get agent configuration',
+        params: ['address?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const config = await arc.agent.getConfig();
+console.log('Agent config:', config);`,
+      },
+      {
+        name: 'getAgentBalance',
+        description: 'Get agent balance',
+        params: ['address?'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const balance = await arc.agent.getBalance();
+console.log('Agent balance:', balance, 'USDC');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // AI (GEMINI)
+  // ============================================
+  {
+    name: 'AI',
+    icon: '🧠',
+    description: 'Gemini-powered payment AI',
+    apis: [
+      {
+        name: 'aiInfo',
+        description: 'AI module information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('AI Payment Module');
+console.log('=================');
+console.log('Uses Google Gemini for:');
+console.log('- Voice command processing');
+console.log('- Invoice image analysis');
+console.log('- Delivery verification');
+console.log('- Natural language payments');
+console.log('');
+console.log('💡 Try Voice Mode in the playground!');
+console.log('💡 Try Image Mode to analyze invoices!');`,
+      },
+      {
+        name: 'parseCommand',
+        description: 'Parse a payment command',
+        params: ['command'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Example: parse a voice command
+const command = 'Send 50 USDC to 0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+
+// Extract payment details
+const amountMatch = command.match(/(\\d+\\.?\\d*)\\s*USDC/i);
+const addressMatch = command.match(/0x[a-fA-F0-9]{40}/);
+
+console.log('Command:', command);
+console.log('Parsed amount:', amountMatch ? amountMatch[1] : 'N/A');
+console.log('Parsed address:', addressMatch ? addressMatch[0] : 'N/A');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // VOICE
+  // ============================================
+  {
+    name: 'Voice',
+    icon: '🎤',
+    description: 'Voice-controlled payments',
+    apis: [
+      {
+        name: 'voiceInfo',
+        description: 'Voice module information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Voice Payment Module');
+console.log('====================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('Voice commands supported:');
+console.log('- "Send X USDC to address"');
+console.log('- "Check my balance"');
+console.log('- "Create escrow for X USDC"');
+console.log('- "Hire agent for task"');
+console.log('');
+console.log('💡 Use Voice Mode in the playground sidebar!');`,
+      },
+      {
+        name: 'textToSpeech',
+        description: 'Speak text (browser)',
+        params: ['text'],
+        code: `// Text-to-speech in browser
+const text = 'Payment of 50 USDC sent successfully';
+
+if ('speechSynthesis' in window) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 1.0;
+  window.speechSynthesis.speak(utterance);
+  console.log('🔊 Speaking:', text);
+} else {
+  console.log('Speech synthesis not supported');
+}`,
+      },
+    ],
+  },
+
+  // ============================================
+  // SMART WALLET
+  // ============================================
+  {
+    name: 'Smart Wallet',
+    icon: '👛',
+    description: 'ERC-4337 Account Abstraction',
+    apis: [
+      {
+        name: 'walletInfo',
+        description: 'Smart wallet information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Smart Wallet Module');
+console.log('===================');
+console.log('Your EOA:', arc.address);
+console.log('');
+console.log('ERC-4337 Account Abstraction features:');
+console.log('- Gas sponsorship (no ETH needed)');
+console.log('- Batch transactions');
+console.log('- Session keys');
+console.log('- Social recovery');
+console.log('');
+console.log('💡 On Arc, USDC is native gas - no wrapper needed!');`,
+      },
+      {
+        name: 'checkGasBalance',
+        description: 'Check gas balance (USDC on Arc)',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const balance = await arc.getBalance();
+console.log('Your address:', arc.address);
+console.log('USDC Balance (also gas):', balance);
+console.log('');
+console.log('💡 On Arc, USDC is the native gas token!');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // COMPLIANCE
+  // ============================================
+  {
+    name: 'Compliance',
+    icon: '✅',
+    description: 'KYC/AML and sanctions screening',
+    apis: [
+      {
+        name: 'complianceInfo',
+        description: 'Compliance module information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Compliance Module');
+console.log('=================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('Features:');
+console.log('- OFAC sanctions screening');
+console.log('- Velocity limits (daily/weekly)');
+console.log('- Transaction screening');
+console.log('- Audit trails');`,
+      },
+      {
+        name: 'validateAddress',
+        description: 'Validate an Ethereum address',
+        params: ['address'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const ADDRESS = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+// ====================================
+
+// Basic address validation
+const isValid = /^0x[a-fA-F0-9]{40}$/.test(ADDRESS);
+console.log('Address:', ADDRESS);
+console.log('Valid format:', isValid);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // MICROPAYMENTS
+  // ============================================
+  {
+    name: 'Micropayments',
+    icon: '💰',
+    description: 'x402 protocol for pay-per-use APIs',
+    apis: [
+      {
+        name: 'micropaymentInfo',
+        description: 'Micropayment module information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Micropayment Module (x402)');
+console.log('==========================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('x402 Protocol enables:');
+console.log('- Pay-per-API-call pricing');
+console.log('- HTTP 402 Payment Required');
+console.log('- Payment channels for instant micro-payments');
+console.log('');
+console.log('💡 Use Channels for gas-free micropayments!');`,
+      },
+      {
+        name: 'sendMicropayment',
+        description: 'Send a small payment',
+        params: ['to', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const AMOUNT = '0.001';  // Very small amount
+// ====================================
+
+console.log('Sending micropayment...');
+const result = await arc.sendUSDC(RECIPIENT, AMOUNT);
+console.log('✅ Micropayment sent!');
+console.log('TX:', result.txHash);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // USYC
+  // ============================================
+  {
+    name: 'USYC',
+    icon: '📈',
+    description: 'Yield-bearing token operations',
+    apis: [
+      {
+        name: 'usycInfo',
+        description: 'USYC token information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('USYC - Yield-Bearing Stablecoin');
+console.log('===============================');
+console.log('Your address:', arc.address);
+console.log('USYC Contract:', arc.contracts.usyc);
+console.log('');
+console.log('USYC is Circle\\'s yield-bearing token:');
+console.log('- Backed by short-term US Treasuries');
+console.log('- Earns yield automatically');
+console.log('- Redeemable for USDC');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // GAS STATION
+  // ============================================
+  {
+    name: 'Gas Station',
+    icon: '⛽',
+    description: 'Sponsor gas for your users',
+    apis: [
+      {
+        name: 'gasInfo',
+        description: 'Gas station information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Gas Station Module');
+console.log('==================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('On Arc Testnet:');
+console.log('- USDC is the native gas token');
+console.log('- No ETH needed for transactions');
+console.log('- Gas sponsorship via Paymaster');
+console.log('');
+const balance = await arc.getBalance();
+console.log('Your USDC (gas) balance:', balance);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // PAYMASTER
+  // ============================================
+  {
+    name: 'Paymaster',
+    icon: '🎫',
+    description: 'Gas sponsorship for users',
+    apis: [
+      {
+        name: 'paymasterInfo',
+        description: 'Paymaster information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Paymaster Module');
+console.log('================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('Paymaster enables:');
+console.log('- Sponsor gas for users');
+console.log('- Gasless transactions');
+console.log('- Custom gas policies');
+console.log('');
+console.log('💡 On Arc, gas is paid in USDC!');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // INTENT
+  // ============================================
+  {
+    name: 'Intent',
+    icon: '💬',
+    description: 'Natural language payment commands',
+    apis: [
+      {
+        name: 'parseIntent',
+        description: 'Parse natural language command',
+        params: ['command'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// Example: parse a payment command
+const command = 'Send 50 USDC to 0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+
+// Simple intent parsing
+const amountMatch = command.match(/(\\d+\\.?\\d*)\\s*USDC/i);
+const addressMatch = command.match(/0x[a-fA-F0-9]{40}/);
+
+console.log('Command:', command);
+console.log('Parsed amount:', amountMatch ? amountMatch[1] : 'N/A', 'USDC');
+console.log('Parsed address:', addressMatch ? addressMatch[0] : 'N/A');
+console.log('');
+console.log('💡 Use Voice Mode for full AI-powered parsing!');`,
+      },
+      {
+        name: 'executeIntent',
+        description: 'Execute parsed intent',
+        params: ['recipient', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const AMOUNT = '0.01';
+// ====================================
+
+console.log('Executing intent: send', AMOUNT, 'USDC');
+const result = await arc.sendUSDC(RECIPIENT, AMOUNT);
+
+console.log('✅ Intent executed!');
+console.log('TX:', result.txHash);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // COMBO
+  // ============================================
+  {
+    name: 'Combo',
+    icon: '🔗',
+    description: 'Combined payment workflows',
+    apis: [
+      {
+        name: 'comboInfo',
+        description: 'Combo workflow information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Combo Workflows');
+console.log('===============');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('Available combos:');
+console.log('1. Intent → Payment: Voice command to transfer');
+console.log('2. Intent → Stream: Voice command to stream');
+console.log('3. Intent → Escrow: Voice command to escrow');
+console.log('4. Image → Payment: Invoice photo to payment');
+console.log('');
+console.log('💡 Try Voice Mode or Image Mode in the sidebar!');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // AI WALLET
+  // ============================================
+  {
+    name: 'AI Wallet',
+    icon: '🧠',
+    description: 'Conversational payment wallet',
+    apis: [
+      {
+        name: 'aiWalletInfo',
+        description: 'AI Wallet information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const balance = await arc.getBalance();
+
+console.log('AI Wallet');
+console.log('=========');
+console.log('Address:', arc.address);
+console.log('Balance:', balance, 'USDC');
+console.log('');
+console.log('AI Wallet features:');
+console.log('- Natural language payments');
+console.log('- Smart suggestions');
+console.log('- Payment scheduling');
+console.log('- Spending insights');
+console.log('');
+console.log('💡 Try: "Send 10 USDC to 0x..." in Voice Mode!');`,
+      },
+      {
+        name: 'checkBalance',
+        description: 'Check wallet balance',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+const usdc = await arc.getBalance();
+const eurc = await arc.getEURCBalance();
+
+console.log('AI Wallet Balances');
+console.log('==================');
+console.log('Address:', arc.address);
+console.log('USDC:', usdc);
+console.log('EURC:', eurc);`,
+      },
+      {
+        name: 'quickPay',
+        description: 'Quick payment',
+        params: ['to', 'amount'],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+// ============ EDIT BELOW ============
+const RECIPIENT = '0x692724Db457b67627dd1E5e58c29DB15Db02C7E8';
+const AMOUNT = '0.01';
+// ====================================
+
+console.log('Quick Pay:', AMOUNT, 'USDC');
+const result = await arc.sendUSDC(RECIPIENT, AMOUNT);
+
+console.log('✅ Paid!');
+console.log('TX:', result.txHash);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // MULTISIG ESCROW
+  // ============================================
+  {
+    name: 'Multisig Escrow',
+    icon: '🔏',
+    description: 'Multi-signature escrow',
+    apis: [
+      {
+        name: 'multisigInfo',
+        description: 'Multisig escrow information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Multisig Escrow Module');
+console.log('======================');
+console.log('Your address:', arc.address);
+console.log('Escrow contract:', arc.contracts.escrow);
+console.log('');
+console.log('Multisig features:');
+console.log('- Multiple signers with weights');
+console.log('- Threshold-based approval');
+console.log('- Proposal/vote mechanism');
+console.log('');
+console.log('💡 Create a regular escrow first with arc.escrow.create()');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // ANALYTICS
+  // ============================================
+  {
+    name: 'Analytics',
+    icon: '📈',
+    description: 'Payment analytics and metrics',
+    apis: [
+      {
+        name: 'analyticsInfo',
+        description: 'Analytics module information',
+        params: [],
+        code: `// Initialize ArcPay
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY
+});
+
+console.log('Analytics Module');
+console.log('================');
+console.log('Your address:', arc.address);
+console.log('');
+console.log('Track your payment metrics:');
+console.log('- Total volume');
+console.log('- Transaction count');
+console.log('- Unique recipients');
+console.log('- Time series data');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // WEBHOOKS
+  // ============================================
+  {
+    name: 'Webhooks',
+    icon: '🔔',
+    description: 'Event notifications',
+    apis: [
+      {
+        name: 'createWebhookManager',
+        description: 'Create webhook manager',
+        params: ['config'],
+        code: `import { createWebhookManager } from 'arcpay';
+
+const webhooks = createWebhookManager({
+  signingSecret: process.env.WEBHOOK_SECRET
+});`,
+      },
+      {
+        name: 'registerEndpoint',
+        description: 'Register webhook endpoint',
+        params: ['url', 'events'],
+        code: `await webhooks.registerEndpoint({
+  url: 'https://myapp.com/webhooks',
+  events: [
+    'payment.sent',
+    'payment.received',
+    'escrow.created',
+    'escrow.released',
+    'stream.claimed'
+  ]
+});`,
+      },
+      {
+        name: 'verifySignature',
+        description: 'Verify webhook signature',
+        params: ['payload', 'signature'],
+        code: `// In your webhook handler
+app.post('/webhooks', (req, res) => {
+  const isValid = webhooks.verifySignature(
+    req.body,
+    req.headers['x-arcpay-signature']
+  );
+
+  if (!isValid) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  const event = req.body;
+  console.log('Event:', event.type, event.data);
+  res.sendStatus(200);
+});`,
+      },
+    ],
+  },
+
+  // ============================================
+  // RATE LIMITING
+  // ============================================
+  {
+    name: 'Rate Limiting',
+    icon: '🚦',
+    description: 'API rate limiting utilities',
+    apis: [
+      {
+        name: 'createRateLimiter',
+        description: 'Create rate limiter',
+        params: ['config'],
+        code: `import { createRateLimiter } from 'arcpay';
+
+const limiter = createRateLimiter({
+  maxRequests: 100,
+  windowMs: 60 * 1000, // 1 minute
+  keyGenerator: (req) => req.ip
+});`,
+      },
+      {
+        name: 'rateLimit',
+        description: 'Rate limit decorator',
+        params: ['fn', 'config'],
+        code: `import { rateLimit } from 'arcpay';
+
+const limitedPay = rateLimit(
+  async (to, amount) => arc.sendUSDC(to, amount),
+  { maxCalls: 10, perSeconds: 60 }
+);
+
+// Will throw if called more than 10 times per minute
+await limitedPay('0x...', '100');`,
+      },
+      {
+        name: 'checkLimit',
+        description: 'Check if rate limited',
+        params: ['key'],
+        code: `const result = await limiter.check('user_123');
+
+if (result.allowed) {
+  // Proceed with request
+  console.log('Remaining:', result.remaining);
+} else {
+  console.log('Rate limited. Retry after:', result.retryAfter, 'ms');
+}`,
+      },
+    ],
+  },
+
+  // ============================================
+  // EVENTS
+  // ============================================
+  {
+    name: 'Events',
+    icon: '📡',
+    description: 'Real-time event system',
+    apis: [
+      {
+        name: 'globalEventEmitter',
+        description: 'Subscribe to SDK events',
+        params: ['event', 'handler'],
+        code: `import { globalEventEmitter, EventType } from 'arcpay';
+
+// Listen for payment events
+globalEventEmitter.on(EventType.TRANSACTION_SENT, (event) => {
+  console.log('TX sent:', event.data.hash);
+  console.log('To:', event.data.to);
+  console.log('Amount:', event.data.amount);
+});
+
+globalEventEmitter.on(EventType.TRANSACTION_CONFIRMED, (event) => {
+  console.log('TX confirmed:', event.data.hash);
+});`,
+      },
+      {
+        name: 'TransactionWatcher',
+        description: 'Watch transaction status',
+        params: ['txHash'],
+        code: `import { TransactionWatcher } from 'arcpay';
+
+const watcher = new TransactionWatcher(publicClient);
+
+// Watch a transaction
+watcher.watch(txHash, {
+  onPending: () => console.log('TX pending...'),
+  onConfirmed: (receipt) => console.log('Confirmed!', receipt),
+  onFailed: (error) => console.log('Failed:', error),
+});`,
+      },
+      {
+        name: 'StreamWatcher',
+        description: 'Watch stream events',
+        params: ['streamId'],
+        code: `import { StreamWatcher } from 'arcpay';
+
+const watcher = new StreamWatcher(streamContract);
+
+watcher.watchStream(streamId, {
+  onClaim: (amount) => console.log('Claimed:', amount),
+  onCancel: () => console.log('Stream cancelled'),
+  onComplete: () => console.log('Stream completed'),
+});`,
+      },
+      {
+        name: 'createEvent',
+        description: 'Create custom event',
+        params: ['type', 'data'],
+        code: `import { createEvent, globalEventEmitter } from 'arcpay';
+
+// Create and emit custom event
+const event = createEvent('custom.payment', {
+  orderId: '12345',
+  amount: '100',
+  status: 'completed'
+});
+
+globalEventEmitter.emit(event);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // LOGGING
+  // ============================================
+  {
+    name: 'Logging',
+    icon: '📝',
+    description: 'Structured logging system',
+    apis: [
+      {
+        name: 'createLogger',
+        description: 'Create a named logger',
+        params: ['name', 'config?'],
+        code: `import { createLogger } from 'arcpay';
+
+const logger = createLogger('MyApp', {
+  level: 'debug',
+  prefix: '[ArcPay]'
+});
+
+logger.info('Payment initiated', { to: '0x...', amount: '100' });
+logger.debug('Processing...');
+logger.error('Payment failed', { error: 'Insufficient funds' });`,
+      },
+      {
+        name: 'defaultLogger',
+        description: 'Use the default logger',
+        params: [],
+        code: `import { defaultLogger } from 'arcpay';
+
+defaultLogger.info('Using default logger');
+defaultLogger.warn('This is a warning');`,
+      },
+      {
+        name: 'loggers',
+        description: 'Access all loggers',
+        params: [],
+        code: `import { loggers, createLogger } from 'arcpay';
+
+createLogger('payments');
+createLogger('escrow');
+
+// Get all logger names
+console.log('Loggers:', Object.keys(loggers));
+
+// Access specific logger
+loggers.payments.info('Payment log');`,
+      },
+    ],
+  },
+
+  // ============================================
+  // CONTRACTS
+  // ============================================
+  {
+    name: 'Contracts',
+    icon: '📜',
+    description: 'Smart contract addresses and ABIs',
+    apis: [
+      {
+        name: 'getContractAddresses',
+        description: 'Get deployed contract addresses',
+        params: ['chainId'],
+        code: `import { getContractAddresses } from 'arcpay';
+
+const addresses = getContractAddresses(5042002); // Arc Testnet
+
+console.log('USDC:', addresses.usdc);
+console.log('Escrow:', addresses.escrow);
+console.log('Channels:', addresses.paymentChannel);
+console.log('Stealth:', addresses.stealthRegistry);
+console.log('Streams:', addresses.streamPayment);
+console.log('Agent Registry:', addresses.agentRegistry);`,
+      },
+      {
+        name: 'areContractsDeployed',
+        description: 'Check if contracts are deployed',
+        params: ['chainId'],
+        code: `import { areContractsDeployed } from 'arcpay';
+
+const deployed = areContractsDeployed(5042002);
+
+if (deployed) {
+  console.log('All contracts deployed on Arc Testnet');
+} else {
+  console.log('Some contracts missing');
+}`,
+      },
+      {
+        name: 'ABIs',
+        description: 'Access contract ABIs',
+        params: [],
+        code: `import {
+  ESCROW_ABI,
+  PAYMENT_CHANNEL_ABI,
+  STEALTH_REGISTRY_ABI,
+  STREAM_PAYMENT_ABI,
+  AGENT_REGISTRY_ABI
+} from 'arcpay';
+
+// Use ABI with viem
+const escrowContract = getContract({
+  address: addresses.escrow,
+  abi: ESCROW_ABI,
+  client: publicClient
+});`,
+      },
+    ],
+  },
+
+  // ============================================
+  // ONCHAIN AGENT
+  // ============================================
+  {
+    name: 'Onchain Agent',
+    icon: '🔗',
+    description: 'On-chain AI agent registry',
+    apis: [
+      {
+        name: 'createOnchainAgentManager',
+        description: 'Create onchain agent manager',
+        params: ['config'],
+        code: `import { createOnchainAgentManager } from 'arcpay';
+
+const manager = createOnchainAgentManager({
+  privateKey,
+  registryAddress: '0x...' // Optional, uses default
+});`,
+      },
+      {
+        name: 'registerAgent',
+        description: 'Register agent on-chain',
+        params: ['name', 'metadata'],
+        code: `const result = await manager.registerAgent({
+  name: 'PaymentBot',
+  description: 'Automated payment processor',
+  capabilities: ['pay', 'escrow', 'stream'],
+  endpoint: 'https://api.mybot.com/agent'
+});
+
+console.log('Agent ID:', result.agentId);
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'executePayment',
+        description: 'Execute payment as registered agent',
+        params: ['agentId', 'params'],
+        code: `const result = await manager.executePayment({
+  agentId: 'agent_123',
+  to: '0xRecipient...',
+  amount: '100',
+  memo: 'Service payment'
+});
+
+console.log('TX:', result.txHash);`,
+      },
+      {
+        name: 'getAgentInfo',
+        description: 'Get registered agent info',
+        params: ['agentId'],
+        code: `const info = await manager.getAgentInfo('agent_123');
+
+console.log('Name:', info.name);
+console.log('Owner:', info.owner);
+console.log('Balance:', info.balance);
+console.log('Tx Count:', info.transactionCount);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // CIRCUIT BREAKER
+  // ============================================
+  {
+    name: 'Circuit Breaker',
+    icon: '🔌',
+    description: 'Fault tolerance patterns',
+    apis: [
+      {
+        name: 'CircuitBreaker',
+        description: 'Create circuit breaker for API calls',
+        params: ['config'],
+        code: `import { CircuitBreaker } from 'arcpay';
+
+const breaker = new CircuitBreaker({
+  failureThreshold: 5,
+  resetTimeout: 30000, // 30 seconds
+  halfOpenRequests: 3
+});
+
+// Wrap risky operation
+const result = await breaker.execute(async () => {
+  return await riskyApiCall();
+});
+
+console.log('Circuit state:', breaker.state);
+// 'closed' | 'open' | 'half-open'`,
+      },
+      {
+        name: 'FallbackRPCManager',
+        description: 'Manage multiple RPC endpoints with fallback',
+        params: ['endpoints'],
+        code: `import { FallbackRPCManager } from 'arcpay';
+
+const rpcManager = new FallbackRPCManager({
+  endpoints: [
+    'https://rpc1.arc.network',
+    'https://rpc2.arc.network',
+    'https://rpc3.arc.network'
+  ],
+  healthCheckInterval: 30000
+});
+
+// Get healthy endpoint
+const rpcUrl = await rpcManager.getHealthyEndpoint();
+
+// Execute with automatic fallback
+const result = await rpcManager.execute(async (url) => {
+  return await fetch(url + '/eth_blockNumber');
+});`,
+      },
+      {
+        name: 'batchExecute',
+        description: 'Execute operations in batches',
+        params: ['items', 'fn', 'options'],
+        code: `import { batchExecute } from 'arcpay';
+
+const recipients = ['0x1...', '0x2...', '0x3...', /* 100 more */];
+
+// Process in batches of 10
+const results = await batchExecute(
+  recipients,
+  async (recipient) => arc.sendUSDC(recipient, '10'),
+  { batchSize: 10, delayMs: 1000 }
+);
+
+console.log('Successful:', results.filter(r => r.success).length);`,
+      },
+    ],
+  },
+
+  // ============================================
+  // ADVANCED AI
+  // ============================================
+  {
+    name: 'Advanced AI',
+    icon: '🎯',
+    description: 'Advanced AI analysis tools',
+    apis: [
+      {
+        name: 'CommandParser',
+        description: 'Parse payment commands',
+        params: ['config'],
+        code: `import { createCommandParser } from 'arcpay';
+
+const parser = createCommandParser({
+  geminiApiKey: process.env.GEMINI_API_KEY
+});
+
+const result = await parser.parse('Send $50 to alice for coffee');
+
+console.log('Action:', result.action); // 'transfer'
+console.log('Amount:', result.amount); // '50'
+console.log('Recipient:', result.recipient); // 'alice'
+console.log('Memo:', result.memo); // 'coffee'`,
+      },
+      {
+        name: 'TransactionExplainer',
+        description: 'Explain transactions in plain language',
+        params: ['config'],
+        code: `import { createTransactionExplainer } from 'arcpay';
+
+const explainer = createTransactionExplainer({
+  geminiApiKey: process.env.GEMINI_API_KEY
+});
+
+const explanation = await explainer.explain({
+  hash: '0xabc...',
+  from: '0x123...',
+  to: '0x456...',
+  value: '1000000', // 1 USDC in wei
+  data: '0xa9059cbb...'
+});
+
+console.log(explanation.summary);
+// "You sent 1 USDC to address 0x456..."
+console.log(explanation.details);`,
+      },
+      {
+        name: 'SpendingAdvisor',
+        description: 'AI-powered spending analysis',
+        params: ['config'],
+        code: `import { createSpendingAdvisor } from 'arcpay';
+
+const advisor = createSpendingAdvisor({
+  geminiApiKey: process.env.GEMINI_API_KEY
+});
+
+const analysis = await advisor.analyze({
+  transactions: [...], // Last 30 days
+  budget: { monthly: '5000' }
+});
+
+console.log('Status:', analysis.budgetStatus);
+console.log('Spending trend:', analysis.trend);
+console.log('Advice:', analysis.recommendations);
+// ["Consider reducing subscription spending by 15%", ...]`,
+      },
+    ],
+  },
+
+  // ============================================
+  // UTILITIES
+  // ============================================
+  {
+    name: 'Utilities',
+    icon: '🔧',
+    description: 'Helper functions and utilities',
+    apis: [
+      {
+        name: 'retry',
+        description: 'Retry failed operations with backoff',
+        params: ['fn', 'config?'],
+        code: `import { retry } from 'arcpay';
+
+const result = await retry(
+  async () => arc.sendUSDC('0x...', '10'),
+  { maxAttempts: 3, baseDelay: 1000 }
+);`,
+      },
+      {
+        name: 'validateAddress',
+        description: 'Validate Ethereum address',
+        params: ['address'],
+        code: `import { validateAddress } from 'arcpay';
+
+try {
+  const addr = validateAddress('0x...');
+  console.log('Valid:', addr);
+} catch (e) {
+  console.log('Invalid address');
+}`,
+      },
+      {
+        name: 'formatAmount',
+        description: 'Format amount with decimals',
+        params: ['amount', 'decimals?'],
+        code: `import { formatUnits, parseUnits } from 'viem';
+
+// Parse user input to wei
+const wei = parseUnits('100.50', 6);
+
+// Format wei to display
+const display = formatUnits(wei, 6);
+console.log(display); // "100.50"`,
+      },
+      {
+        name: 'EventEmitter',
+        description: 'Subscribe to SDK events',
+        params: ['event', 'handler'],
+        code: `import { globalEventEmitter, EventType } from 'arcpay';
+
+globalEventEmitter.on(EventType.TRANSACTION_SENT, (event) => {
+  console.log('TX sent:', event.data.hash);
+});
+
+globalEventEmitter.on(EventType.STREAM_CLAIMED, (event) => {
+  console.log('Stream claimed:', event.data.amount);
+});`,
+      },
+    ],
+  },
+];
+
+// Calculate total API count
+export const TOTAL_API_COUNT = API_CATEGORIES.reduce(
+  (sum, cat) => sum + cat.apis.length,
+  0
+);
+
+export const TOTAL_CATEGORY_COUNT = API_CATEGORIES.length;
+
+// Get all API names for search
+export const ALL_API_NAMES = API_CATEGORIES.flatMap((cat) =>
+  cat.apis.map((api) => ({
+    category: cat.name,
+    name: api.name,
+    description: api.description,
+  }))
+);

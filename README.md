@@ -1,0 +1,714 @@
+# ArcPay SDK
+
+> **The Complete TypeScript SDK for Autonomous Commerce on Arc Blockchain**
+
+[![npm version](https://badge.fury.io/js/arcpay.svg)](https://www.npmjs.com/package/arcpay)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+
+ArcPay is a powerful SDK designed for building **autonomous commerce experiences** on the Arc blockchain. Whether you're integrating simple payments, building AI agents that handle transactions, or creating complex streaming payment systems, ArcPay provides all the tools you need.
+
+---
+
+## Why ArcPay?
+
+| Feature | Description |
+|---------|-------------|
+| **AI-First Design** | Purpose-built SDK for AI agents and autonomous systems |
+| **One-liner API** | Simple functions for common operations - `pay()`, `escrow()`, `stream()` |
+| **Real Smart Contracts** | 4 contracts deployed and verified on Arc Testnet |
+| **Privacy Built-in** | Stealth address support (EIP-5564) for private payments |
+| **Full Featured** | Escrow, streaming, payment channels, micropayments, and more |
+
+---
+
+## Quick Start
+
+```bash
+npm install arcpay
+```
+
+### One-liner Payments (Simplest Way)
+
+```typescript
+import { configure, pay, balance, escrow, stream } from 'arcpay';
+
+// Configure once
+configure({ privateKey: process.env.PRIVATE_KEY });
+
+// Simple payment
+await pay('0x...recipient', '100');
+
+// Check balance
+const { usdc, address } = await balance();
+console.log(`Balance: ${usdc} USDC at ${address}`);
+
+// Create escrow for freelance work
+const { escrowId } = await escrow('0x...freelancer', '500', {
+  release: 'on-approval',
+  deadline: '7d'
+});
+
+// Stream salary payments
+await stream('0x...employee', '5000', '30d');
+
+// Private payment (stealth address)
+await pay('0x...recipient', '100', { private: true });
+```
+
+### Full Client Usage
+
+```typescript
+import { ArcPay } from 'arcpay';
+
+// Initialize
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY,
+});
+
+// Send USDC
+await arc.sendUSDC('0x...', '100.00');
+
+// Get balance
+const balance = await arc.getBalance();
+console.log(`Balance: ${balance} USDC`);
+```
+
+---
+
+## Features Overview
+
+### Core Modules
+
+| Module | Description |
+|--------|-------------|
+| **Simple API** | One-liner functions for payments, escrow, streaming |
+| **AI Agent SDK** | Purpose-built for autonomous AI commerce |
+| **Escrow** | Multi-party conditional payments with disputes |
+| **Streaming** | Real-time per-second salary/subscription payments |
+| **Payment Channels** | Instant off-chain micropayments |
+| **Privacy** | Stealth address payments (EIP-5564) |
+| **Micropayments** | x402 protocol for pay-per-use APIs |
+| **Paymaster** | Gas sponsorship for users |
+| **Bridge** | Cross-chain USDC via Circle CCTP |
+| **Gateway** | Unified balance across chains |
+| **FX** | Stablecoin swaps (USDC <-> EURC) |
+| **USYC** | Yield-bearing USDC operations |
+
+---
+
+## AI Agent SDK
+
+Build **autonomous AI agents** that handle payments without human intervention. Perfect for trading bots, AI assistants, and machine-to-machine payments.
+
+```typescript
+import { createAgent } from 'arcpay';
+
+// Create an AI agent with budget controls
+const agent = createAgent({
+  privateKey: process.env.AGENT_PRIVATE_KEY,
+  name: 'trading-bot',
+  budget: {
+    daily: '1000',        // Max daily spending
+    perTransaction: '100', // Max per transaction
+    hourly: '200'          // Max hourly spending
+  },
+  autoApprove: true,
+  verbose: true
+});
+
+// Agent pays for API calls automatically
+await agent.payForService('openai', '0.05');
+
+// Agent hires a freelancer with escrow protection
+const task = await agent.createTask({
+  description: 'Write a blog post about AI',
+  payment: '50',
+  worker: '0x...freelancer',
+  deadline: '48h'
+});
+
+// Agent approves and releases payment when work is done
+await agent.approveTask(task.id);
+
+// Agent starts streaming salary to an employee
+await agent.startStream({
+  recipient: '0x...employee',
+  amount: '5000',
+  duration: '30d'
+});
+
+// Open payment channel for high-frequency micropayments
+await agent.openChannel('api-provider', '0x...', '10');
+await agent.channelPay('api-provider', '0.001');
+await agent.channelPay('api-provider', '0.002');
+
+// Get spending report
+const report = agent.getSpendingReport();
+console.log(`Total spent today: ${report.totalSpent} USDC`);
+console.log(`Remaining budget: ${report.remainingBudget.daily} USDC`);
+```
+
+---
+
+## Gemini AI Integration
+
+ArcPay integrates **Gemini 3.0 Flash** for intelligent payment processing. Use natural language commands, analyze invoices from images, and enable voice-controlled payments.
+
+### Function Calling
+
+Gemini directly calls ArcPay payment functions based on natural language:
+
+```typescript
+import { createAIAgent } from 'arcpay';
+
+// Create AI-powered agent with Gemini
+const aiAgent = createAIAgent({
+  privateKey: process.env.PRIVATE_KEY,
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  confirmBeforeExecute: true,
+  confirmThreshold: '100' // Confirm payments over 100 USDC
+});
+
+// Natural language payment commands
+await aiAgent.processCommand("Send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78");
+await aiAgent.processCommand("Create an escrow for 500 USDC to alice.eth for website development");
+await aiAgent.processCommand("Start streaming 5000 USDC to 0x... over 30 days");
+await aiAgent.processCommand("What's my current balance?");
+await aiAgent.processCommand("Show me my spending report for today");
+```
+
+### Multimodal - Invoice & Receipt Analysis
+
+Analyze images of invoices, receipts, and delivery proofs:
+
+```typescript
+import { createMultimodalAnalyzer, createAIAgent } from 'arcpay';
+
+const aiAgent = createAIAgent({
+  privateKey: process.env.PRIVATE_KEY,
+  geminiApiKey: process.env.GEMINI_API_KEY,
+});
+
+// Analyze and pay invoice from image
+const result = await aiAgent.analyzeAndPayInvoice(
+  invoiceImageBase64,
+  false // Set to true for auto-pay
+);
+
+console.log(`Invoice detected: ${result.data.analysis.amount} USDC`);
+console.log(`Recipient: ${result.data.analysis.recipientName}`);
+console.log(`Confidence: ${result.data.analysis.confidence * 100}%`);
+
+// If confirmation needed
+if (result.needsConfirmation) {
+  console.log(result.confirmationPrompt);
+  // User confirms...
+  await aiAgent.confirmExecution();
+}
+
+// Verify delivery and release escrow
+const deliveryResult = await aiAgent.analyzeDeliveryAndRelease(
+  deliveryProofImage,
+  escrowId,
+  "MacBook Pro 14-inch",
+  false // Set to true for auto-release
+);
+```
+
+---
+
+## Voice Commands
+
+Enable hands-free payments with voice recognition and speech synthesis:
+
+```typescript
+import { createVoiceAgent } from 'arcpay';
+
+// Create voice-enabled agent
+const voiceAgent = createVoiceAgent({
+  privateKey: process.env.PRIVATE_KEY,
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  voice: {
+    language: 'en-US',
+    speakResponses: true,
+    confirmLargePayments: true,
+    largePaymentThreshold: '100'
+  },
+  aliases: {
+    'alice': '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78',
+    'bob': '0x8ba1f109551bD432803012645Ac136ddd64DBA72'
+  }
+});
+
+// Execute voice command (listen -> AI -> execute -> speak)
+const result = await voiceAgent.executeVoiceCommand();
+// User says: "Send 25 USDC to Alice"
+// Agent responds: "Sent 25 USDC to Alice. Transaction confirmed."
+
+// Continuous listening mode
+voiceAgent.startContinuousListening(
+  (result) => console.log('Command result:', result),
+  (error) => console.error('Error:', error)
+);
+
+// Stop listening
+voiceAgent.stopContinuousListening();
+
+// Check voice availability
+if (voiceAgent.isVoiceAvailable()) {
+  console.log('Voice features are available');
+}
+```
+
+### React Components
+
+```tsx
+import { VoiceButton, ImagePayment, useVoiceAgent } from 'arcpay/react';
+
+function PaymentApp() {
+  const { processCommand, isVoiceAvailable } = useVoiceAgent({
+    privateKey: process.env.PRIVATE_KEY,
+    geminiApiKey: process.env.GEMINI_API_KEY,
+  });
+
+  return (
+    <div>
+      {/* Voice command button */}
+      <VoiceButton
+        processCommand={processCommand}
+        isVoiceAvailable={isVoiceAvailable}
+        showTranscript={true}
+        showStatus={true}
+        onResult={(result) => console.log('Payment:', result)}
+      />
+
+      {/* Image-based payment */}
+      <ImagePayment
+        processWithImage={processWithImage}
+        analyzeInvoice={analyzeInvoice}
+        confirmPayment={confirmPayment}
+        autoAnalyze={true}
+        showPreview={true}
+        allowCamera={true}
+      />
+    </div>
+  );
+}
+```
+
+---
+
+## Escrow System
+
+Secure multi-party payments with conditions and dispute resolution.
+
+```typescript
+import { createEscrowManager } from 'arcpay';
+
+const escrow = createEscrowManager({ privateKey });
+
+// Create escrow with conditions
+const { id } = await escrow.createEscrow({
+  depositor: '0x...buyer',
+  beneficiary: '0x...seller',
+  amount: '1000',
+  conditions: [{
+    type: 'approval',
+    params: { approver: '0x...buyer' },
+    isMet: false
+  }],
+  arbitrators: ['0x...arbiter'],
+  expiresAt: '2025-12-31',
+  description: 'Website development project'
+});
+
+// Fund the escrow
+await escrow.fundEscrow(id);
+
+// Release when conditions met
+await escrow.releaseEscrow(id);
+
+// Or refund if needed
+await escrow.refundEscrow(id);
+
+// Handle disputes
+await escrow.createDispute(id, 'Work not delivered as specified');
+await escrow.resolveDispute(id, 'release', 'Both parties agreed');
+```
+
+---
+
+## Payment Streaming
+
+Real-time continuous payments for salaries, subscriptions, and more.
+
+```typescript
+import { createStreamManager } from 'arcpay';
+
+const streams = createStreamManager({ privateKey });
+
+// Create a salary stream - $5000 over 30 days
+const stream = await streams.createStream({
+  recipient: '0x...employee',
+  totalAmount: '5000',
+  duration: 30 * 24 * 60 * 60, // 30 days in seconds
+});
+
+// Check claimable amount at any time
+const { claimable, progress } = await streams.getClaimable(stream.id);
+console.log(`Progress: ${progress.toFixed(2)}%`);
+console.log(`Claimable: ${claimable} USDC`);
+
+// Recipient claims their earnings (can be done anytime)
+const claim = await streams.claim(stream.id);
+console.log(`Claimed: ${claim.amountClaimed} USDC`);
+
+// Cancel stream (refunds remaining to sender)
+await streams.cancelStream(stream.id);
+```
+
+---
+
+## Payment Channels
+
+Off-chain micropayments with instant settlement. Perfect for API calls, gaming, and IoT.
+
+```typescript
+import { createPaymentChannelManager } from 'arcpay';
+
+const channels = createPaymentChannelManager({ privateKey });
+
+// Open a channel with $10 deposit
+const channel = await channels.createChannel({
+  recipient: '0x...api-provider',
+  deposit: '10'
+});
+
+// Make instant micropayments (NO GAS FEES!)
+await channels.pay(channel.id, '0.001');
+await channels.pay(channel.id, '0.002');
+await channels.pay(channel.id, '0.0015');
+// ... thousands of payments possible
+
+// Close and settle on-chain when done
+const settlement = await channels.closeChannel(channel.id);
+console.log(`Final settlement: ${settlement.txHash}`);
+```
+
+---
+
+## Privacy (Stealth Addresses)
+
+Private payments using EIP-5564 stealth addresses. Recipient addresses are hidden on-chain.
+
+```typescript
+import { createPrivacyModule, payPrivate, getStealthAddress } from 'arcpay';
+
+// Get your stealth meta-address (share this to receive private payments)
+const stealthAddress = await getStealthAddress();
+console.log('Share this address:', stealthAddress);
+
+// Send private payment
+await payPrivate('st:arc:0x...recipient', '100');
+
+// Using the full module
+const privacy = createPrivacyModule({ privateKey });
+
+// Scan for incoming private payments
+const { payments } = await privacy.scanAnnouncements();
+for (const payment of payments) {
+  if (!payment.claimed) {
+    await privacy.claimPayment(payment);
+    console.log(`Claimed ${payment.amount} USDC privately!`);
+  }
+}
+```
+
+---
+
+## Micropayments (x402 Protocol)
+
+Implement pay-per-use APIs using the x402 protocol.
+
+```typescript
+// Server-side: Create paywall
+import express from 'express';
+
+const app = express();
+app.use(arc.micropayments.paywall('0xYourAddress', {
+  'GET /api/premium': { price: '0.10', description: 'Premium data' },
+  'POST /api/generate': { price: '1.00', description: 'AI generation' },
+}));
+
+// Client-side: Make paid requests
+const data = await arc.micropayments.pay('https://api.example.com/premium');
+```
+
+---
+
+## Simple API Reference
+
+### Configuration
+
+```typescript
+configure({
+  privateKey: '0x...',
+  network: 'arc-testnet'  // or 'arc-mainnet'
+});
+```
+
+### Payments
+
+| Function | Description |
+|----------|-------------|
+| `pay(to, amount, options?)` | Send USDC payment |
+| `balance(options?)` | Get USDC balance |
+| `payPrivate(to, amount)` | Send private payment |
+| `getStealthAddress()` | Get stealth meta-address |
+
+### Escrow
+
+| Function | Description |
+|----------|-------------|
+| `escrow(beneficiary, amount, options?)` | Create escrow |
+| `releaseEscrow(escrowId)` | Release to beneficiary |
+| `refundEscrow(escrowId)` | Refund to depositor |
+
+### Streaming
+
+| Function | Description |
+|----------|-------------|
+| `stream(recipient, amount, duration)` | Start payment stream |
+| `claimStream(streamId)` | Claim from stream |
+| `cancelStream(streamId)` | Cancel stream |
+
+### Payment Channels
+
+| Function | Description |
+|----------|-------------|
+| `openChannel(recipient, deposit)` | Open channel |
+| `channelPay(channelId, amount)` | Instant payment |
+| `closeChannel(channelId)` | Settle and close |
+
+---
+
+## Deployed Smart Contracts
+
+All contracts are deployed on **Arc Testnet** (Chain ID: 5042002):
+
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| **Escrow** | `0x0a982E2250F1C66487b88286e14D965025dD89D2` | Multi-party escrow with conditions |
+| **Stream Payment** | `0x4678D992DE548BDdCb5cd4104470766b5207A855` | Real-time payment streaming |
+| **Stealth Registry** | `0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B` | Private payment announcements (EIP-5564) |
+| **Payment Channel** | `0x3FF7bC1C52e7DdD2B7B915bDAdBe003037B0FA2E` | Off-chain micropayments |
+| **Agent Registry** | `0x5E3ef9A91AD33270f84B32ACFF91068Eea44c5ee` | On-chain AI agent budget management |
+
+---
+
+## Network Configuration
+
+### Arc Testnet
+
+| Property | Value |
+|----------|-------|
+| **Chain ID** | 5042002 |
+| **RPC URL** | https://rpc.testnet.arc.network |
+| **Explorer** | https://testnet.arcscan.io |
+| **Faucet** | https://faucet.arc.network |
+| **Native Token** | USDC (used for gas) |
+
+```typescript
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  privateKey: process.env.PRIVATE_KEY,
+});
+```
+
+---
+
+## React Hooks
+
+ArcPay includes React hooks for easy frontend integration:
+
+```typescript
+import {
+  useArcPay,
+  useEscrow,
+  useStream,
+  useChannel,
+  usePrivacy,
+  useAgent
+} from 'arcpay/react';
+
+function PaymentButton() {
+  const { pay, balance, loading, error } = useArcPay();
+
+  return (
+    <button
+      onClick={() => pay('0x...', '10')}
+      disabled={loading}
+    >
+      Pay 10 USDC (Balance: {balance})
+    </button>
+  );
+}
+
+function SalaryStream() {
+  const { createStream, claimable, claim, loading } = useStream();
+
+  return (
+    <div>
+      <p>Claimable: {claimable} USDC</p>
+      <button onClick={claim} disabled={loading}>
+        Claim Earnings
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+## Error Handling
+
+```typescript
+import {
+  ArcPayError,
+  SignerRequiredError,
+  NetworkError,
+  InsufficientBalanceError
+} from 'arcpay';
+
+try {
+  await arc.sendUSDC('0x...', '1000000');
+} catch (error) {
+  if (error instanceof InsufficientBalanceError) {
+    console.log(`Need ${error.required}, have ${error.available}`);
+  } else if (error instanceof SignerRequiredError) {
+    console.log('Please provide a private key');
+  } else if (error instanceof NetworkError) {
+    console.log('Network connection failed');
+  }
+}
+```
+
+---
+
+## Resilience & Reliability
+
+ArcPay includes built-in resilience features:
+
+```typescript
+import { retry, CircuitBreaker, FallbackRPCManager } from 'arcpay';
+
+// Automatic retry with exponential backoff
+const result = await retry(() => arc.sendUSDC(to, amount), {
+  maxRetries: 3,
+  baseDelay: 1000
+});
+
+// Circuit breaker for failing services
+const breaker = new CircuitBreaker({
+  failureThreshold: 5,
+  resetTimeout: 30000
+});
+```
+
+---
+
+## TypeScript Support
+
+Full TypeScript support with comprehensive type definitions:
+
+```typescript
+import type {
+  ArcPayConfig,
+  TransactionResult,
+  Escrow,
+  Stream,
+  PaymentChannel,
+  AgentConfig,
+  SpendingReport,
+  StealthAddress,
+} from 'arcpay';
+```
+
+---
+
+## Environment Variables
+
+```bash
+# Required
+PRIVATE_KEY=0x...
+
+# AI Features (for Gemini integration)
+GEMINI_API_KEY=AIzaSy...
+
+# Optional - Circle APIs
+CIRCLE_API_KEY=...           # For FX swaps
+CIRCLE_ENTITY_SECRET=...     # For Circle services
+
+# Optional - Network
+ARCPAY_NETWORK=arc-testnet
+ARCPAY_RPC_URL=https://rpc.testnet.arc.network
+```
+
+---
+
+## Examples
+
+See the [examples](./examples) directory for complete working examples:
+
+- **basic-payment** - Simple USDC transfers
+- **escrow-freelance** - Freelancer payment with escrow
+- **streaming-salary** - Employee salary streaming
+- **ai-agent-commerce** - Autonomous AI agent making payments
+- **private-payment** - Stealth address payments
+- **payment-channels** - High-frequency micropayments
+
+---
+
+## Use Cases
+
+### AI Agent Marketplace
+AI agents autonomously hiring and paying other AI agents for services.
+
+### Freelance Platform
+Secure escrow-based payments with milestone tracking and dispute resolution.
+
+### Subscription Services
+Real-time streaming payments - users pay per second of usage.
+
+### API Monetization
+Payment channels for per-request API billing without gas fees.
+
+### Private Payments
+Stealth addresses for privacy-preserving transactions.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details.
+
+---
+
+## License
+
+MIT License - see [LICENSE](./LICENSE) for details.
+
+---
+
+## Links
+
+- [GitHub](https://github.com/Himess/arcpay)
+- [NPM](https://www.npmjs.com/package/arcpay)
+- [Arc Network](https://arc.network)
+- [Circle](https://circle.com)
+
+---
+
+Built with love for the **Arc Blockchain Hackathon 2025** - Best Dev Tools Track

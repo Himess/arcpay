@@ -1,0 +1,38 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/index.ts"],
+  "out": "./docs/api",
+  "name": "ArcPay SDK",
+  "readme": "./README.md",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "default",
+  "navigationLinks": {
+    "GitHub": "https://github.com/Himess/arcpay",
+    "NPM": "https://www.npmjs.com/package/arcpay"
+  },
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Core",
+    "Payments",
+    "Escrow",
+    "Streaming",
+    "Privacy",
+    "Channels",
+    "Agent",
+    "AI",
+    "Utils",
+    "*"
+  ],
+  "sort": ["source-order"],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": false
+  }
+}
