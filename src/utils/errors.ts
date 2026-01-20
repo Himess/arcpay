@@ -393,7 +393,18 @@ export class ValidationError extends ArcPayError {
 }
 
 /**
- * Invalid address error
+ * Thrown when an invalid Ethereum address is provided
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await pay('invalid-address', '100');
+ * } catch (error) {
+ *   if (error instanceof InvalidAddressError) {
+ *     console.log('Please provide a valid 0x address');
+ *   }
+ * }
+ * ```
  */
 export class InvalidAddressError extends ArcPayError {
   constructor(address: string) {
@@ -465,7 +476,18 @@ export class ContractNotDeployedError extends ArcPayError {
 }
 
 /**
- * Signer required error
+ * Thrown when a private key is required but not provided
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await pay('0x...', '100'); // No configure() called
+ * } catch (error) {
+ *   if (error instanceof SignerRequiredError) {
+ *     console.log('Call configure({ privateKey }) first');
+ *   }
+ * }
+ * ```
  */
 export class SignerRequiredError extends ArcPayError {
   constructor(operation: string) {
@@ -502,7 +524,18 @@ export class InvalidPrivateKeyError extends ArcPayError {
 }
 
 /**
- * Insufficient balance error
+ * Thrown when the wallet doesn't have enough USDC for the transaction
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await pay('0x...', '1000000');
+ * } catch (error) {
+ *   if (error instanceof InsufficientBalanceError) {
+ *     console.log(`Need ${error.required} USDC, have ${error.available} USDC`);
+ *   }
+ * }
+ * ```
  */
 export class InsufficientBalanceError extends ArcPayError {
   constructor(

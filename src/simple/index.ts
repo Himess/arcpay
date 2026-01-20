@@ -90,7 +90,23 @@ function getPrivateKey(options?: { privateKey?: string }): string {
 // ============================================
 
 /**
- * Send a payment in one line
+ * Send a USDC payment in one line
+ *
+ * @description Transfers USDC to a recipient address. Supports both regular
+ * and private (stealth address) payments for enhanced privacy.
+ *
+ * @param to - Recipient address (0x...) or stealth address (st:arc:...)
+ * @param amount - Amount in USDC (e.g., "100" or "100.50")
+ * @param options - Optional configuration
+ * @param options.privateKey - Override global private key
+ * @param options.private - Use stealth address for privacy
+ *
+ * @returns Promise with transaction hash and success status
+ *
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ * @throws {InvalidAddressError} When recipient address is invalid
+ * @throws {NetworkError} When transaction fails due to network issues
+ * @throws {SignerRequiredError} When no private key is configured
  *
  * @example
  * ```typescript
@@ -130,12 +146,22 @@ export async function pay(
 }
 
 /**
- * Get balance
+ * Get USDC balance for the configured wallet
+ *
+ * @description Retrieves the current USDC balance and wallet address.
+ *
+ * @param options - Optional configuration
+ * @param options.privateKey - Override global private key
+ *
+ * @returns Promise with USDC balance and wallet address
+ *
+ * @throws {NetworkError} When unable to connect to the network
+ * @throws {SignerRequiredError} When no private key is configured
  *
  * @example
  * ```typescript
  * const { usdc, address } = await balance();
- * console.log(`Balance: ${usdc} USDC`);
+ * console.log(`Balance: ${usdc} USDC at ${address}`);
  * ```
  */
 export async function balance(options?: { privateKey?: string }): Promise<{
@@ -164,7 +190,26 @@ export interface EscrowOptions {
 }
 
 /**
- * Create an escrow in one line
+ * Create a secure escrow for multi-party payments
+ *
+ * @description Creates an escrow where funds are held until conditions are met.
+ * Supports arbitration for dispute resolution.
+ *
+ * @param beneficiary - Address that will receive funds when released
+ * @param amount - Amount in USDC to escrow
+ * @param options - Escrow configuration
+ * @param options.privateKey - Override global private key
+ * @param options.release - Release condition: 'on-approval', 'on-time', 'on-milestone'
+ * @param options.arbiter - Arbitrator address for disputes
+ * @param options.deadline - Expiration time (e.g., '7d', '24h', '1w')
+ * @param options.description - Human-readable description
+ *
+ * @returns Promise with escrow ID and transaction hash
+ *
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ * @throws {InvalidAddressError} When beneficiary or arbiter address is invalid
+ * @throws {NetworkError} When transaction fails
+ * @throws {SignerRequiredError} When no private key is configured
  *
  * @example
  * ```typescript
@@ -263,7 +308,24 @@ export interface StreamOptions {
 }
 
 /**
- * Start a payment stream in one line
+ * Start a real-time payment stream
+ *
+ * @description Creates a continuous payment stream where funds flow per-second
+ * from sender to recipient. Perfect for salaries, subscriptions, and rent.
+ *
+ * @param recipient - Address to receive the streamed funds
+ * @param amount - Total amount or rate (e.g., '5000' or '100/day')
+ * @param duration - Stream duration (e.g., '30d', '1w', '24h')
+ * @param options - Stream configuration
+ * @param options.privateKey - Override global private key
+ * @param options.startAt - Delayed start time
+ *
+ * @returns Promise with stream ID and transaction hash
+ *
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ * @throws {InvalidAddressError} When recipient address is invalid
+ * @throws {ValidationError} When duration format is invalid
+ * @throws {NetworkError} When transaction fails
  *
  * @example
  * ```typescript
@@ -344,11 +406,27 @@ export async function cancelStream(
 // ============================================
 
 /**
- * Open a payment channel
+ * Open an off-chain payment channel for instant micropayments
+ *
+ * @description Creates a payment channel with a deposit. Once open, you can
+ * make thousands of instant payments with no gas fees until you close it.
+ *
+ * @param recipient - Channel recipient address
+ * @param deposit - Initial deposit amount in USDC
+ * @param options - Channel configuration
+ * @param options.privateKey - Override global private key
+ *
+ * @returns Promise with channel ID
+ *
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ * @throws {InvalidAddressError} When recipient address is invalid
+ * @throws {NetworkError} When transaction fails
  *
  * @example
  * ```typescript
  * const { channelId } = await openChannel('0x...', '10');
+ * // Now make instant payments
+ * await channelPay(channelId, '0.001');
  * ```
  */
 export async function openChannel(
@@ -422,10 +500,28 @@ export async function getStealthAddress(options?: { privateKey?: string }): Prom
 }
 
 /**
- * Send a private payment using stealth addresses
+ * Send a private payment using stealth addresses (EIP-5564)
+ *
+ * @description Sends USDC to a stealth address where the recipient's real
+ * address is hidden on-chain. Only the recipient can claim the funds.
+ *
+ * @param to - Stealth meta-address (st:arc:...) or recipient's stealth address
+ * @param amount - Amount in USDC to send
+ * @param options - Payment configuration
+ * @param options.privateKey - Override global private key
+ *
+ * @returns Promise with transaction hash and generated stealth address
+ *
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ * @throws {ValidationError} When stealth address format is invalid
+ * @throws {NetworkError} When transaction fails
  *
  * @example
  * ```typescript
+ * // Get recipient's stealth address first
+ * const stealthAddr = await getStealthAddress();
+ *
+ * // Send private payment
  * await payPrivate('st:arc:...', '100');
  * ```
  */
