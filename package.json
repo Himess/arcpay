@@ -1,6 +1,6 @@
 {
   "name": "arcpay",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Complete SDK for autonomous commerce on Arc blockchain - Payments, Escrow, Streaming, Privacy & AI Agents",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
