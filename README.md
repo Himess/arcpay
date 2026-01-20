@@ -16,7 +16,7 @@ ArcPay is a powerful SDK designed for building **autonomous commerce experiences
 |---------|-------------|
 | **AI-First Design** | Purpose-built SDK for AI agents and autonomous systems |
 | **One-liner API** | Simple functions for common operations - `pay()`, `escrow()`, `stream()` |
-| **Real Smart Contracts** | 4 contracts deployed and verified on Arc Testnet |
+| **Real Smart Contracts** | 5 contracts deployed and verified on Arc Testnet |
 | **Privacy Built-in** | Stealth address support (EIP-5564) for private payments |
 | **Full Featured** | Escrow, streaming, payment channels, micropayments, and more |
 
@@ -711,4 +711,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ---
 
-Built with love for the **Arc Blockchain Hackathon 2025** - Best Dev Tools Track
+Built with love for the **Agentic Commerce on Arc Hackathon 2026** - Best Dev Tools Track
