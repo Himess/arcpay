@@ -107,10 +107,10 @@ export default function Home() {
           {/* Stats Row */}
           <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-8 mb-12">
             {[
-              { value: '35+', label: 'Modules' },
-              { value: '200+', label: 'APIs' },
               { value: '5', label: 'Smart Contracts' },
-              { value: '143', label: 'Tests Passing' },
+              { value: '150+', label: 'APIs' },
+              { value: '26', label: 'Modules' },
+              { value: '500+', label: 'Tests Passing' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold text-cyan-400">{stat.value}</div>
@@ -356,7 +356,7 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Complete Payment Toolkit</h2>
-            <p className="text-gray-400">35 modules for every payment scenario</p>
+            <p className="text-gray-400">26 modules for every payment scenario</p>
           </motion.div>
 
           <motion.div
@@ -405,7 +405,7 @@ export default function Home() {
           </motion.div>
 
           <p className="text-center text-gray-500 mt-8">
-            5 Smart Contracts • 150+ APIs • 35 Modules • React Hooks
+            5 Smart Contracts • 150+ APIs • 26 Modules • React Hooks
           </p>
         </div>
       </section>
@@ -512,8 +512,8 @@ await agent.payInvoice(img);
           >
             {[
               { value: '5', label: 'Smart Contracts' },
-              { value: '200+', label: 'Public APIs' },
-              { value: '29', label: 'Modules' },
+              { value: '150+', label: 'Public APIs' },
+              { value: '26', label: 'Modules' },
               { value: '120+', label: 'Types' },
               { value: 'Gemini 3', label: 'Flash AI' },
             ].map((stat, i) => (

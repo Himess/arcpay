@@ -1,7 +1,7 @@
 /**
  * ArcPay SDK - Complete API Reference with Code Examples
  *
- * Total: 150+ APIs across 35 modules
+ * Total: 150+ APIs across 26 modules
  */
 
 export interface APIItem {
