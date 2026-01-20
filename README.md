@@ -126,6 +126,39 @@ console.log(`Balance: ${balance} USDC`);
 | **compliance** | KYC/AML/Sanctions checks |
 | **micropayments** | x402 protocol server/client |
 
+### 📚 Module Documentation
+
+Each module has detailed documentation with examples:
+
+| Module | Docs | Description |
+|--------|------|-------------|
+| Escrow | [README](src/modules/escrow/README.md) | Multi-party secure payments |
+| Streams | [README](src/modules/streams/README.md) | Real-time salary streaming |
+| Channels | [README](src/modules/channels/README.md) | Off-chain micropayments |
+| Privacy | [README](src/modules/privacy/README.md) | Stealth address payments |
+| Stealth | [README](src/modules/stealth/README.md) | EIP-5564 implementation |
+| Agent | [README](src/modules/agent/README.md) | Autonomous AI agents |
+| AI Wallet | [README](src/modules/ai-wallet/README.md) | AI-powered wallet |
+| Contacts | [README](src/modules/contacts/README.md) | Address book |
+| Templates | [README](src/modules/templates/README.md) | Payment templates |
+| Links | [README](src/modules/links/README.md) | Shareable payment links |
+| Requests | [README](src/modules/requests/README.md) | Payment requests |
+| Split | [README](src/modules/split/README.md) | Split payments |
+| Invoices | [README](src/modules/invoices/README.md) | Invoice management |
+| Subscriptions | [README](src/modules/subscriptions/README.md) | Recurring payments |
+| Micropayments | [README](src/modules/micropayments/README.md) | x402 protocol |
+| Bridge | [README](src/modules/bridge/README.md) | Cross-chain CCTP |
+| Gateway | [README](src/modules/gateway/README.md) | Multi-chain balance |
+| FX | [README](src/modules/fx/README.md) | USDC/EURC swaps |
+| USYC | [README](src/modules/usyc/README.md) | Yield-bearing USDC |
+| Smart Wallet | [README](src/modules/smart-wallet/README.md) | ERC-4337 AA |
+| Gas Station | [README](src/modules/gas-station/README.md) | Gas sponsorship |
+| Paymaster | [README](src/modules/paymaster/README.md) | Gasless txs |
+| Compliance | [README](src/modules/compliance/README.md) | KYC/AML checks |
+| Intent | [README](src/modules/intent/README.md) | NL command parsing |
+| Streaming | [README](src/modules/streaming/README.md) | Audio streaming |
+| Combo | [README](src/modules/combo/README.md) | Combined operations |
+
 ---
 
 ## Hackathon Features
