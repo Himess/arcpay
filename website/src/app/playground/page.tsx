@@ -184,26 +184,26 @@ console.log('USDC Balance:', formatUnits(balance, 6));
         // Ignore parse errors
       }
     } else {
-      // Demo contacts for first load
+      // Demo contacts for first load (valid checksum addresses)
       const demoContacts: PlaygroundContact[] = [
         {
           name: 'ahmed',
           displayName: 'Ahmed',
-          address: '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78',
+          address: '0xA6d1f2Cb6041Cb049BC196aD496F24581B0377EC',
           category: 'personal',
           createdAt: new Date().toISOString(),
         },
         {
-          name: 'writer-bot',
-          displayName: 'Writer Bot',
-          address: '0xF505e2E71df58D7244189072008f25f6b6aaE5ae',
-          category: 'agent',
+          name: 'bob',
+          displayName: 'Bob',
+          address: '0xD27EBC060D02b0E4C69C537cde26273935fd3db9',
+          category: 'personal',
           createdAt: new Date().toISOString(),
         },
         {
           name: 'netflix',
           displayName: 'Netflix',
-          address: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
+          address: '0x47e8e33Af5f664240bcDfFCad24cC4798e450372',
           category: 'subscription',
           createdAt: new Date().toISOString(),
         },
@@ -339,6 +339,7 @@ Only return valid JSON, no markdown or explanation.`;
 
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
+      console.log('Gemini raw response:', responseText);
 
       // Parse JSON from response
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
@@ -638,8 +639,8 @@ Only return valid JSON, no markdown or explanation.`;
       // === SUBSCRIPTIONS ===
       case 'add_subscription': {
         const subName = name || recipient || 'Subscription';
-        addVoiceLog('success', `Added ${subName} subscription for $${amount || 15}/month`);
-        speakResponse(`Added ${subName} subscription for ${amount || 15} dollars monthly`);
+        addVoiceLog('success', `Added ${subName} subscription for $${amount || 0.1}/month`);
+        speakResponse(`Added ${subName} subscription for ${amount || 0.1} dollars monthly`);
         break;
       }
 
@@ -652,8 +653,8 @@ Only return valid JSON, no markdown or explanation.`;
         );
         if (sub) {
           try {
-            const result = await arc!.sendUSDC(sub.address, (amount || 15).toString());
-            addVoiceLog('success', `Paid ${subName} subscription: ${amount || 15} USDC`);
+            const result = await arc!.sendUSDC(sub.address, (amount || 0.1).toString());
+            addVoiceLog('success', `Paid ${subName} subscription: ${amount || 0.1} USDC`);
             addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
             addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
             speakResponse(`Paid ${subName} subscription`);
@@ -699,13 +700,13 @@ Only return valid JSON, no markdown or explanation.`;
         try {
           const result = await arc!.escrow.create({
             beneficiary: targetAddr,
-            amount: (amount || 10).toString(),
+            amount: (amount || 0.1).toString(),
             description: task || 'Voice command escrow'
           });
-          addVoiceLog('success', `Created escrow for ${amount || 10} USDC to ${recipient || targetAddr.slice(0, 10)}...`);
+          addVoiceLog('success', `Created escrow for ${amount || 0.1} USDC to ${recipient || targetAddr.slice(0, 10)}...`);
           addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
           addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
-          speakResponse(`Created escrow for ${amount || 10} USDC`);
+          speakResponse(`Created escrow for ${amount || 0.1} USDC`);
         } catch (error: any) {
           addVoiceLog('error', `Escrow failed: ${error.message}`);
           speakResponse(`Escrow creation failed`);
@@ -738,14 +739,14 @@ Only return valid JSON, no markdown or explanation.`;
         try {
           const result = await arc!.streams.create({
             recipient: targetAddr,
-            amount: (amount || 100).toString(),
+            amount: (amount || 0.5).toString(),
             duration: durationSecs
           });
-          addVoiceLog('success', `Created stream: ${amount || 100} USDC over ${duration || '30 days'}`);
+          addVoiceLog('success', `Created stream: ${amount || 0.5} USDC over ${duration || '30 days'}`);
           if (result.streamId) addVoiceLog('info', `Stream ID: ${result.streamId.slice(0, 16)}...`);
           addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
           addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
-          speakResponse(`Created payment stream for ${amount || 100} USDC`);
+          speakResponse(`Created payment stream for ${amount || 0.5} USDC`);
         } catch (error: any) {
           addVoiceLog('error', `Stream failed: ${error.message}`);
           speakResponse(`Stream creation failed`);
@@ -779,7 +780,7 @@ Only return valid JSON, no markdown or explanation.`;
           speakResponse('Please specify recipients for the split payment');
           return;
         }
-        const totalAmount = amount || 10;
+        const totalAmount = amount || 0.3;
         const perPerson = totalAmount / splitRecipients.length;
         addVoiceLog('info', `Splitting ${totalAmount} USDC between ${splitRecipients.length} people (${perPerson.toFixed(2)} each)`);
 
@@ -840,13 +841,13 @@ Only return valid JSON, no markdown or explanation.`;
         try {
           const result = await arc!.privacy.sendPrivate({
             recipient: targetAddr,
-            amount: (amount || 10).toString()
+            amount: (amount || 0.1).toString()
           });
-          addVoiceLog('success', `Private payment: ${amount || 10} USDC sent`);
+          addVoiceLog('success', `Private payment: ${amount || 0.1} USDC sent`);
           addVoiceLog('info', 'Stealth address used for privacy');
           addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
           addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
-          speakResponse(`Sent ${amount || 10} USDC privately`);
+          speakResponse(`Sent ${amount || 0.1} USDC privately`);
         } catch (error: any) {
           addVoiceLog('error', `Private payment failed: ${error.message}`);
           speakResponse(`Private payment failed`);
@@ -872,12 +873,12 @@ Only return valid JSON, no markdown or explanation.`;
         const addr = resolveAddr(agentName);
         const targetAddr = addr || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
         try {
-          const result = await arc!.sendUSDC(targetAddr, (amount || 50).toString());
-          addVoiceLog('success', `Hired ${agentName} for ${amount || 50} USDC`);
+          const result = await arc!.sendUSDC(targetAddr, (amount || 0.1).toString());
+          addVoiceLog('success', `Hired ${agentName} for ${amount || 0.1} USDC`);
           addVoiceLog('info', `Task: ${task || 'Complete assigned work'}`);
           addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
           addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
-          speakResponse(`Hired ${agentName} for ${amount || 50} USDC`);
+          speakResponse(`Hired ${agentName} for ${amount || 0.1} USDC`);
         } catch (error: any) {
           addVoiceLog('error', `Hiring failed: ${error.message}`);
           speakResponse(`Hiring failed`);
@@ -886,9 +887,9 @@ Only return valid JSON, no markdown or explanation.`;
       }
 
       case 'create_agent': {
-        addVoiceLog('success', `Created AI agent with ${amount || 100} USDC daily budget`);
+        addVoiceLog('success', `Created AI agent with ${amount || 1} USDC daily budget`);
         addVoiceLog('info', `Agent ID: agent_${Date.now().toString(36)}`);
-        speakResponse(`Created AI agent with ${amount || 100} USDC budget`);
+        speakResponse(`Created AI agent with ${amount || 1} USDC budget`);
         break;
       }
 
