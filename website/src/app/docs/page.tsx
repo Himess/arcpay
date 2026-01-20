@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type DocSection = 'why-arcpay' | 'getting-started' | 'ai-voice' | 'core' | 'contacts' | 'advanced' | 'contracts';
+type DocSection = 'why-arcpay' | 'getting-started' | 'ai-voice' | 'core' | 'contacts' | 'tools' | 'hackathon' | 'advanced' | 'contracts';
 
 // Comparison data for Before/After cards
 const COMPARISONS = [
@@ -205,6 +205,8 @@ export default function DocsPage() {
     { id: 'core', label: 'Core Modules', icon: '💰' },
     { id: 'contacts', label: 'Contacts & Subs', icon: '📇', isNew: true },
     { id: 'ai-voice', label: 'AI & Voice', icon: '🤖', isNew: true },
+    { id: 'tools', label: 'Payment Tools', icon: '🛠️', isNew: true },
+    { id: 'hackathon', label: 'Hackathon Features', icon: '🏆', isNew: true },
     { id: 'advanced', label: 'Advanced', icon: '⚡' },
     { id: 'contracts', label: 'Contracts', icon: '📜' },
   ];
@@ -791,6 +793,229 @@ const job = await arc.agent.hire({
 
 // Approve and release payment
 await arc.agent.approveWork(job.id);`} />
+                  </section>
+                </motion.div>
+              )}
+
+              {/* Payment Tools */}
+              {activeSection === 'tools' && (
+                <motion.div
+                  key="tools"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-12"
+                >
+                  <section>
+                    <h1 className="text-4xl font-bold mb-4">Payment Tools</h1>
+                    <p className="text-gray-400 mb-8">
+                      Convenience modules for managing payments, contacts, and requests.
+                    </p>
+
+                    <h2 className="text-2xl font-semibold mb-4">📇 Contacts (Pay by Name)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Store addresses with human-readable names. Pay "ahmed" instead of "0x742d35...".
+                    </p>
+                    <CodeBlock code={`import { addContact, getContact, pay } from 'arcpay';
+
+// Save a contact
+await addContact('ahmed', '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78');
+await addContact('alice', '0x8ba1f109551bD432803012645Ac136ddd64DBA72');
+
+// Pay by name - no more copy-pasting addresses!
+await pay('ahmed', '50');
+await pay('alice', '100');
+
+// Get contact details
+const contact = await getContact('ahmed');
+console.log(contact.address); // 0x742d35...`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">📋 Templates (Reusable Payments)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Create payment templates for recurring transactions.
+                    </p>
+                    <CodeBlock code={`import { createTemplate, executeTemplate } from 'arcpay';
+
+// Create a template for monthly rent
+const template = await createTemplate({
+  name: 'Monthly Rent',
+  recipient: '0x...landlord',
+  amount: '1500',
+  memo: 'Rent payment'
+});
+
+// Execute template with one click
+await executeTemplate(template.id);`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">🔗 Links (Shareable Payment Links)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Generate payment links that anyone can use to pay you.
+                    </p>
+                    <CodeBlock code={`import { createPaymentLink, getPaymentLink } from 'arcpay';
+
+// Create a payment link
+const link = await createPaymentLink({
+  amount: '25',
+  memo: 'Coffee meetup',
+  expiresIn: '7d'
+});
+
+console.log(link.url); // https://pay.arcpay.io/link/abc123
+
+// Check link status
+const status = await getPaymentLink(link.id);
+console.log(status.paid); // true/false`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">📨 Requests (Payment Requests)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Request payments from others with notifications.
+                    </p>
+                    <CodeBlock code={`import { createRequest, getMyRequests, payRequest } from 'arcpay';
+
+// Request payment from someone
+const request = await createRequest({
+  from: '0x...debtor',
+  amount: '100',
+  memo: 'Dinner split from last week'
+});
+
+// Check incoming requests
+const myRequests = await getMyRequests();
+
+// Pay a request
+await payRequest(request.id);`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">➗ Split (Split Bills)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Split payments among multiple recipients.
+                    </p>
+                    <CodeBlock code={`import { splitPayment, splitEvenly } from 'arcpay';
+
+// Split custom amounts
+await splitPayment('150', [
+  { address: '0x...alice', amount: '50' },
+  { address: '0x...bob', amount: '50' },
+  { address: '0x...carol', amount: '50' },
+]);
+
+// Split evenly
+await splitEvenly('90', ['0x...alice', '0x...bob', '0x...carol']);
+// Each receives 30 USDC`} />
+                  </section>
+                </motion.div>
+              )}
+
+              {/* Hackathon Features */}
+              {activeSection === 'hackathon' && (
+                <motion.div
+                  key="hackathon"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-12"
+                >
+                  <section>
+                    <h1 className="text-4xl font-bold mb-4">Hackathon Features</h1>
+                    <p className="text-gray-400 mb-8">
+                      Key features built for the Arc Hackathon 2026 - Best Dev Tools Track.
+                    </p>
+
+                    <div className="grid md:grid-cols-2 gap-6 mb-8">
+                      <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-xl p-6 border border-blue-500/30">
+                        <div className="text-3xl mb-3">⚡</div>
+                        <h3 className="text-xl font-bold mb-2">x402 Protocol</h3>
+                        <p className="text-gray-400 text-sm">Pay-per-request API monetization without gas fees</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-xl p-6 border border-green-500/30">
+                        <div className="text-3xl mb-3">⛽</div>
+                        <h3 className="text-xl font-bold mb-2">Gasless Payments</h3>
+                        <p className="text-gray-400 text-sm">Users don't need ETH - sponsor their gas with USDC</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-xl p-6 border border-purple-500/30">
+                        <div className="text-3xl mb-3">🌐</div>
+                        <h3 className="text-xl font-bold mb-2">Circle Gateway</h3>
+                        <p className="text-gray-400 text-sm">Unified balance across Ethereum, Arbitrum, Base, Arc</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 rounded-xl p-6 border border-amber-500/30">
+                        <div className="text-3xl mb-3">🤖</div>
+                        <h3 className="text-xl font-bold mb-2">AI Voice Commands</h3>
+                        <p className="text-gray-400 text-sm">"Send 50 to Ahmed" - Gemini understands and executes</p>
+                      </div>
+                    </div>
+
+                    <h2 className="text-2xl font-semibold mb-4">⚡ x402 Protocol (Micropayments)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Monetize APIs with pay-per-request. No subscriptions, no gas fees.
+                    </p>
+                    <CodeBlock code={`// Server: Add paywall to your API
+import { micropayments } from 'arcpay';
+
+app.use(micropayments.paywall('0xYourAddress', {
+  'GET /api/premium': { price: '0.10', description: 'Premium data' },
+  'POST /api/generate': { price: '1.00', description: 'AI generation' },
+}));
+
+// Client: Pay for API access
+const data = await micropayments.pay('https://api.example.com/premium');`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">⛽ Gas Station (Gasless Transactions)</h2>
+                    <p className="text-gray-400 mb-4">
+                      Sponsor gas fees for your users. They pay in USDC, you cover the ETH.
+                    </p>
+                    <CodeBlock code={`import { gasStation } from 'arcpay';
+
+// Sponsor a user's transaction
+const result = await gasStation.sponsorTransaction({
+  userAddress: '0x...user',
+  transaction: {
+    to: '0x...recipient',
+    data: '0x...',
+  },
+  maxGasUSDC: '1.00' // Max gas cost in USDC
+});
+
+console.log(result.txHash); // Transaction sent without user paying gas!`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">🌐 Circle Gateway (Unified Balance)</h2>
+                    <p className="text-gray-400 mb-4">
+                      See and use your USDC across all chains from one interface.
+                    </p>
+                    <CodeBlock code={`import { gateway } from 'arcpay';
+
+// Get unified balance across all chains
+const balance = await gateway.getUnifiedBalance('0x...user');
+console.log(balance);
+// {
+//   total: '1500.00',
+//   chains: {
+//     ethereum: '500.00',
+//     arbitrum: '300.00',
+//     base: '400.00',
+//     arc: '300.00'
+//   }
+// }
+
+// Pay from any chain, gateway handles routing
+await gateway.payFrom({
+  recipient: '0x...',
+  amount: '100',
+  preferredChain: 'arc' // Or 'cheapest', 'fastest'
+});`} />
+
+                    <h2 className="text-2xl font-semibold mt-8 mb-4">🛡️ Compliance Module</h2>
+                    <p className="text-gray-400 mb-4">
+                      Built-in KYC/AML/Sanctions screening for enterprise use.
+                    </p>
+                    <CodeBlock code={`import { compliance } from 'arcpay';
+
+// Check address before sending
+const check = await compliance.screenAddress('0x...');
+if (check.passed) {
+  await pay('0x...', '1000');
+} else {
+  console.log('Blocked:', check.reason);
+  // e.g., "Address on OFAC sanctions list"
+}`} />
                   </section>
                 </motion.div>
               )}

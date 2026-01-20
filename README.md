@@ -79,22 +79,100 @@ console.log(`Balance: ${balance} USDC`);
 
 ## Features Overview
 
-### Core Modules
+### All Modules (28)
 
+#### Core Payment
 | Module | Description |
 |--------|-------------|
-| **Simple API** | One-liner functions for payments, escrow, streaming |
-| **AI Agent SDK** | Purpose-built for autonomous AI commerce |
-| **Escrow** | Multi-party conditional payments with disputes |
-| **Streaming** | Real-time per-second salary/subscription payments |
-| **Payment Channels** | Instant off-chain micropayments |
-| **Privacy** | Stealth address payments (EIP-5564) |
-| **Micropayments** | x402 protocol for pay-per-use APIs |
-| **Paymaster** | Gas sponsorship for users |
-| **Bridge** | Cross-chain USDC via Circle CCTP |
-| **Gateway** | Unified balance across chains |
-| **FX** | Stablecoin swaps (USDC <-> EURC) |
-| **USYC** | Yield-bearing USDC operations |
+| **pay** | Simple USDC transfers |
+| **escrow** | Multi-party escrow with arbitration |
+| **streaming** | Per-second salary payments |
+| **channels** | Off-chain micropayments (x402) |
+| **subscriptions** | Recurring payments |
+
+#### AI & Voice (Hackathon Star)
+| Module | Description |
+|--------|-------------|
+| **voice** | Speech-to-payment with Gemini |
+| **ai** | Multimodal invoice/receipt analysis |
+| **agent** | Autonomous AI agents with budgets |
+| **intent** | Natural language command parsing |
+
+#### Payment Tools
+| Module | Description |
+|--------|-------------|
+| **contacts** | Address book, pay by name |
+| **templates** | Reusable payment templates |
+| **links** | Shareable payment links |
+| **requests** | Payment request management |
+| **split** | Split bills among multiple people |
+| **invoices** | Create and pay invoices |
+
+#### Advanced
+| Module | Description |
+|--------|-------------|
+| **privacy/stealth** | EIP-5564 stealth addresses |
+| **bridge** | Cross-chain USDC (Circle CCTP) |
+| **gateway** | Unified multi-chain balance |
+| **fx** | USDC ↔ EURC swaps |
+| **usyc** | Yield-bearing USDC |
+
+#### Infrastructure
+| Module | Description |
+|--------|-------------|
+| **smart-wallet** | ERC-4337 account abstraction |
+| **gas-station** | Sponsor user gas fees |
+| **paymaster** | Gasless transactions |
+| **compliance** | KYC/AML/Sanctions checks |
+| **micropayments** | x402 protocol server/client |
+
+---
+
+## Hackathon Features
+
+Built for **Arc Hackathon 2026** - targeting Best Dev Tools, Best Trustless AI Agent, and Best Gemini Use.
+
+### x402 Protocol (Micropayments)
+Pay-per-request API monetization without gas fees.
+
+```typescript
+// Server: Add paywall
+app.use(arc.micropayments.paywall('0xYourAddress', {
+  'GET /api/premium': { price: '0.10' },
+}));
+
+// Client: Pay for access
+const data = await arc.micropayments.pay('https://api.example.com/premium');
+```
+
+### Gasless Payments
+Users don't need ETH - sponsor their gas with USDC.
+
+```typescript
+await gasStation.sponsorTransaction({
+  userAddress: '0x...user',
+  transaction: { to: '0x...', data: '0x...' },
+  maxGasUSDC: '1.00'
+});
+```
+
+### Circle Gateway
+Unified balance across Ethereum, Arbitrum, Base, Arc.
+
+```typescript
+const balance = await gateway.getUnifiedBalance('0x...user');
+// { total: '1500', chains: { ethereum: '500', arc: '1000' } }
+```
+
+### AI Voice Commands
+"Send 50 to Ahmed" - Gemini understands and executes.
+
+```typescript
+const voiceAgent = createVoiceAgent({ geminiApiKey: '...' });
+await voiceAgent.executeVoiceCommand();
+// User speaks: "Send 50 USDC to Alice"
+// Agent: "Sent 50 USDC to Alice. Transaction confirmed."
+```
 
 ---
 

@@ -109,7 +109,7 @@ export default function Home() {
             {[
               { value: '5', label: 'Smart Contracts' },
               { value: '150+', label: 'APIs' },
-              { value: '26', label: 'Modules' },
+              { value: '28', label: 'Modules' },
               { value: '500+', label: 'Tests Passing' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -356,7 +356,7 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Complete Payment Toolkit</h2>
-            <p className="text-gray-400">26 modules for every payment scenario</p>
+            <p className="text-gray-400">28 modules for every payment scenario</p>
           </motion.div>
 
           <motion.div
@@ -367,22 +367,22 @@ export default function Home() {
             className="grid md:grid-cols-4 gap-6"
           >
             {[
-              { icon: '🤖', title: 'AI Agent', desc: 'Voice + AI powered payments', tag: 'Gemini Function Calling' },
-              { icon: '🔒', title: 'Escrow', desc: 'Multi-party + Multi-sig', tag: '' },
-              { icon: '💸', title: 'Streaming', desc: 'Per-second salary payments', tag: '' },
-              { icon: '⚡', title: 'Channels', desc: 'Off-chain micropay (x402)', tag: '' },
-              { icon: '🔐', title: 'Privacy', desc: 'Stealth addresses (EIP-5564)', tag: '' },
-              { icon: '🌉', title: 'Bridge', desc: 'Cross-chain USDC (CCTP)', tag: '' },
-              { icon: '💱', title: 'FX Swap', desc: 'USDC ↔ EURC real-time', tag: '' },
-              { icon: '📋', title: 'Invoice', desc: 'Create & pay with QR', tag: '' },
-              { icon: '📅', title: 'Subscriptions', desc: 'Recurring auto-renew', tag: '' },
+              { icon: '🤖', title: 'AI Agent', desc: 'Voice + Vision payments', tag: 'Gemini' },
               { icon: '🎤', title: 'Voice', desc: 'Speech-to-payment', tag: 'NEW' },
-              { icon: '📸', title: 'Vision', desc: 'Invoice & delivery AI', tag: 'NEW' },
-              { icon: '⛓️', title: 'Agent Registry', desc: 'On-chain AI agents', tag: 'NEW' },
-              { icon: '🎯', title: 'Intent Parser', desc: 'Natural language commands', tag: '' },
-              { icon: '💳', title: 'Smart Wallet', desc: 'ERC-4337 Account Abstraction', tag: '' },
-              { icon: '⛽', title: 'Gas Station', desc: 'Sponsor user gas fees', tag: '' },
-              { icon: '🛡️', title: 'Compliance', desc: 'KYC/AML/Sanctions checks', tag: '' },
+              { icon: '📸', title: 'Vision', desc: 'Invoice & receipt AI', tag: 'NEW' },
+              { icon: '🔒', title: 'Escrow', desc: 'Multi-party + Arbiter', tag: '' },
+              { icon: '💸', title: 'Streaming', desc: 'Per-second payments', tag: '' },
+              { icon: '⚡', title: 'Channels', desc: 'x402 micropayments', tag: 'x402' },
+              { icon: '🔐', title: 'Privacy', desc: 'Stealth addresses', tag: '' },
+              { icon: '📇', title: 'Contacts', desc: 'Pay by name', tag: 'NEW' },
+              { icon: '📋', title: 'Templates', desc: 'Reusable payments', tag: 'NEW' },
+              { icon: '🔗', title: 'Links', desc: 'Shareable pay links', tag: 'NEW' },
+              { icon: '📨', title: 'Requests', desc: 'Request payments', tag: 'NEW' },
+              { icon: '➗', title: 'Split', desc: 'Split bills', tag: 'NEW' },
+              { icon: '⛽', title: 'Gasless', desc: 'Sponsor user gas', tag: 'x402' },
+              { icon: '🌉', title: 'Bridge', desc: 'Cross-chain USDC', tag: '' },
+              { icon: '💱', title: 'FX Swap', desc: 'USDC ↔ EURC', tag: '' },
+              { icon: '🛡️', title: 'Compliance', desc: 'KYC/AML checks', tag: '' },
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -405,7 +405,7 @@ export default function Home() {
           </motion.div>
 
           <p className="text-center text-gray-500 mt-8">
-            5 Smart Contracts • 150+ APIs • 26 Modules • React Hooks
+            5 Smart Contracts • 150+ APIs • 28 Modules • React Hooks
           </p>
         </div>
       </section>
@@ -513,7 +513,7 @@ await agent.payInvoice(img);
             {[
               { value: '5', label: 'Smart Contracts' },
               { value: '150+', label: 'Public APIs' },
-              { value: '26', label: 'Modules' },
+              { value: '28', label: 'Modules' },
               { value: '120+', label: 'Types' },
               { value: 'Gemini 3', label: 'Flash AI' },
             ].map((stat, i) => (
