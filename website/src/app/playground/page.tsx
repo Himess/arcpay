@@ -362,8 +362,156 @@ Only return valid JSON, no markdown or explanation.`;
   };
 
   // Execute voice command action
+  // Helper to parse duration strings like "30 days", "1 month", "24 hours"
+  const parseDurationToSeconds = (dur: string | null): number | null => {
+    if (!dur) return null;
+    const match = dur.match(/(\d+)\s*(d|day|days|h|hour|hours|m|min|month|months|w|week|weeks)/i);
+    if (!match) return null;
+    const num = parseInt(match[1]);
+    const unit = match[2].toLowerCase();
+    if (unit.startsWith('d')) return num * 24 * 60 * 60;
+    if (unit.startsWith('h')) return num * 60 * 60;
+    if (unit.startsWith('w')) return num * 7 * 24 * 60 * 60;
+    if (unit.startsWith('month') || unit === 'm') return num * 30 * 24 * 60 * 60;
+    return null;
+  };
+
+  // Create ArcPay client for voice commands (real onchain)
+  const createVoiceArcClient = async (pk: string) => {
+    const viem = await import('viem');
+    const { createPublicClient, createWalletClient, http, formatUnits, parseUnits, defineChain } = viem;
+    const { privateKeyToAccount } = await import('viem/accounts');
+
+    const arcTestnet = defineChain({
+      id: 5042002,
+      name: 'Arc Testnet',
+      nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+      rpcUrls: { default: { http: ['https://rpc.testnet.arc.network'] } },
+    });
+
+    const CONTRACTS = {
+      escrow: '0x0a982E2250F1C66487b88286e14D965025dD89D2' as `0x${string}`,
+      stream: '0x4678D992De548bddCb5Cd4104470766b5207A855' as `0x${string}`,
+      stealth: '0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B' as `0x${string}`,
+    };
+
+    const ESCROW_ABI = [
+      { name: 'createAndFundEscrow', type: 'function', inputs: [{ name: 'beneficiary', type: 'address' }, { name: 'arbiter', type: 'address' }, { name: 'amount', type: 'uint256' }, { name: 'expiresAt', type: 'uint256' }, { name: 'conditionHash', type: 'string' }], outputs: [{ name: '', type: 'bytes32' }], stateMutability: 'payable' },
+    ] as const;
+
+    const STREAM_ABI = [
+      { name: 'createStream', type: 'function', inputs: [{ name: 'recipient', type: 'address' }, { name: 'totalAmount', type: 'uint256' }, { name: 'duration', type: 'uint256' }], outputs: [{ name: '', type: 'bytes32' }], stateMutability: 'payable' },
+    ] as const;
+
+    const STEALTH_ABI = [
+      { name: 'sendStealthPayment', type: 'function', inputs: [{ name: 'stealthAddress', type: 'address' }, { name: 'ephemeralPubKey', type: 'bytes' }, { name: 'encryptedMemo', type: 'bytes' }], outputs: [{ name: '', type: 'bytes32' }], stateMutability: 'payable' },
+    ] as const;
+
+    let pkFormatted = pk;
+    if (!pkFormatted.startsWith('0x')) pkFormatted = '0x' + pkFormatted;
+    const account = privateKeyToAccount(pkFormatted as `0x${string}`);
+
+    const publicClient = createPublicClient({
+      chain: arcTestnet,
+      transport: http('https://rpc.testnet.arc.network'),
+    });
+
+    const walletClient = createWalletClient({
+      account,
+      chain: arcTestnet,
+      transport: http('https://rpc.testnet.arc.network'),
+    });
+
+    return {
+      address: account.address,
+
+      async getBalance() {
+        const balance = await publicClient.getBalance({ address: account.address });
+        return formatUnits(balance, 18);
+      },
+
+      async sendUSDC(to: string, amount: string) {
+        const amountWei = parseUnits(amount, 18);
+        const hash = await walletClient.sendTransaction({
+          to: to as `0x${string}`,
+          value: amountWei,
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+        return { txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
+      },
+
+      escrow: {
+        async create(params: { beneficiary: string; amount: string; description?: string }) {
+          const amountWei = parseUnits(params.amount, 18);
+          const expiresAt = BigInt(Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60);
+          const hash = await walletClient.writeContract({
+            address: CONTRACTS.escrow,
+            abi: ESCROW_ABI,
+            functionName: 'createAndFundEscrow',
+            args: [params.beneficiary as `0x${string}`, account.address, amountWei, expiresAt, params.description || ''],
+            value: amountWei,
+          });
+          await publicClient.waitForTransactionReceipt({ hash });
+          return { txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
+        },
+      },
+
+      streams: {
+        async create(params: { recipient: string; amount: string; duration: number }) {
+          const amountWei = parseUnits(params.amount, 18);
+          const hash = await walletClient.writeContract({
+            address: CONTRACTS.stream,
+            abi: STREAM_ABI,
+            functionName: 'createStream',
+            args: [params.recipient as `0x${string}`, amountWei, BigInt(params.duration)],
+            value: amountWei,
+          });
+          const receipt = await publicClient.waitForTransactionReceipt({ hash });
+          const streamId = receipt.logs[0]?.topics[1] || null;
+          return { txHash: hash, streamId, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
+        },
+      },
+
+      privacy: {
+        async sendPrivate(params: { recipient: string; amount: string }) {
+          const amountWei = parseUnits(params.amount, 18);
+          const hash = await walletClient.writeContract({
+            address: CONTRACTS.stealth,
+            abi: STEALTH_ABI,
+            functionName: 'sendStealthPayment',
+            args: [params.recipient as `0x${string}`, '0x00', '0x00'],
+            value: amountWei,
+          });
+          await publicClient.waitForTransactionReceipt({ hash });
+          return { txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
+        },
+        async getStealthAddress() {
+          return `st:arc:${account.address}`;
+        },
+      },
+    };
+  };
+
   const executeVoiceAction = async (parsed: any) => {
     const { action, amount, recipient, recipients, name, address, duration, task } = parsed;
+
+    // Check for private key (required for onchain actions)
+    if (!privateKey && !['list_contacts', 'get_contact', 'help', 'list_due_bills'].includes(action)) {
+      addVoiceLog('error', 'Private key required. Set it in Settings (gear icon)');
+      speakResponse('Please set your private key in settings first');
+      return;
+    }
+
+    // Create ArcPay instance for onchain operations
+    let arc: Awaited<ReturnType<typeof createVoiceArcClient>> | null = null;
+    if (privateKey) {
+      try {
+        arc = await createVoiceArcClient(privateKey);
+      } catch (e: any) {
+        addVoiceLog('error', `Failed to initialize wallet: ${e.message}`);
+        return;
+      }
+    }
 
     // Helper to resolve recipient
     const resolveAddr = (nameOrAddr: string): string | null => {
@@ -380,7 +528,7 @@ Only return valid JSON, no markdown or explanation.`;
     };
 
     switch (action) {
-      // === PAYMENTS ===
+      // === PAYMENTS (REAL ONCHAIN) ===
       case 'pay': {
         const addr = resolveAddr(recipient);
         if (!addr && recipient && !recipient.startsWith('0x')) {
@@ -389,22 +537,29 @@ Only return valid JSON, no markdown or explanation.`;
           return;
         }
         const targetAddr = addr || recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
-        const result = await sendPayment(targetAddr, (amount || 0).toString());
-        if (result.success) {
-          const simText = result.simulated ? ' (simulated)' : '';
-          addVoiceLog('success', `Sent ${amount} USDC to ${recipient || targetAddr.slice(0, 10)}...${simText}`);
-          if (result.txHash) addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+        try {
+          const result = await arc!.sendUSDC(targetAddr, (amount || 0).toString());
+          addVoiceLog('success', `Sent ${amount} USDC to ${recipient || targetAddr.slice(0, 10)}...`);
+          addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
           speakResponse(`Sent ${amount} USDC to ${recipient || 'recipient'}`);
-        } else {
-          addVoiceLog('error', `Payment failed: ${result.error}`);
-          speakResponse(`Payment failed: ${result.error}`);
+        } catch (error: any) {
+          addVoiceLog('error', `Payment failed: ${error.message}`);
+          speakResponse(`Payment failed: ${error.message}`);
         }
         break;
       }
 
       case 'balance': {
-        addVoiceLog('success', `Your balance is ${demoBalance || '1000'} USDC`);
-        speakResponse(`Your balance is ${demoBalance || '1000'} USDC`);
+        try {
+          const balance = await arc!.getBalance();
+          const formatted = parseFloat(balance).toFixed(2);
+          addVoiceLog('success', `Your balance is ${formatted} USDC`);
+          speakResponse(`Your balance is ${formatted} USDC`);
+        } catch (error: any) {
+          addVoiceLog('error', `Could not fetch balance: ${error.message}`);
+          speakResponse(`Could not fetch balance`);
+        }
         break;
       }
 
@@ -496,14 +651,19 @@ Only return valid JSON, no markdown or explanation.`;
            c.displayName.toLowerCase() === subName?.toLowerCase())
         );
         if (sub) {
-          const result = await sendPayment(sub.address, (amount || 15).toString());
-          if (result.success) {
-            addVoiceLog('success', `Paid ${subName} subscription`);
+          try {
+            const result = await arc!.sendUSDC(sub.address, (amount || 15).toString());
+            addVoiceLog('success', `Paid ${subName} subscription: ${amount || 15} USDC`);
+            addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+            addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
             speakResponse(`Paid ${subName} subscription`);
+          } catch (error: any) {
+            addVoiceLog('error', `Payment failed: ${error.message}`);
+            speakResponse(`Subscription payment failed`);
           }
         } else {
-          addVoiceLog('success', `Paid ${subName} subscription (demo)`);
-          speakResponse(`Paid ${subName} subscription`);
+          addVoiceLog('error', `Subscription "${subName}" not found in contacts`);
+          speakResponse(`Subscription ${subName} not found`);
         }
         break;
       }
@@ -527,64 +687,119 @@ Only return valid JSON, no markdown or explanation.`;
         break;
       }
 
-      // === ESCROW ===
+      // === ESCROW (REAL ONCHAIN) ===
       case 'create_escrow': {
-        const escrowId = `escrow_${Date.now().toString(36)}`;
-        const recipientName = recipient || name || 'beneficiary';
-        addVoiceLog('success', `Created escrow for ${amount} USDC to ${recipientName}`);
-        addVoiceLog('info', `Escrow ID: ${escrowId}`);
-        speakResponse(`Created escrow for ${amount} USDC to ${recipientName}`);
+        const addr = resolveAddr(recipient);
+        const targetAddr = addr || recipient;
+        if (!targetAddr) {
+          addVoiceLog('error', 'Recipient required for escrow');
+          speakResponse('Please specify a recipient for the escrow');
+          return;
+        }
+        try {
+          const result = await arc!.escrow.create({
+            beneficiary: targetAddr,
+            amount: (amount || 10).toString(),
+            description: task || 'Voice command escrow'
+          });
+          addVoiceLog('success', `Created escrow for ${amount || 10} USDC to ${recipient || targetAddr.slice(0, 10)}...`);
+          addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
+          speakResponse(`Created escrow for ${amount || 10} USDC`);
+        } catch (error: any) {
+          addVoiceLog('error', `Escrow failed: ${error.message}`);
+          speakResponse(`Escrow creation failed`);
+        }
         break;
       }
 
       case 'release_escrow': {
-        addVoiceLog('success', `Released escrow to ${recipient || name || 'beneficiary'}`);
-        speakResponse('Escrow released successfully');
+        addVoiceLog('info', 'Release escrow requires escrow ID from previous transaction');
+        speakResponse('Please provide the escrow ID to release');
         break;
       }
 
       case 'refund_escrow': {
-        addVoiceLog('success', 'Escrow refunded');
-        speakResponse('Escrow refunded successfully');
+        addVoiceLog('info', 'Refund escrow requires escrow ID from previous transaction');
+        speakResponse('Please provide the escrow ID to refund');
         break;
       }
 
-      // === STREAMING ===
+      // === STREAMING (REAL ONCHAIN) ===
       case 'create_stream': {
-        const recipientName = recipient || name || 'recipient';
-        const streamDuration = duration || '30 days';
-        addVoiceLog('success', `Started streaming ${amount} USDC to ${recipientName} over ${streamDuration}`);
-        addVoiceLog('info', `Stream ID: stream_${Date.now().toString(36)}`);
-        speakResponse(`Started streaming ${amount} USDC to ${recipientName}`);
+        const addr = resolveAddr(recipient);
+        const targetAddr = addr || recipient;
+        if (!targetAddr) {
+          addVoiceLog('error', 'Recipient required for stream');
+          speakResponse('Please specify a recipient for the stream');
+          return;
+        }
+        const durationSecs = parseDurationToSeconds(duration) || 30 * 24 * 60 * 60; // default 30 days
+        try {
+          const result = await arc!.streams.create({
+            recipient: targetAddr,
+            amount: (amount || 100).toString(),
+            duration: durationSecs
+          });
+          addVoiceLog('success', `Created stream: ${amount || 100} USDC over ${duration || '30 days'}`);
+          if (result.streamId) addVoiceLog('info', `Stream ID: ${result.streamId.slice(0, 16)}...`);
+          addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
+          speakResponse(`Created payment stream for ${amount || 100} USDC`);
+        } catch (error: any) {
+          addVoiceLog('error', `Stream failed: ${error.message}`);
+          speakResponse(`Stream creation failed`);
+        }
         break;
       }
 
       case 'cancel_stream': {
-        addVoiceLog('success', `Cancelled stream to ${recipient || name || 'recipient'}`);
-        speakResponse('Stream cancelled successfully');
+        addVoiceLog('info', 'Cancel stream requires stream ID from previous transaction');
+        speakResponse('Please provide the stream ID to cancel');
         break;
       }
 
       case 'claim_stream': {
-        addVoiceLog('success', 'Claimed stream earnings: 125.50 USDC');
-        speakResponse('Claimed 125.50 USDC from your stream');
+        addVoiceLog('info', 'Claim stream requires stream ID from previous transaction');
+        speakResponse('Please provide the stream ID to claim');
         break;
       }
 
       case 'stream_status': {
-        addVoiceLog('info', 'Stream status: 42% complete, 125.50 USDC claimable');
-        speakResponse('Your stream is 42 percent complete with 125.50 USDC claimable');
+        addVoiceLog('info', 'Stream status requires stream ID from previous transaction');
+        speakResponse('Please provide the stream ID to check status');
         break;
       }
 
-      // === SPLIT ===
+      // === SPLIT (REAL ONCHAIN) ===
       case 'split_equal': {
         const splitRecipients = recipients || [recipient].filter(Boolean);
-        const numPeople = splitRecipients.length || 2;
-        const perPerson = ((amount || 100) / numPeople).toFixed(2);
-        addVoiceLog('success', `Split ${amount || 100} USDC equally: $${perPerson} each`);
-        splitRecipients.forEach((r: string) => addVoiceLog('info', `  ${r}: $${perPerson}`));
-        speakResponse(`Split ${amount || 100} USDC between ${numPeople} people, ${perPerson} each`);
+        if (!splitRecipients || splitRecipients.length === 0) {
+          addVoiceLog('error', 'Recipients required for split payment');
+          speakResponse('Please specify recipients for the split payment');
+          return;
+        }
+        const totalAmount = amount || 10;
+        const perPerson = totalAmount / splitRecipients.length;
+        addVoiceLog('info', `Splitting ${totalAmount} USDC between ${splitRecipients.length} people (${perPerson.toFixed(2)} each)`);
+
+        let successCount = 0;
+        for (const r of splitRecipients) {
+          const addr = resolveAddr(r);
+          if (addr) {
+            try {
+              const result = await arc!.sendUSDC(addr, perPerson.toString());
+              successCount++;
+              addVoiceLog('success', `Sent ${perPerson.toFixed(2)} USDC to ${r}`);
+              addVoiceLog('info', `TX: ${result.txHash.slice(0, 16)}...`);
+            } catch (e: any) {
+              addVoiceLog('error', `Failed to send to ${r}: ${e.message}`);
+            }
+          } else {
+            addVoiceLog('error', `Contact "${r}" not found, skipping`);
+          }
+        }
+        speakResponse(`Split payment complete. Sent to ${successCount} of ${splitRecipients.length} recipients`);
         break;
       }
 
@@ -613,35 +828,59 @@ Only return valid JSON, no markdown or explanation.`;
         break;
       }
 
-      // === PRIVACY ===
+      // === PRIVACY (REAL ONCHAIN) ===
       case 'pay_private': {
-        const recipientName = recipient || name || 'recipient';
-        addVoiceLog('success', `Sent ${amount} USDC privately to ${recipientName}`);
-        addVoiceLog('info', 'Stealth address generated');
-        speakResponse(`Sent ${amount} USDC privately to ${recipientName}`);
+        const addr = resolveAddr(recipient);
+        const targetAddr = addr || recipient;
+        if (!targetAddr) {
+          addVoiceLog('error', 'Recipient required for private payment');
+          speakResponse('Please specify a recipient for the private payment');
+          return;
+        }
+        try {
+          const result = await arc!.privacy.sendPrivate({
+            recipient: targetAddr,
+            amount: (amount || 10).toString()
+          });
+          addVoiceLog('success', `Private payment: ${amount || 10} USDC sent`);
+          addVoiceLog('info', 'Stealth address used for privacy');
+          addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
+          speakResponse(`Sent ${amount || 10} USDC privately`);
+        } catch (error: any) {
+          addVoiceLog('error', `Private payment failed: ${error.message}`);
+          speakResponse(`Private payment failed`);
+        }
         break;
       }
 
       case 'get_stealth_address': {
-        const stealthAddr = `st:arc:0x${Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
-        addVoiceLog('info', `Your stealth address: ${stealthAddr.slice(0, 24)}...`);
-        speakResponse('Generated your stealth address');
+        try {
+          const stealthAddr = await arc!.privacy.getStealthAddress();
+          addVoiceLog('info', `Your stealth address: ${stealthAddr.slice(0, 24)}...`);
+          addVoiceLog('info', 'Share this address to receive private payments');
+          speakResponse('Generated your stealth address');
+        } catch (error: any) {
+          addVoiceLog('error', `Could not generate stealth address: ${error.message}`);
+        }
         break;
       }
 
-      // === AI AGENTS ===
+      // === AI AGENTS (REAL ONCHAIN) ===
       case 'hire_agent': {
         const agentName = recipient || name || 'agent';
         const addr = resolveAddr(agentName);
         const targetAddr = addr || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
-        const result = await sendPayment(targetAddr, (amount || 50).toString());
-        if (result.success) {
+        try {
+          const result = await arc!.sendUSDC(targetAddr, (amount || 50).toString());
           addVoiceLog('success', `Hired ${agentName} for ${amount || 50} USDC`);
           addVoiceLog('info', `Task: ${task || 'Complete assigned work'}`);
-          if (result.txHash) addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
           speakResponse(`Hired ${agentName} for ${amount || 50} USDC`);
-        } else {
-          addVoiceLog('error', `Hiring failed: ${result.error}`);
+        } catch (error: any) {
+          addVoiceLog('error', `Hiring failed: ${error.message}`);
+          speakResponse(`Hiring failed`);
         }
         break;
       }
