@@ -9,5 +9,5 @@ export default defineConfig({
   clean: true,
   minify: false,
   treeshake: true,
-  external: ['express', 'react', 'react-dom'],
+  external: ['express', 'react', 'react-dom', '@google/generative-ai'],
 });

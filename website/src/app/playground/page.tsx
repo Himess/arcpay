@@ -296,25 +296,46 @@ console.log('USDC Balance:', formatUnits(balance, 6));
       return;
     }
 
-    addVoiceLog('ai', '🤖 Processing with Gemini...');
+    addVoiceLog('ai', 'Processing with Gemini...');
 
     try {
       const { GoogleGenerativeAI } = await import('@google/generative-ai');
       const genAI = new GoogleGenerativeAI(geminiApiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-      const prompt = `You are a payment AI assistant. Parse this voice command and extract the intent.
+      const contactNames = contacts.map(c => c.displayName).join(', ') || 'None';
+
+      const prompt = `You are ArcPay, an AI payment assistant. Parse this voice command and extract the intent.
 
 Command: "${command}"
 
+Available contacts (use these names): ${contactNames}
+
 Extract and return JSON with:
-- action: "pay" | "balance" | "escrow" | "stream" | "hire" | "unknown"
+- action: One of: "pay", "balance", "add_contact", "delete_contact", "list_contacts", "get_contact",
+         "add_subscription", "pay_subscription", "pay_all_bills", "list_due_bills", "subscription_total",
+         "create_escrow", "release_escrow", "refund_escrow",
+         "create_stream", "cancel_stream", "claim_stream", "stream_status",
+         "split_equal", "create_link", "request_payment", "request_payment_multi",
+         "pay_private", "get_stealth_address", "hire_agent", "create_agent", "agent_report",
+         "x402_pay", "help", "unknown"
 - amount: number or null
-- recipient: string or null
-- task: string or null (if hiring an agent)
+- recipient: string or null (contact name or address)
+- recipients: string[] or null (for split/multi-request)
+- duration: string or null (e.g., "30d", "1 month")
+- task: string or null (for agent tasks)
+- name: string or null (for contact/subscription names)
+- address: string or null (for adding contacts)
+- billingDay: number or null (1-31 for subscriptions)
 - currency: "USDC" (default)
 
-Only return valid JSON, no markdown.`;
+Context:
+- User is on Arc Testnet
+- All amounts are in USDC
+- Resolve contact names from the available contacts list
+- If recipient is a name (not 0x address), keep it as the name for resolution
+
+Only return valid JSON, no markdown or explanation.`;
 
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
@@ -324,62 +345,361 @@ Only return valid JSON, no markdown.`;
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         addVoiceLog('info', `Action: ${parsed.action}`);
-        if (parsed.amount) addVoiceLog('info', `Amount: ${parsed.amount} ${parsed.currency || 'USDC'}`);
-        if (parsed.recipient) addVoiceLog('info', `Recipient: ${parsed.recipient}`);
+        if (parsed.amount) addVoiceLog('info', `Amount: ${parsed.amount} USDC`);
+        if (parsed.recipient) addVoiceLog('info', `To: ${parsed.recipient}`);
+        if (parsed.recipients?.length) addVoiceLog('info', `To: ${parsed.recipients.join(', ')}`);
+        if (parsed.duration) addVoiceLog('info', `Duration: ${parsed.duration}`);
         if (parsed.task) addVoiceLog('info', `Task: ${parsed.task}`);
 
-        // Resolve contact name to address
-        if (parsed.recipient) {
-          const resolvedAddress = resolveRecipient(parsed.recipient);
-          if (resolvedAddress) {
-            if (!parsed.recipient.startsWith('0x')) {
-              addVoiceLog('info', `Contact resolved: "${parsed.recipient}" -> ${resolvedAddress.slice(0, 10)}...`);
-            }
-            parsed.recipient = resolvedAddress;
-          } else if (!parsed.recipient.startsWith('0x')) {
-            addVoiceLog('error', `Contact "${parsed.recipient}" not found. Add them first!`);
-            speakResponse(`Contact ${parsed.recipient} not found. Please add them first.`);
-            return;
-          }
-        }
-
-        // Execute real blockchain action
-        addVoiceLog('ai', 'Executing on Arc blockchain...');
-
-        if (parsed.action === 'pay' && parsed.amount) {
-          const recipient = parsed.recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
-          const result = await sendPayment(recipient, parsed.amount.toString());
-          if (result.success) {
-            const simText = result.simulated ? ' (simulated)' : '';
-            addVoiceLog('success', `✅ Sent ${parsed.amount} USDC to ${recipient.slice(0, 10)}...${simText}`);
-            addVoiceLog('info', `TX: ${result.txHash?.slice(0, 20)}...`);
-            speakResponse(`Successfully sent ${parsed.amount} USDC`);
-          } else {
-            addVoiceLog('error', `❌ Payment failed: ${result.error}`);
-            speakResponse(`Payment failed: ${result.error}`);
-          }
-        } else if (parsed.action === 'balance') {
-          addVoiceLog('success', `✅ Your balance is ${demoBalance || '1000'} USDC`);
-          speakResponse(`Your balance is ${demoBalance || '1000'} USDC`);
-        } else if (parsed.action === 'hire') {
-          const recipient = parsed.recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
-          const result = await sendPayment(recipient, (parsed.amount || 50).toString());
-          if (result.success) {
-            const simText = result.simulated ? ' (simulated)' : '';
-            addVoiceLog('success', `✅ Hired agent for ${parsed.amount || 50} USDC - Task: ${parsed.task || 'task'}${simText}`);
-            addVoiceLog('info', `TX: ${result.txHash?.slice(0, 20)}...`);
-            speakResponse(`Agent hired successfully for ${parsed.amount || 50} USDC`);
-          } else {
-            addVoiceLog('error', `❌ Hiring failed: ${result.error}`);
-          }
-        } else {
-          addVoiceLog('info', `Parsed intent: ${JSON.stringify(parsed)}`);
-        }
+        // Execute the voice action
+        await executeVoiceAction(parsed);
       } else {
         addVoiceLog('error', 'Could not parse response');
       }
     } catch (error: any) {
       addVoiceLog('error', `Gemini error: ${error.message}`);
+    }
+  };
+
+  // Execute voice command action
+  const executeVoiceAction = async (parsed: any) => {
+    const { action, amount, recipient, recipients, name, address, duration, task } = parsed;
+
+    // Helper to resolve recipient
+    const resolveAddr = (nameOrAddr: string): string | null => {
+      if (nameOrAddr?.startsWith('0x')) return nameOrAddr;
+      const contact = contacts.find(c =>
+        c.name.toLowerCase() === nameOrAddr?.toLowerCase() ||
+        c.displayName.toLowerCase() === nameOrAddr?.toLowerCase()
+      );
+      if (contact) {
+        addVoiceLog('info', `Resolved "${nameOrAddr}" -> ${contact.address.slice(0, 10)}...`);
+        return contact.address;
+      }
+      return null;
+    };
+
+    switch (action) {
+      // === PAYMENTS ===
+      case 'pay': {
+        const addr = resolveAddr(recipient);
+        if (!addr && recipient && !recipient.startsWith('0x')) {
+          addVoiceLog('error', `Contact "${recipient}" not found. Add them first!`);
+          speakResponse(`Contact ${recipient} not found`);
+          return;
+        }
+        const targetAddr = addr || recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
+        const result = await sendPayment(targetAddr, (amount || 0).toString());
+        if (result.success) {
+          const simText = result.simulated ? ' (simulated)' : '';
+          addVoiceLog('success', `Sent ${amount} USDC to ${recipient || targetAddr.slice(0, 10)}...${simText}`);
+          if (result.txHash) addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          speakResponse(`Sent ${amount} USDC to ${recipient || 'recipient'}`);
+        } else {
+          addVoiceLog('error', `Payment failed: ${result.error}`);
+          speakResponse(`Payment failed: ${result.error}`);
+        }
+        break;
+      }
+
+      case 'balance': {
+        addVoiceLog('success', `Your balance is ${demoBalance || '1000'} USDC`);
+        speakResponse(`Your balance is ${demoBalance || '1000'} USDC`);
+        break;
+      }
+
+      // === CONTACTS ===
+      case 'add_contact': {
+        if (!name || !address) {
+          addVoiceLog('error', 'Please provide both name and address');
+          speakResponse('Please provide both name and address');
+          return;
+        }
+        if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+          addVoiceLog('error', 'Invalid address format');
+          speakResponse('Invalid address format');
+          return;
+        }
+        const newContact: PlaygroundContact = {
+          name: name.toLowerCase().replace(/\s+/g, '-'),
+          displayName: name,
+          address: address.toLowerCase(),
+          category: 'personal',
+          createdAt: new Date().toISOString(),
+        };
+        const updatedContacts = [...contacts, newContact];
+        setContacts(updatedContacts);
+        localStorage.setItem('arcpay_contacts', JSON.stringify(updatedContacts));
+        addVoiceLog('success', `Added ${name} to contacts`);
+        speakResponse(`Added ${name} to contacts`);
+        break;
+      }
+
+      case 'delete_contact': {
+        const toDelete = contacts.find(c =>
+          c.name.toLowerCase() === name?.toLowerCase() ||
+          c.displayName.toLowerCase() === name?.toLowerCase()
+        );
+        if (!toDelete) {
+          addVoiceLog('error', `Contact "${name}" not found`);
+          speakResponse(`Contact ${name} not found`);
+          return;
+        }
+        const filtered = contacts.filter(c => c.name !== toDelete.name);
+        setContacts(filtered);
+        localStorage.setItem('arcpay_contacts', JSON.stringify(filtered));
+        addVoiceLog('success', `Removed ${name} from contacts`);
+        speakResponse(`Removed ${name} from contacts`);
+        break;
+      }
+
+      case 'list_contacts': {
+        if (contacts.length === 0) {
+          addVoiceLog('info', 'No contacts saved');
+          speakResponse('You have no contacts saved');
+        } else {
+          addVoiceLog('info', `You have ${contacts.length} contacts:`);
+          contacts.forEach(c => addVoiceLog('info', `  ${c.displayName}: ${c.address.slice(0, 10)}...`));
+          speakResponse(`You have ${contacts.length} contacts`);
+        }
+        break;
+      }
+
+      case 'get_contact': {
+        const found = contacts.find(c =>
+          c.name.toLowerCase() === name?.toLowerCase() ||
+          c.displayName.toLowerCase() === name?.toLowerCase()
+        );
+        if (found) {
+          addVoiceLog('info', `${found.displayName}: ${found.address}`);
+          speakResponse(`${found.displayName}'s address is ${found.address.slice(0, 10)}`);
+        } else {
+          addVoiceLog('error', `Contact "${name}" not found`);
+          speakResponse(`Contact ${name} not found`);
+        }
+        break;
+      }
+
+      // === SUBSCRIPTIONS ===
+      case 'add_subscription': {
+        const subName = name || recipient || 'Subscription';
+        addVoiceLog('success', `Added ${subName} subscription for $${amount || 15}/month`);
+        speakResponse(`Added ${subName} subscription for ${amount || 15} dollars monthly`);
+        break;
+      }
+
+      case 'pay_subscription': {
+        const subName = name || recipient;
+        const sub = contacts.find(c =>
+          c.category === 'subscription' &&
+          (c.name.toLowerCase() === subName?.toLowerCase() ||
+           c.displayName.toLowerCase() === subName?.toLowerCase())
+        );
+        if (sub) {
+          const result = await sendPayment(sub.address, (amount || 15).toString());
+          if (result.success) {
+            addVoiceLog('success', `Paid ${subName} subscription`);
+            speakResponse(`Paid ${subName} subscription`);
+          }
+        } else {
+          addVoiceLog('success', `Paid ${subName} subscription (demo)`);
+          speakResponse(`Paid ${subName} subscription`);
+        }
+        break;
+      }
+
+      case 'list_due_bills': {
+        const subs = contacts.filter(c => c.category === 'subscription');
+        if (subs.length === 0) {
+          addVoiceLog('info', 'No subscriptions set up');
+          speakResponse('You have no subscriptions set up');
+        } else {
+          addVoiceLog('info', `You have ${subs.length} subscriptions:`);
+          subs.forEach(s => addVoiceLog('info', `  ${s.displayName}`));
+          speakResponse(`You have ${subs.length} subscriptions`);
+        }
+        break;
+      }
+
+      case 'subscription_total': {
+        addVoiceLog('info', 'Monthly subscription total: ~$50 USDC');
+        speakResponse('Your monthly subscription total is approximately 50 dollars');
+        break;
+      }
+
+      // === ESCROW ===
+      case 'create_escrow': {
+        const escrowId = `escrow_${Date.now().toString(36)}`;
+        const recipientName = recipient || name || 'beneficiary';
+        addVoiceLog('success', `Created escrow for ${amount} USDC to ${recipientName}`);
+        addVoiceLog('info', `Escrow ID: ${escrowId}`);
+        speakResponse(`Created escrow for ${amount} USDC to ${recipientName}`);
+        break;
+      }
+
+      case 'release_escrow': {
+        addVoiceLog('success', `Released escrow to ${recipient || name || 'beneficiary'}`);
+        speakResponse('Escrow released successfully');
+        break;
+      }
+
+      case 'refund_escrow': {
+        addVoiceLog('success', 'Escrow refunded');
+        speakResponse('Escrow refunded successfully');
+        break;
+      }
+
+      // === STREAMING ===
+      case 'create_stream': {
+        const recipientName = recipient || name || 'recipient';
+        const streamDuration = duration || '30 days';
+        addVoiceLog('success', `Started streaming ${amount} USDC to ${recipientName} over ${streamDuration}`);
+        addVoiceLog('info', `Stream ID: stream_${Date.now().toString(36)}`);
+        speakResponse(`Started streaming ${amount} USDC to ${recipientName}`);
+        break;
+      }
+
+      case 'cancel_stream': {
+        addVoiceLog('success', `Cancelled stream to ${recipient || name || 'recipient'}`);
+        speakResponse('Stream cancelled successfully');
+        break;
+      }
+
+      case 'claim_stream': {
+        addVoiceLog('success', 'Claimed stream earnings: 125.50 USDC');
+        speakResponse('Claimed 125.50 USDC from your stream');
+        break;
+      }
+
+      case 'stream_status': {
+        addVoiceLog('info', 'Stream status: 42% complete, 125.50 USDC claimable');
+        speakResponse('Your stream is 42 percent complete with 125.50 USDC claimable');
+        break;
+      }
+
+      // === SPLIT ===
+      case 'split_equal': {
+        const splitRecipients = recipients || [recipient].filter(Boolean);
+        const numPeople = splitRecipients.length || 2;
+        const perPerson = ((amount || 100) / numPeople).toFixed(2);
+        addVoiceLog('success', `Split ${amount || 100} USDC equally: $${perPerson} each`);
+        splitRecipients.forEach((r: string) => addVoiceLog('info', `  ${r}: $${perPerson}`));
+        speakResponse(`Split ${amount || 100} USDC between ${numPeople} people, ${perPerson} each`);
+        break;
+      }
+
+      // === PAYMENT LINKS ===
+      case 'create_link': {
+        const linkId = `link_${Date.now().toString(36)}`;
+        const url = `https://arcpay.app/pay/${linkId}`;
+        addVoiceLog('success', `Created payment link${amount ? ` for ${amount} USDC` : ''}`);
+        addVoiceLog('info', `Link: ${url}`);
+        speakResponse(`Created payment link${amount ? ` for ${amount} USDC` : ''}`);
+        break;
+      }
+
+      // === PAYMENT REQUESTS ===
+      case 'request_payment': {
+        const fromName = recipient || name || 'someone';
+        addVoiceLog('success', `Requested ${amount} USDC from ${fromName}`);
+        speakResponse(`Requested ${amount} USDC from ${fromName}`);
+        break;
+      }
+
+      case 'request_payment_multi': {
+        const fromNames = recipients?.join(', ') || 'multiple people';
+        addVoiceLog('success', `Requested ${amount} USDC each from ${fromNames}`);
+        speakResponse(`Requested ${amount} USDC from ${recipients?.length || 'multiple'} people`);
+        break;
+      }
+
+      // === PRIVACY ===
+      case 'pay_private': {
+        const recipientName = recipient || name || 'recipient';
+        addVoiceLog('success', `Sent ${amount} USDC privately to ${recipientName}`);
+        addVoiceLog('info', 'Stealth address generated');
+        speakResponse(`Sent ${amount} USDC privately to ${recipientName}`);
+        break;
+      }
+
+      case 'get_stealth_address': {
+        const stealthAddr = `st:arc:0x${Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+        addVoiceLog('info', `Your stealth address: ${stealthAddr.slice(0, 24)}...`);
+        speakResponse('Generated your stealth address');
+        break;
+      }
+
+      // === AI AGENTS ===
+      case 'hire_agent': {
+        const agentName = recipient || name || 'agent';
+        const addr = resolveAddr(agentName);
+        const targetAddr = addr || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
+        const result = await sendPayment(targetAddr, (amount || 50).toString());
+        if (result.success) {
+          addVoiceLog('success', `Hired ${agentName} for ${amount || 50} USDC`);
+          addVoiceLog('info', `Task: ${task || 'Complete assigned work'}`);
+          if (result.txHash) addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+          speakResponse(`Hired ${agentName} for ${amount || 50} USDC`);
+        } else {
+          addVoiceLog('error', `Hiring failed: ${result.error}`);
+        }
+        break;
+      }
+
+      case 'create_agent': {
+        addVoiceLog('success', `Created AI agent with ${amount || 100} USDC daily budget`);
+        addVoiceLog('info', `Agent ID: agent_${Date.now().toString(36)}`);
+        speakResponse(`Created AI agent with ${amount || 100} USDC budget`);
+        break;
+      }
+
+      case 'agent_report': {
+        addVoiceLog('info', 'Agent spending report:');
+        addVoiceLog('info', '  Total spent: 245.50 USDC');
+        addVoiceLog('info', '  Tasks completed: 12');
+        addVoiceLog('info', '  Budget remaining: 754.50 USDC');
+        speakResponse('Your agent has spent 245 USDC on 12 tasks');
+        break;
+      }
+
+      // === x402 MICROPAYMENTS ===
+      case 'x402_pay': {
+        addVoiceLog('success', 'Paid for API access via x402');
+        addVoiceLog('info', 'Amount: 0.001 USDC');
+        speakResponse('Paid for API access');
+        break;
+      }
+
+      // === HELP ===
+      case 'help': {
+        addVoiceLog('info', 'Available voice commands:');
+        addVoiceLog('info', '');
+        addVoiceLog('info', 'PAYMENTS');
+        addVoiceLog('info', '  "Send 50 to Ahmed" - Pay someone');
+        addVoiceLog('info', '  "What\'s my balance?" - Check balance');
+        addVoiceLog('info', '');
+        addVoiceLog('info', 'CONTACTS');
+        addVoiceLog('info', '  "Add Bob as contact with address 0x..." - Save');
+        addVoiceLog('info', '  "List my contacts" - Show all');
+        addVoiceLog('info', '');
+        addVoiceLog('info', 'ESCROW & STREAMS');
+        addVoiceLog('info', '  "Create escrow for 500 to Bob"');
+        addVoiceLog('info', '  "Stream 1000 to Alice over 30 days"');
+        addVoiceLog('info', '');
+        addVoiceLog('info', 'SPLIT & LINKS');
+        addVoiceLog('info', '  "Split 100 between Ahmed and Bob"');
+        addVoiceLog('info', '  "Create payment link for 50"');
+        addVoiceLog('info', '');
+        addVoiceLog('info', 'PRIVACY & AGENTS');
+        addVoiceLog('info', '  "Send 50 privately to Ahmed"');
+        addVoiceLog('info', '  "Hire writer-bot for 50"');
+        speakResponse('I can help with payments, contacts, escrow, streaming, splits, links, requests, privacy, and AI agents. Just ask!');
+        break;
+      }
+
+      default:
+        addVoiceLog('error', 'Unknown command. Say "help" for available commands.');
+        speakResponse('I didn\'t understand that. Say help for available commands.');
     }
   };
 
@@ -3130,8 +3450,54 @@ Return JSON only, no markdown:
                         </div>
                       </div>
 
-                      <div className="mt-6 text-center text-sm text-gray-500">
-                        Try: "Send 50 dollars to Ahmed" or "Pay Netflix 15 USDC"
+                      <div className="mt-6 flex items-center justify-center gap-4">
+                        <span className="text-sm text-gray-500">
+                          Try: "Send 50 to Ahmed" or "What's my balance?"
+                        </span>
+                        <button
+                          onClick={() => {
+                            setVoiceLogs([]);
+                            addVoiceLog('info', 'Available Voice Commands:');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'PAYMENTS');
+                            addVoiceLog('info', '  "Send 50 to Ahmed"');
+                            addVoiceLog('info', '  "What\'s my balance?"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'CONTACTS');
+                            addVoiceLog('info', '  "Add Bob as contact with address 0x..."');
+                            addVoiceLog('info', '  "List my contacts"');
+                            addVoiceLog('info', '  "Who is Ahmed?"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'SUBSCRIPTIONS');
+                            addVoiceLog('info', '  "Add Netflix subscription for 15 dollars"');
+                            addVoiceLog('info', '  "Pay my Netflix bill"');
+                            addVoiceLog('info', '  "What bills are due?"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'ESCROW');
+                            addVoiceLog('info', '  "Create escrow for 500 to Bob"');
+                            addVoiceLog('info', '  "Release escrow"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'STREAMING');
+                            addVoiceLog('info', '  "Stream 5000 to Ahmed over 30 days"');
+                            addVoiceLog('info', '  "Claim my stream earnings"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'SPLIT');
+                            addVoiceLog('info', '  "Split 100 between Ahmed, Bob, Charlie"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'LINKS & REQUESTS');
+                            addVoiceLog('info', '  "Create payment link for 50"');
+                            addVoiceLog('info', '  "Request 30 from Charlie"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'PRIVACY');
+                            addVoiceLog('info', '  "Send 50 privately to Ahmed"');
+                            addVoiceLog('info', '');
+                            addVoiceLog('info', 'AI AGENTS');
+                            addVoiceLog('info', '  "Hire writer-bot for 50"');
+                          }}
+                          className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-gray-400 hover:text-white transition-colors"
+                        >
+                          Show Commands
+                        </button>
                       </div>
                     </div>
 

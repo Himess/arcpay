@@ -30,6 +30,11 @@ import { ArcPay } from '../core/client';
 import { createSplitManager, type SplitResult, type SplitRecipient } from '../modules/split';
 import { createLinkManager, type PaymentLink } from '../modules/links';
 import { createRequestManager, type PaymentRequest } from '../modules/requests';
+import { createVoiceProcessor, SUPPORTED_COMMANDS, type VoiceConfig, type VoiceResult, type VoiceProcessor } from '../modules/voice';
+
+// Re-export voice types and constants
+export { createVoiceProcessor, SUPPORTED_COMMANDS };
+export type { VoiceConfig, VoiceResult, VoiceProcessor };
 
 // Global configuration
 let globalConfig: {
@@ -1405,4 +1410,7 @@ export default {
   getOutgoingRequests,
   payRequest,
   declineRequest,
+  // Voice
+  createVoiceProcessor,
+  SUPPORTED_COMMANDS,
 };
