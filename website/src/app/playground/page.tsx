@@ -61,7 +61,7 @@ const DEMO_CONFIG = {
 };
 
 // Helper function to send real payment via API
-async function sendPayment(to: string, amount: string): Promise<{ success: boolean; txHash?: string; error?: string; simulated?: boolean }> {
+async function sendPayment(to: string, amount: string): Promise<{ success: boolean; txHash?: string; error?: string }> {
   try {
     const response = await fetch('/api/pay', {
       method: 'POST',
@@ -69,10 +69,10 @@ async function sendPayment(to: string, amount: string): Promise<{ success: boole
       body: JSON.stringify({ to, amount }),
     });
     const data = await response.json();
-    if (data.error && !data.simulated) {
+    if (data.error) {
       return { success: false, error: data.error };
     }
-    return { success: true, txHash: data.txHash, simulated: data.simulated };
+    return { success: true, txHash: data.txHash };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -523,7 +523,7 @@ Only return valid JSON, no markdown or explanation.`;
           return { success: true, txHash: hash, sponsoredAmount: '0.001', explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
         },
       },
-      // Yield Token (USYC)
+      // Yield Token (USYC) - Read-only (deposit/withdraw require Teller contract)
       usyc: {
         async getBalance() {
           const balance = await publicClient.readContract({
@@ -533,39 +533,65 @@ Only return valid JSON, no markdown or explanation.`;
             args: [account.address],
           });
           const usycBalance = formatUnits(balance as bigint, 6);
+          // USYC/USDC rate - would come from Teller contract in production
           const rate = 1.0234;
           return { usyc: usycBalance, usdcValue: (parseFloat(usycBalance) * rate).toFixed(2), yield: (parseFloat(usycBalance) * (rate - 1)).toFixed(4) };
         },
         async getExchangeRate() {
+          // In production, fetch from Teller contract
           return '1.0234';
         },
-        async deposit(amount: string) {
-          const amountWei = parseUnits(amount, 6);
-          const hash = await walletClient.writeContract({
-            address: CONTRACTS.usyc,
-            abi: ERC20_ABI,
-            functionName: 'transfer',
-            args: [CONTRACTS.usyc, amountWei],
-          });
-          await publicClient.waitForTransactionReceipt({ hash });
-          return { usycReceived: (parseFloat(amount) / 1.0234).toFixed(2), txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
-        },
-        async withdraw(amount: string) {
-          const hash = await walletClient.writeContract({
-            address: CONTRACTS.usyc,
-            abi: ERC20_ABI,
-            functionName: 'transfer',
-            args: [account.address, parseUnits(amount, 6)],
-          });
-          await publicClient.waitForTransactionReceipt({ hash });
-          return { usdcReceived: (parseFloat(amount) * 1.0234).toFixed(2), txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
-        },
+        // NOTE: deposit() and withdraw() removed - require Teller contract integration
       },
-      // Micropayments (x402)
+      // Micropayments (x402) - Real Implementation
       micropayments: {
         async pay<T>(url: string, options?: { maxPrice?: string }): Promise<T> {
-          console.log(`[Micropayments] Paying for access to: ${url}`);
-          return { success: true, url, paid: options?.maxPrice || '0.01' } as T;
+          // 1. Check if endpoint requires payment (HEAD request)
+          const checkRes = await fetch(url, { method: 'HEAD' });
+
+          if (checkRes.status === 402) {
+            // 2. Parse payment requirements from headers
+            const price = checkRes.headers.get('X-Price') || '0.001';
+            const payTo = checkRes.headers.get('X-Pay-To');
+            const network = checkRes.headers.get('X-Network') || 'arc-testnet';
+
+            if (!payTo) throw new Error('No payment address in 402 response');
+
+            // 3. Check max price
+            const maxPrice = parseFloat(options?.maxPrice || '1.00');
+            if (parseFloat(price) > maxPrice) {
+              throw new Error(`Price ${price} exceeds max ${maxPrice}`);
+            }
+
+            // 4. Send REAL USDC payment onchain
+            const amountWei = parseUnits(price, 18);
+            const hash = await walletClient.sendTransaction({
+              to: payTo as `0x${string}`,
+              value: amountWei,
+            });
+            await publicClient.waitForTransactionReceipt({ hash });
+
+            // 5. Fetch content with payment proof
+            const response = await fetch(url, {
+              headers: {
+                'X-Payment': JSON.stringify({
+                  txHash: hash,
+                  amount: price,
+                  network,
+                }),
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Payment accepted but content fetch failed: ${response.status}`);
+            }
+
+            return response.json() as Promise<T>;
+          }
+
+          // No payment required, fetch directly
+          const response = await fetch(url);
+          return response.json() as Promise<T>;
         },
       },
     };
@@ -1506,8 +1532,7 @@ Return JSON only, no markdown:
     if (result.success) {
       setPaymentTxHash(result.txHash || null);
       setAnalysisResult(prev => prev ? { ...prev, paid: true } : null);
-      const simText = result.simulated ? ' (simulated)' : '';
-      speakResponse(`Payment of ${analysisResult.amount} USDC sent successfully${simText}`);
+      speakResponse(`Payment of ${analysisResult.amount} USDC sent successfully`);
     } else {
       alert(`Payment failed: ${result.error}`);
     }
@@ -3385,57 +3410,49 @@ Return JSON only, no markdown:
             },
           },
 
-          // ==================== GAS STATION ====================
+          // ==================== GAS STATION (Circle Gas Station API) ====================
           gasStation: {
-            _balance: '0',
+            _walletId: null as string | null,
 
-            async deposit(amount: string) {
-              requireWallet();
-              console.log(`[GasStation] Depositing ${amount} for gas sponsorship...`);
-
-              this._balance = (parseFloat(this._balance) + parseFloat(amount)).toString();
-
-              return {
-                success: true,
-                newBalance: this._balance,
-                message: 'Demo: Gas station deposit simulated',
-              };
+            setWalletId(walletId: string) {
+              this._walletId = walletId;
             },
 
-            getBalance() {
-              return this._balance;
-            },
+            async sponsorTransaction(params: { to: string; data?: string; value?: string }) {
+              // Use Circle Gas Station via API
+              try {
+                const res = await fetch('/api/circle/gasless', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    walletId: this._walletId,
+                    to: params.to,
+                    data: params.data || '0x',
+                    value: params.value || '0',
+                  }),
+                });
 
-            async sponsorGas(userTx: { from: string; to: string; data?: string }) {
-              const gasEstimate = '0.001';
+                const result = await res.json();
 
-              if (parseFloat(this._balance) < parseFloat(gasEstimate)) {
-                return { success: false, error: 'Insufficient gas station balance' };
+                if (!result.success) {
+                  return { success: false, error: result.error };
+                }
+
+                return {
+                  success: true,
+                  txHash: result.txHash,
+                  gasSponsored: true,
+                  explorerUrl: result.explorerUrl,
+                };
+              } catch (e: any) {
+                return { success: false, error: e.message };
               }
-
-              this._balance = (parseFloat(this._balance) - parseFloat(gasEstimate)).toString();
-
-              return {
-                success: true,
-                sponsoredAmount: gasEstimate,
-                remainingBalance: this._balance,
-              };
             },
 
-            async withdraw(amount: string) {
-              requireWallet();
-
-              if (parseFloat(amount) > parseFloat(this._balance)) {
-                throw new Error('Insufficient balance');
-              }
-
-              this._balance = (parseFloat(this._balance) - parseFloat(amount)).toString();
-
-              return {
-                success: true,
-                withdrawn: amount,
-                remainingBalance: this._balance,
-              };
+            async isEligible(address: string) {
+              // Check if address is eligible for gas sponsorship
+              // In production, this would check Circle's gas station rules
+              return { eligible: true, reason: 'All Arc Testnet addresses are eligible' };
             },
           },
 
@@ -3729,8 +3746,7 @@ Return JSON only, no markdown:
 
       const result = await sendPayment(to, amount);
       if (result.success) {
-        const simText = result.simulated ? ' (simulated)' : '';
-        addConsoleLog('success', `✅ Sent ${amount} USDC to ${to}${simText}`);
+        addConsoleLog('success', `✅ Sent ${amount} USDC to ${to}`);
         addConsoleLog('info', `Tx: ${result.txHash}`);
       } else {
         addConsoleLog('error', `❌ Failed: ${result.error}`);

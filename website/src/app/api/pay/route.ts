@@ -54,14 +54,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
     }
 
-    // Check for private key
+    // Check for private key - required for real onchain transactions
     const privateKey = process.env.DEMO_PRIVATE_KEY;
     if (!privateKey) {
       return NextResponse.json({
-        error: 'Demo wallet not configured. Set DEMO_PRIVATE_KEY in .env.local',
-        simulated: true,
-        txHash: `0x${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`,
-      }, { status: 200 });
+        error: 'Demo wallet not configured. Set DEMO_PRIVATE_KEY in .env.local to enable payments.',
+      }, { status: 400 });
     }
 
     // Create account from private key
