@@ -641,6 +641,67 @@ export async function searchContacts(query: string): Promise<Contact[]> {
   return results.map(r => r.contact);
 }
 
+/**
+ * Pay by contact name or address
+ *
+ * @description Resolves a contact name to address and sends payment.
+ * If the recipient is already an address, sends directly.
+ *
+ * @param to - Contact name (e.g., "ahmed") or address (0x...)
+ * @param amount - Amount in USDC
+ * @param options - Optional configuration
+ *
+ * @returns Promise with transaction hash and resolved address
+ *
+ * @throws {ContactNotFoundError} When contact name is not found
+ * @throws {InsufficientBalanceError} When wallet doesn't have enough USDC
+ *
+ * @example
+ * ```typescript
+ * // Add contact first
+ * await addContact('ahmed', '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78');
+ *
+ * // Pay by name
+ * await payTo('ahmed', '50');
+ *
+ * // Or pay by address (still works)
+ * await payTo('0x742d35Cc...', '50');
+ * ```
+ */
+export async function payTo(
+  to: string,
+  amount: string,
+  options?: { privateKey?: string }
+): Promise<{ txHash: string; resolvedAddress: string; contactName?: string }> {
+  const manager = getContactManager();
+
+  // Resolve contact name to address
+  let resolvedAddress: string;
+  let contactName: string | undefined;
+
+  if (to.startsWith('0x') && to.length === 42) {
+    // Already an address
+    resolvedAddress = to;
+  } else {
+    // Try to resolve from contacts
+    const resolved = await manager.resolve(to);
+    if (!resolved) {
+      throw new Error(`Contact "${to}" not found. Add them first with addContact().`);
+    }
+    resolvedAddress = resolved;
+    contactName = to;
+  }
+
+  // Send payment
+  const result = await pay(resolvedAddress, amount, options);
+
+  return {
+    txHash: result.txHash,
+    resolvedAddress,
+    contactName,
+  };
+}
+
 // ============================================
 // SUBSCRIPTIONS
 // ============================================
@@ -1314,6 +1375,7 @@ export default {
   deleteContact,
   resolveContact,
   searchContacts,
+  payTo,
   // Subscriptions
   addSubscription,
   getDueBills,

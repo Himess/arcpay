@@ -183,6 +183,33 @@ console.log('USDC Balance:', formatUnits(balance, 6));
       } catch {
         // Ignore parse errors
       }
+    } else {
+      // Demo contacts for first load
+      const demoContacts: PlaygroundContact[] = [
+        {
+          name: 'ahmed',
+          displayName: 'Ahmed',
+          address: '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78',
+          category: 'personal',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          name: 'writer-bot',
+          displayName: 'Writer Bot',
+          address: '0xF505e2E71df58D7244189072008f25f6b6aaE5ae',
+          category: 'agent',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          name: 'netflix',
+          displayName: 'Netflix',
+          address: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
+          category: 'subscription',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+      setContacts(demoContacts);
+      localStorage.setItem('arcpay_contacts', JSON.stringify(demoContacts));
     }
 
     // Load subscriptions from localStorage
@@ -301,8 +328,23 @@ Only return valid JSON, no markdown.`;
         if (parsed.recipient) addVoiceLog('info', `Recipient: ${parsed.recipient}`);
         if (parsed.task) addVoiceLog('info', `Task: ${parsed.task}`);
 
+        // Resolve contact name to address
+        if (parsed.recipient) {
+          const resolvedAddress = resolveRecipient(parsed.recipient);
+          if (resolvedAddress) {
+            if (!parsed.recipient.startsWith('0x')) {
+              addVoiceLog('info', `Contact resolved: "${parsed.recipient}" -> ${resolvedAddress.slice(0, 10)}...`);
+            }
+            parsed.recipient = resolvedAddress;
+          } else if (!parsed.recipient.startsWith('0x')) {
+            addVoiceLog('error', `Contact "${parsed.recipient}" not found. Add them first!`);
+            speakResponse(`Contact ${parsed.recipient} not found. Please add them first.`);
+            return;
+          }
+        }
+
         // Execute real blockchain action
-        addVoiceLog('ai', '⏳ Executing on Arc blockchain...');
+        addVoiceLog('ai', 'Executing on Arc blockchain...');
 
         if (parsed.action === 'pay' && parsed.amount) {
           const recipient = parsed.recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
@@ -348,6 +390,23 @@ Only return valid JSON, no markdown.`;
       utterance.rate = 1.0;
       window.speechSynthesis.speak(utterance);
     }
+  };
+
+  // Resolve contact name to address
+  const resolveRecipient = (nameOrAddress: string): string | null => {
+    // Already an address, return it
+    if (nameOrAddress.startsWith('0x') && nameOrAddress.length === 42) {
+      return nameOrAddress;
+    }
+
+    // Search in contacts (case-insensitive)
+    const normalizedName = nameOrAddress.toLowerCase().trim();
+    const contact = contacts.find(c =>
+      c.name.toLowerCase() === normalizedName ||
+      c.displayName.toLowerCase() === normalizedName
+    );
+
+    return contact?.address || null;
   };
 
   // ==================== CONTACTS MODE ====================
@@ -3022,55 +3081,97 @@ Return JSON only, no markdown:
 
                 {/* Voice Sub-mode */}
                 {aiSubMode === 'voice' && (
-                  <div>
-                    <div className="flex flex-col items-center mb-8">
-                  <button
-                    onClick={isListening ? stopListening : startListening}
-                    className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 transition-all ${
-                      isListening
-                        ? 'bg-red-500 animate-pulse'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                  >
-                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/>
-                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                    </svg>
-                  </button>
-                  <p className="text-gray-400">
-                    {isListening ? 'Listening... Click to stop' : 'Click to start'}
-                  </p>
-                  {transcript && (
-                    <p className="mt-4 text-lg text-cyan-400">"{transcript}"</p>
-                  )}
-                </div>
-
-                    {/* Voice Logs */}
-                    <div className="bg-gray-800/50 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto">
-                      <h3 className="text-sm text-gray-500 mb-4">📝 Activity Log</h3>
-                      <div className="space-y-2">
-                        {voiceLogs.map((log, i) => (
-                          <div
-                            key={i}
-                            className={`text-sm ${
-                              log.type === 'success' ? 'text-emerald-400' :
-                              log.type === 'error' ? 'text-red-400' :
-                              log.type === 'user' ? 'text-white' :
-                              log.type === 'ai' ? 'text-cyan-400' :
-                              log.type === 'info' ? 'text-cyan-400' : 'text-gray-400'
-                            }`}
-                          >
-                            {log.text}
-                          </div>
-                        ))}
-                        {voiceLogs.length === 0 && (
-                          <p className="text-gray-600">Click the microphone to start...</p>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {/* Voice Area - 2 columns */}
+                    <div className="md:col-span-2">
+                      <div className="flex flex-col items-center mb-8">
+                        <button
+                          onClick={isListening ? stopListening : startListening}
+                          className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 transition-all ${
+                            isListening
+                              ? 'bg-red-500 animate-pulse'
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                        >
+                          <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                          </svg>
+                        </button>
+                        <p className="text-gray-400">
+                          {isListening ? 'Listening... Click to stop' : 'Click to start'}
+                        </p>
+                        {transcript && (
+                          <p className="mt-4 text-lg text-cyan-400">"{transcript}"</p>
                         )}
+                      </div>
+
+                      {/* Voice Logs */}
+                      <div className="bg-gray-800/50 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto">
+                        <h3 className="text-sm text-gray-500 mb-4">Activity Log</h3>
+                        <div className="space-y-2">
+                          {voiceLogs.map((log, i) => (
+                            <div
+                              key={i}
+                              className={`text-sm ${
+                                log.type === 'success' ? 'text-emerald-400' :
+                                log.type === 'error' ? 'text-red-400' :
+                                log.type === 'user' ? 'text-white' :
+                                log.type === 'ai' ? 'text-cyan-400' :
+                                log.type === 'info' ? 'text-cyan-400' : 'text-gray-400'
+                              }`}
+                            >
+                              {log.text}
+                            </div>
+                          ))}
+                          {voiceLogs.length === 0 && (
+                            <p className="text-gray-600">Click the microphone to start...</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-6 text-center text-sm text-gray-500">
+                        Try: "Send 50 dollars to Ahmed" or "Pay Netflix 15 USDC"
                       </div>
                     </div>
 
-                    <div className="mt-6 text-center text-sm text-gray-500">
-                      Try: "Send 50 dollars to writer-bot" or "What's my balance?"
+                    {/* Contacts Sidebar - 1 column */}
+                    <div className="bg-gray-800/30 rounded-xl p-4 h-fit">
+                      <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                        <span>Contacts</span>
+                        <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">{contacts.length}</span>
+                      </h3>
+                      <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                        {contacts.map((contact) => (
+                          <div
+                            key={contact.name}
+                            onClick={() => copyAddress(contact.address)}
+                            className="flex items-center gap-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer transition-colors group"
+                            title={`Click to copy: ${contact.address}`}
+                          >
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${categoryColors[contact.category] || 'bg-gray-600'}`}>
+                              {contact.displayName.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-white truncate">{contact.displayName}</p>
+                              <p className="text-xs text-gray-500 font-mono truncate">{contact.address.slice(0, 10)}...</p>
+                            </div>
+                            <span className="text-gray-600 group-hover:text-gray-400 text-xs">copy</span>
+                          </div>
+                        ))}
+                        {contacts.length === 0 && (
+                          <p className="text-gray-600 text-sm text-center py-4">No contacts yet</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setMode('payments');
+                          setPaymentSubMode('contacts');
+                        }}
+                        className="mt-3 w-full py-2 text-sm text-cyan-400 hover:text-cyan-300 border border-gray-700 hover:border-cyan-500/50 rounded-lg transition-colors"
+                      >
+                        + Manage Contacts
+                      </button>
                     </div>
                   </div>
                 )}
