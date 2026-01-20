@@ -301,7 +301,7 @@ console.log('USDC Balance:', formatUnits(balance, 6));
     try {
       const { GoogleGenerativeAI } = await import('@google/generative-ai');
       const genAI = new GoogleGenerativeAI(geminiApiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
       const contactNames = contacts.map(c => c.displayName).join(', ') || 'None';
 
@@ -1022,7 +1022,7 @@ Only return valid JSON, no markdown or explanation.`;
     try {
       const { GoogleGenerativeAI } = await import('@google/generative-ai');
       const genAI = new GoogleGenerativeAI(geminiApiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
       // Convert image to base64
       const base64Data = uploadedImage.split(',')[1];
@@ -3243,7 +3243,7 @@ Return JSON only, no markdown:
       try {
         const { GoogleGenerativeAI } = await import('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(geminiApiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const result = await model.generateContent(
           `You are a blockchain payment assistant. The user typed: "${cmd}".
