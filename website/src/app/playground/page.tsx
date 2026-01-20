@@ -9,7 +9,9 @@ import { API_CATEGORIES, TOTAL_API_COUNT, type APIItem, type APICategory } from 
 // Dynamic import for Monaco Editor (client-side only)
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
-type DemoMode = 'voice' | 'image' | 'code' | 'console' | 'contacts' | 'subscriptions' | 'templates' | 'split' | 'links' | 'requests';
+type DemoMode = 'ai-demo' | 'code' | 'payments' | 'streaming';
+type AISubMode = 'voice' | 'image';
+type PaymentSubMode = 'contacts' | 'templates' | 'split' | 'links' | 'requests';
 
 interface LogEntry {
   type: 'info' | 'success' | 'error' | 'user' | 'ai' | 'system';
@@ -77,7 +79,9 @@ async function sendPayment(to: string, amount: string): Promise<{ success: boole
 }
 
 export default function PlaygroundPage() {
-  const [mode, setMode] = useState<DemoMode>('voice');
+  const [mode, setMode] = useState<DemoMode>('ai-demo');
+  const [aiSubMode, setAISubMode] = useState<AISubMode>('voice');
+  const [paymentSubMode, setPaymentSubMode] = useState<PaymentSubMode>('contacts');
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
@@ -2953,19 +2957,13 @@ Return JSON only, no markdown:
           )}
         </AnimatePresence>
 
-        {/* Mode Tabs */}
+        {/* Mode Tabs - Simplified to 4 */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
           {[
-            { id: 'voice', icon: '🎤', label: 'Voice' },
-            { id: 'image', icon: '📸', label: 'Image' },
-            { id: 'code', icon: '⌨️', label: 'Code' },
-            { id: 'console', icon: '💻', label: 'Console' },
-            { id: 'contacts', icon: '📇', label: 'Contacts' },
-            { id: 'subscriptions', icon: '📅', label: 'Subscriptions' },
-            { id: 'templates', icon: '📋', label: 'Templates' },
-            { id: 'split', icon: '➗', label: 'Split' },
-            { id: 'links', icon: '🔗', label: 'Links' },
-            { id: 'requests', icon: '📩', label: 'Requests' },
+            { id: 'ai-demo', icon: '🎤', label: 'AI Demo' },
+            { id: 'code', icon: '💻', label: 'Code' },
+            { id: 'payments', icon: '💳', label: 'Payments' },
+            { id: 'streaming', icon: '📅', label: 'Streaming' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -2984,21 +2982,48 @@ Return JSON only, no markdown:
 
         {/* Content */}
         <AnimatePresence mode="wait">
-          {/* VOICE MODE */}
-          {mode === 'voice' && (
+          {/* AI DEMO MODE - Voice + Image combined */}
+          {mode === 'ai-demo' && (
             <motion.div
-              key="voice"
+              key="ai-demo"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <h2 className="text-2xl font-bold text-center mb-6">🎤 Voice Command Mode</h2>
-                <p className="text-center text-gray-400 mb-8">
-                  Click the microphone and speak a payment command
+                <h2 className="text-2xl font-bold text-center mb-4">🤖 AI Demo</h2>
+                <p className="text-center text-gray-400 mb-6">
+                  Voice commands and image analysis powered by Gemini
                 </p>
 
-                <div className="flex flex-col items-center mb-8">
+                {/* AI Sub-mode Toggle */}
+                <div className="flex justify-center gap-2 mb-8">
+                  <button
+                    onClick={() => setAISubMode('voice')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                      aiSubMode === 'voice'
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    <span>🎤</span> Voice Command
+                  </button>
+                  <button
+                    onClick={() => setAISubMode('image')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                      aiSubMode === 'image'
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    <span>📸</span> Image Analysis
+                  </button>
+                </div>
+
+                {/* Voice Sub-mode */}
+                {aiSubMode === 'voice' && (
+                  <div>
+                    <div className="flex flex-col items-center mb-8">
                   <button
                     onClick={isListening ? stopListening : startListening}
                     className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 transition-all ${
@@ -3020,49 +3045,39 @@ Return JSON only, no markdown:
                   )}
                 </div>
 
-                {/* Voice Logs */}
-                <div className="bg-gray-800/50 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto">
-                  <h3 className="text-sm text-gray-500 mb-4">📝 Activity Log</h3>
-                  <div className="space-y-2">
-                    {voiceLogs.map((log, i) => (
-                      <div
-                        key={i}
-                        className={`text-sm ${
-                          log.type === 'success' ? 'text-emerald-400' :
-                          log.type === 'error' ? 'text-red-400' :
-                          log.type === 'user' ? 'text-white' :
-                          log.type === 'ai' ? 'text-cyan-400' :
-                          log.type === 'info' ? 'text-cyan-400' : 'text-gray-400'
-                        }`}
-                      >
-                        {log.text}
+                    {/* Voice Logs */}
+                    <div className="bg-gray-800/50 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto">
+                      <h3 className="text-sm text-gray-500 mb-4">📝 Activity Log</h3>
+                      <div className="space-y-2">
+                        {voiceLogs.map((log, i) => (
+                          <div
+                            key={i}
+                            className={`text-sm ${
+                              log.type === 'success' ? 'text-emerald-400' :
+                              log.type === 'error' ? 'text-red-400' :
+                              log.type === 'user' ? 'text-white' :
+                              log.type === 'ai' ? 'text-cyan-400' :
+                              log.type === 'info' ? 'text-cyan-400' : 'text-gray-400'
+                            }`}
+                          >
+                            {log.text}
+                          </div>
+                        ))}
+                        {voiceLogs.length === 0 && (
+                          <p className="text-gray-600">Click the microphone to start...</p>
+                        )}
                       </div>
-                    ))}
-                    {voiceLogs.length === 0 && (
-                      <p className="text-gray-600">Click the microphone to start...</p>
-                    )}
+                    </div>
+
+                    <div className="mt-6 text-center text-sm text-gray-500">
+                      Try: "Send 50 dollars to writer-bot" or "What's my balance?"
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="mt-6 text-center text-sm text-gray-500">
-                  Try: "Send 50 dollars to writer-bot" or "What's my balance?"
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* IMAGE MODE */}
-          {mode === 'image' && (
-            <motion.div
-              key="image"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <h2 className="text-2xl font-bold text-center mb-6">📸 Image Analysis Mode</h2>
-
-                <div className="grid md:grid-cols-2 gap-8">
+                {/* Image Sub-mode */}
+                {aiSubMode === 'image' && (
+                  <div className="grid md:grid-cols-2 gap-8">
                   {/* Upload */}
                   <div>
                     <h3 className="font-semibold mb-4">Upload Invoice or Receipt</h3>
@@ -3178,7 +3193,8 @@ Return JSON only, no markdown:
                       )}
                     </div>
                   </div>
-                </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -3365,68 +3381,46 @@ Return JSON only, no markdown:
             </motion.div>
           )}
 
-          {/* CONSOLE MODE */}
-          {mode === 'console' && (
+          {/* PAYMENTS MODE - Contains Contacts, Templates, Split, Links, Requests */}
+          {mode === 'payments' && (
             <motion.div
-              key="console"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
-                <div className="px-4 py-3 bg-gray-800 border-b border-gray-700 flex items-center">
-                  <span className="text-sm font-medium">💻 ArcPay Console</span>
-                  <span className="ml-auto text-xs text-gray-500">Arc Testnet</span>
-                </div>
-
-                {/* Console Output */}
-                <div className="h-[500px] overflow-y-auto p-4 font-mono text-sm">
-                  {consoleLogs.map((log, i) => (
-                    <div
-                      key={i}
-                      className={`mb-1 ${
-                        log.type === 'success' ? 'text-emerald-400' :
-                        log.type === 'error' ? 'text-red-400' :
-                        log.type === 'user' ? 'text-yellow-400' :
-                        log.type === 'ai' ? 'text-cyan-400' :
-                        log.type === 'info' ? 'text-cyan-400' : 'text-gray-400'
-                      }`}
-                    >
-                      {log.text}
-                    </div>
-                  ))}
-                  <div ref={consoleEndRef} />
-                </div>
-
-                {/* Console Input */}
-                <form onSubmit={handleConsoleSubmit} className="border-t border-gray-800">
-                  <div className="flex items-center px-4 py-3">
-                    <span className="text-emerald-400 mr-2">❯</span>
-                    <input
-                      type="text"
-                      value={consoleInput}
-                      onChange={(e) => setConsoleInput(e.target.value)}
-                      placeholder="Type a command..."
-                      className="flex-1 bg-transparent outline-none text-white font-mono"
-                      autoFocus
-                    />
-                  </div>
-                </form>
-              </div>
-            </motion.div>
-          )}
-
-          {/* CONTACTS MODE */}
-          {mode === 'contacts' && (
-            <motion.div
-              key="contacts"
+              key="payments"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">📇 Contacts</h2>
+                <h2 className="text-2xl font-bold text-center mb-4">💳 Payments</h2>
+                <p className="text-center text-gray-400 mb-6">Manage contacts, templates, splits, links, and requests</p>
+
+                {/* Payment Sub-mode Toggle */}
+                <div className="flex flex-wrap justify-center gap-2 mb-8">
+                  {[
+                    { id: 'contacts', icon: '👥', label: 'Contacts' },
+                    { id: 'templates', icon: '📋', label: 'Templates' },
+                    { id: 'split', icon: '➗', label: 'Split' },
+                    { id: 'links', icon: '🔗', label: 'Links' },
+                    { id: 'requests', icon: '📨', label: 'Requests' },
+                  ].map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => setPaymentSubMode(sub.id as PaymentSubMode)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                        paymentSubMode === sub.id
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      <span>{sub.icon}</span> {sub.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Contacts Sub-mode */}
+                {paymentSubMode === 'contacts' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold">👥 Contacts</h3>
                   <button
                     onClick={() => setIsAddingContact(!isAddingContact)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
@@ -3609,14 +3603,182 @@ await arc.contacts.delete('ahmed');`}
                     </ul>
                   </div>
                 </div>
+                  </div>
+                )}
+
+                {/* Templates Sub-mode - will be rendered here */}
+                {paymentSubMode === 'templates' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold">📋 Payment Templates</h3>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Pre-configured templates for popular services
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Templates Grid */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {[
+                        { id: 'netflix', name: 'Netflix', amount: '15.99', icon: '🎬', category: 'Subscription' },
+                        { id: 'spotify', name: 'Spotify', amount: '9.99', icon: '🎵', category: 'Subscription' },
+                        { id: 'youtube', name: 'YouTube Premium', amount: '13.99', icon: '📺', category: 'Subscription' },
+                        { id: 'github', name: 'GitHub Pro', amount: '4.00', icon: '🐙', category: 'Subscription' },
+                        { id: 'chatgpt', name: 'ChatGPT Plus', amount: '20.00', icon: '🤖', category: 'Subscription' },
+                        { id: 'salary', name: 'Monthly Salary', amount: '-', icon: '💼', category: 'Business' },
+                      ].map((template) => (
+                        <div
+                          key={template.id}
+                          className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 hover:border-cyan-500 transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl">
+                              {template.icon}
+                            </div>
+                            <div>
+                              <p className="font-semibold">{template.name}</p>
+                              <p className="text-sm text-gray-400">{template.category}</p>
+                            </div>
+                          </div>
+                          {template.amount !== '-' && (
+                            <p className="text-cyan-400 font-bold">${template.amount} USDC</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Split Sub-mode */}
+                {paymentSubMode === 'split' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold">➗ Split Payment</h3>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Divide payments between multiple recipients
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
+                      <h4 className="text-lg font-semibold mb-4">Create Split Payment</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Total Amount (USDC)</label>
+                          <input
+                            type="text"
+                            placeholder="100.00"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Recipients</label>
+                          <div className="space-y-2">
+                            <input placeholder="alice - 25%" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+                            <input placeholder="bob - 25%" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+                            <input placeholder="charlie - 50%" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+                          </div>
+                        </div>
+                        <button className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium">
+                          Split Payment
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Links Sub-mode */}
+                {paymentSubMode === 'links' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold">🔗 Payment Links</h3>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Create shareable payment links
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
+                      <h4 className="text-lg font-semibold mb-4">Create Payment Link</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Amount (USDC)</label>
+                          <input
+                            type="text"
+                            placeholder="50.00"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Description</label>
+                          <input
+                            type="text"
+                            placeholder="Dinner split"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                          />
+                        </div>
+                        <button className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium">
+                          Create Link
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Requests Sub-mode */}
+                {paymentSubMode === 'requests' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold">📨 Payment Requests</h3>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Request payments from others
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
+                      <h4 className="text-lg font-semibold mb-4">Create Payment Request</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">From (Address or Name)</label>
+                          <input
+                            type="text"
+                            placeholder="ahmed or 0x..."
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Amount (USDC)</label>
+                          <input
+                            type="text"
+                            placeholder="25.00"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Note</label>
+                          <input
+                            type="text"
+                            placeholder="For lunch yesterday"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                          />
+                        </div>
+                        <button className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium">
+                          Send Request
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
 
-          {/* SUBSCRIPTIONS MODE */}
-          {mode === 'subscriptions' && (
+          {/* STREAMING MODE (formerly Subscriptions) */}
+          {mode === 'streaming' && (
             <motion.div
-              key="subscriptions"
+              key="streaming"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -3625,7 +3787,7 @@ await arc.contacts.delete('ahmed');`}
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold">📅 Subscriptions</h2>
+                    <h2 className="text-2xl font-bold">📅 Streaming Payments</h2>
                     <p className="text-gray-400 text-sm mt-1">
                       Monthly total: <span className="text-emerald-400 font-semibold">${getMonthlyTotal()}</span>
                     </p>
@@ -3871,563 +4033,6 @@ const total = await arc.contacts.getMonthlyTotal();`}
             </motion.div>
           )}
 
-          {/* TEMPLATES MODE */}
-          {mode === 'templates' && (
-            <motion.div
-              key="templates"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold">📋 Payment Templates</h2>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Pre-configured templates for popular services
-                    </p>
-                  </div>
-                </div>
-
-                {/* Category Tabs */}
-                <div className="flex gap-2 mb-6 flex-wrap">
-                  {['All', 'Subscription', 'Business', 'Personal', 'Utility'].map((cat) => (
-                    <button
-                      key={cat}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 transition-all"
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Templates Grid */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {[
-                    { id: 'netflix', name: 'Netflix', amount: '15.99', icon: '🎬', category: 'Subscription' },
-                    { id: 'spotify', name: 'Spotify', amount: '9.99', icon: '🎵', category: 'Subscription' },
-                    { id: 'youtube', name: 'YouTube Premium', amount: '13.99', icon: '📺', category: 'Subscription' },
-                    { id: 'disney', name: 'Disney+', amount: '10.99', icon: '🏰', category: 'Subscription' },
-                    { id: 'hbo', name: 'HBO Max', amount: '15.99', icon: '🎭', category: 'Subscription' },
-                    { id: 'github', name: 'GitHub Pro', amount: '4.00', icon: '🐙', category: 'Subscription' },
-                    { id: 'chatgpt', name: 'ChatGPT Plus', amount: '20.00', icon: '🤖', category: 'Subscription' },
-                    { id: 'salary', name: 'Monthly Salary', amount: '-', icon: '💼', category: 'Business' },
-                    { id: 'rent', name: 'Rent', amount: '-', icon: '🏠', category: 'Personal' },
-                    { id: 'phone', name: 'Phone Bill', amount: '-', icon: '📱', category: 'Utility' },
-                    { id: 'internet', name: 'Internet', amount: '-', icon: '🌐', category: 'Utility' },
-                    { id: 'electricity', name: 'Electricity', amount: '-', icon: '⚡', category: 'Utility' },
-                  ].map((template) => (
-                    <div
-                      key={template.id}
-                      className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 hover:border-cyan-500 transition-all cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl">
-                          {template.icon}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-white">{template.name}</div>
-                          <div className="text-sm text-gray-400">{template.category}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-emerald-400 font-semibold">
-                          {template.amount !== '-' ? `$${template.amount}/mo` : 'Custom amount'}
-                        </span>
-                        <button className="px-3 py-1 rounded-lg text-sm bg-blue-600 hover:bg-blue-700 text-white opacity-0 group-hover:opacity-100 transition-all">
-                          Use Template
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Usage Examples */}
-                <div className="mt-8 bg-gray-800/30 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold mb-4">💡 SDK Examples</h3>
-                  <pre className="bg-gray-900 rounded-lg p-3 font-mono text-xs overflow-x-auto text-gray-300">
-{`import { createTemplateManager, getTemplateById, searchTemplates } from 'arcpay';
-
-// Create template manager
-const templates = createTemplateManager();
-
-// List all templates (25+ built-in)
-const all = templates.list();
-
-// Get templates by category
-const subscriptions = templates.list({ category: 'subscription' });
-
-// Get a specific template
-const netflix = templates.get('netflix');
-console.log(netflix.amount); // '15.99'
-
-// Search templates
-const music = templates.search('music');
-
-// Use a template to create a contact
-const contact = await templates.use('netflix', {
-  address: '0x742d35...',
-  amount: '22.99'  // Override default amount
-});
-
-// Or use standalone functions
-const spotify = getTemplateById('spotify');
-const streaming = searchTemplates('streaming');`}
-                  </pre>
-                  <p className="mt-4 text-sm text-gray-400">Voice commands:</p>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-400 ml-2">
-                    <li>"Add Netflix subscription"</li>
-                    <li>"Use Spotify template"</li>
-                    <li>"Show available templates"</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* SPLIT MODE */}
-          {mode === 'split' && (
-            <motion.div
-              key="split"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold">➗ Split Payment</h2>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Divide payments between multiple recipients
-                    </p>
-                  </div>
-                </div>
-
-                {/* Split Form */}
-                <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-semibold mb-4">Create Split Payment</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Total Amount (USDC)</label>
-                      <input
-                        type="text"
-                        placeholder="100.00"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-xl"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Recipients (comma separated)</label>
-                      <input
-                        type="text"
-                        placeholder="alice, bob, charlie"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Enter contact names or addresses</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-all">
-                        Split Equally
-                      </button>
-                      <button className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-all">
-                        Custom Split
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Split Preview */}
-                <div className="bg-gray-800/30 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-semibold mb-4">Preview</h3>
-                  <div className="space-y-3">
-                    {['alice', 'bob', 'charlie'].map((name, i) => (
-                      <div key={name} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center font-bold">
-                            {name.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="text-white">{name}</span>
-                        </div>
-                        <span className="text-emerald-400 font-semibold">$33.33</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-700 flex justify-between">
-                    <span className="text-gray-400">Total</span>
-                    <span className="text-white font-bold">$100.00</span>
-                  </div>
-                </div>
-
-                {/* Usage Examples */}
-                <div className="bg-gray-800/30 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold mb-4">💡 SDK Examples</h3>
-                  <pre className="bg-gray-900 rounded-lg p-3 font-mono text-xs overflow-x-auto text-gray-300 mb-4">
-{`import { ArcPay, createSplitManager } from 'arcpay';
-
-const arc = await ArcPay.init({ network: 'arc-testnet', privateKey });
-const split = createSplitManager(arc);
-
-// Preview split without paying
-const preview = await split.preview('100', ['alice', 'bob', 'charlie']);
-console.log(preview.perPerson); // '33.33'
-
-// Split equally (real payments)
-const result = await split.equal('100', [
-  '0x742d35...',
-  '0x8ba1f1...',
-  '0x5B38Da...'
-]);
-console.log(result.successCount); // 3
-
-// Custom amounts
-const custom = await split.custom([
-  { to: 'alice', amount: '50' },
-  { to: 'bob', amount: '30' },
-  { to: 'charlie', amount: '20' }
-]);
-
-// Percentage split
-const percent = await split.byPercent('100', [
-  { to: 'alice', percent: 50 },
-  { to: 'bob', percent: 30 },
-  { to: 'charlie', percent: 20 }
-]);`}
-                  </pre>
-                  <p className="text-sm text-gray-400 mb-2">Voice commands:</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-400 text-sm">
-                    <li>"Split $100 between alice, bob and charlie"</li>
-                    <li>"Divide the bill with alice and bob"</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* LINKS MODE */}
-          {mode === 'links' && (
-            <motion.div
-              key="links"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold">🔗 Payment Links</h2>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Create shareable links for receiving payments
-                    </p>
-                  </div>
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-all">
-                    + Create Link
-                  </button>
-                </div>
-
-                {/* Create Link Form */}
-                <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-semibold mb-4">New Payment Link</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Amount (USDC)</label>
-                      <input
-                        type="text"
-                        placeholder="50.00 (optional)"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Description</label>
-                      <input
-                        type="text"
-                        placeholder="Dinner split, etc."
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Expires In</label>
-                      <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white">
-                        <option value="">Never</option>
-                        <option value="24h">24 hours</option>
-                        <option value="7d">7 days</option>
-                        <option value="30d">30 days</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Max Uses</label>
-                      <input
-                        type="number"
-                        placeholder="Unlimited"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                  </div>
-                  <button className="mt-4 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium transition-all">
-                    Generate Link
-                  </button>
-                </div>
-
-                {/* Links List */}
-                <div className="space-y-3">
-                  <h3 className="text-lg font-semibold mb-4">Your Links</h3>
-                  {[
-                    { id: 'link_abc123', amount: '50', description: 'Dinner split', status: 'active', usedCount: 2, maxUses: 5 },
-                    { id: 'link_xyz789', amount: null, description: 'Donations', status: 'active', usedCount: 10, maxUses: null },
-                    { id: 'link_def456', amount: '25', description: 'Coffee', status: 'paid', usedCount: 1, maxUses: 1 },
-                  ].map((link) => (
-                    <div
-                      key={link.id}
-                      className={`rounded-xl p-4 flex items-center justify-between border ${
-                        link.status === 'active' ? 'bg-emerald-500/10 border-emerald-500/30' :
-                        link.status === 'paid' ? 'bg-gray-800/50 border-gray-700' :
-                        'bg-red-500/10 border-red-500/30'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{link.description}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            link.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' :
-                            link.status === 'paid' ? 'bg-gray-700 text-gray-400' :
-                            'bg-red-500/20 text-red-400'
-                          }`}>
-                            {link.status}
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          {link.amount ? `$${link.amount}` : 'Any amount'} • {link.usedCount}{link.maxUses ? `/${link.maxUses}` : ''} uses
-                        </div>
-                        <div className="text-xs text-gray-500 font-mono mt-1">
-                          arcpay://pay/{link.id}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="px-3 py-1 rounded-lg text-sm bg-gray-700 hover:bg-gray-600 text-white transition-all">
-                          Copy
-                        </button>
-                        {link.status === 'active' && (
-                          <button className="px-3 py-1 rounded-lg text-sm bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-all">
-                            Cancel
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Usage Examples */}
-                <div className="mt-8 bg-gray-800/30 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold mb-4">💡 SDK Examples</h3>
-                  <pre className="bg-gray-900 rounded-lg p-3 font-mono text-xs overflow-x-auto text-gray-300 mb-4">
-{`import { ArcPay, createLinkManager } from 'arcpay';
-
-const arc = await ArcPay.init({ network: 'arc-testnet', privateKey });
-const links = createLinkManager(arc);
-
-// Create a payment link
-const link = await links.create({
-  amount: '50.00',
-  description: 'Dinner split',
-  expiresIn: '7d',   // Expires in 7 days
-  maxUses: 5         // Max 5 payments
-});
-console.log(link.url); // arcpay://pay/link_abc123
-
-// Create open-amount link (payer chooses)
-const donation = await links.create({
-  description: 'Donations welcome'
-});
-
-// List all links
-const allLinks = await links.list();
-const activeLinks = await links.list({ status: 'active' });
-
-// Get link status
-const status = await links.getStatus('link_abc123');
-
-// Pay a link
-const result = await links.pay('link_abc123');
-
-// Cancel a link
-await links.cancel('link_abc123');`}
-                  </pre>
-                  <p className="text-sm text-gray-400 mb-2">Voice commands:</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-400 text-sm">
-                    <li>"Create payment link for $50"</li>
-                    <li>"Pay link abc123"</li>
-                    <li>"Show my payment links"</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* REQUESTS MODE */}
-          {mode === 'requests' && (
-            <motion.div
-              key="requests"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold">📩 Payment Requests</h2>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Request payments from contacts
-                    </p>
-                  </div>
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-all">
-                    + New Request
-                  </button>
-                </div>
-
-                {/* Request Form */}
-                <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-semibold mb-4">Request Payment</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">From (contact name)</label>
-                      <input
-                        type="text"
-                        placeholder="alice"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2">Amount (USDC)</label>
-                      <input
-                        type="text"
-                        placeholder="50.00"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm text-gray-400 mb-2">Reason (optional)</label>
-                      <input
-                        type="text"
-                        placeholder="Dinner last night"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                      />
-                    </div>
-                  </div>
-                  <button className="mt-4 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium transition-all">
-                    Send Request
-                  </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex gap-2 mb-4">
-                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">
-                    Outgoing (3)
-                  </button>
-                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-400 hover:bg-gray-700">
-                    Incoming (1)
-                  </button>
-                </div>
-
-                {/* Requests List */}
-                <div className="space-y-3">
-                  {[
-                    { id: 'req_1', from: 'alice', amount: '50', reason: 'Dinner split', status: 'pending' },
-                    { id: 'req_2', from: 'bob', amount: '25', reason: 'Movie tickets', status: 'paid' },
-                    { id: 'req_3', from: 'charlie', amount: '100', reason: 'Concert tickets', status: 'declined' },
-                  ].map((req) => (
-                    <div
-                      key={req.id}
-                      className={`rounded-xl p-4 flex items-center justify-between border ${
-                        req.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30' :
-                        req.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30' :
-                        'bg-red-500/10 border-red-500/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-xl font-bold">
-                          {req.from.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white">{req.from}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              req.status === 'pending' ? 'bg-amber-500/20 text-amber-400' :
-                              req.status === 'paid' ? 'bg-emerald-500/20 text-emerald-400' :
-                              'bg-red-500/20 text-red-400'
-                            }`}>
-                              {req.status}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-400 mt-1">
-                            ${req.amount} • {req.reason}
-                          </div>
-                        </div>
-                      </div>
-                      {req.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <button className="px-3 py-1 rounded-lg text-sm bg-gray-700 hover:bg-gray-600 text-white transition-all">
-                            Remind
-                          </button>
-                          <button className="px-3 py-1 rounded-lg text-sm bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-all">
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Usage Examples */}
-                <div className="mt-8 bg-gray-800/30 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold mb-4">💡 SDK Examples</h3>
-                  <pre className="bg-gray-900 rounded-lg p-3 font-mono text-xs overflow-x-auto text-gray-300 mb-4">
-{`import { ArcPay, createRequestManager } from 'arcpay';
-
-const arc = await ArcPay.init({ network: 'arc-testnet', privateKey });
-const requests = createRequestManager(arc);
-
-// Create a payment request
-const req = await requests.create({
-  from: 'alice',       // Contact name
-  amount: '50.00',
-  reason: 'Dinner split',
-  dueDate: 'in 7d'     // Due in 7 days
-});
-
-// Request from multiple people
-const bulk = await requests.createBulk({
-  from: ['alice', 'bob', 'charlie'],
-  amount: '33.33',
-  reason: 'Group dinner'
-});
-
-// List outgoing requests (who owes you)
-const outgoing = await requests.listOutgoing();
-
-// List incoming requests (what you owe)
-const incoming = await requests.listIncoming();
-
-// Pay a request you received
-const result = await requests.pay('req_abc123');
-
-// Decline a request
-await requests.decline('req_abc123', 'Already paid cash');
-
-// Cancel your own request
-await requests.cancel('req_abc123');
-
-// Get total requested amount
-const total = await requests.getTotalRequested();`}
-                  </pre>
-                  <p className="text-sm text-gray-400 mb-2">Voice commands:</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-400 text-sm">
-                    <li>"Request $50 from alice"</li>
-                    <li>"Ask bob for $25 for lunch"</li>
-                    <li>"Who owes me money?"</li>
-                    <li>"What do I owe?"</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
 
         {/* Info */}
