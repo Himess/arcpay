@@ -2458,8 +2458,15 @@ Return JSON only, no markdown:
             async _loadCrypto() {
               if (this._secp256k1) return this._secp256k1;
               const secp = await import('@noble/secp256k1');
-              const hashes = await import('@noble/hashes/sha256');
-              this._secp256k1 = { secp, sha256: hashes.sha256 };
+              // Use Web Crypto API for sha256
+              const sha256 = async (data: Uint8Array): Promise<Uint8Array> => {
+                // Create a copy to ensure proper ArrayBuffer type
+                const buffer = new ArrayBuffer(data.length);
+                new Uint8Array(buffer).set(data);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                return new Uint8Array(hashBuffer);
+              };
+              this._secp256k1 = { secp, sha256 };
               return this._secp256k1;
             },
 
@@ -2579,8 +2586,8 @@ Return JSON only, no markdown:
               const viewingPubKeyBytes = this._hexToBytes(viewingPubKey);
               const sharedSecret = secp.getSharedSecret(ephemeralPrivKeyBytes, viewingPubKeyBytes);
 
-              // 3. Hash the shared secret
-              const hashScalar = sha256(sharedSecret);
+              // 3. Hash the shared secret (using Web Crypto API)
+              const hashScalar = await sha256(sharedSecret);
 
               // 4. Derive stealth public key: P_stealth = P_spending + hash(sharedSecret) * G
               const spendingPubKeyBytes = this._hexToBytes(spendingPubKey);
@@ -2590,8 +2597,8 @@ Return JSON only, no markdown:
 
               // 5. Derive address from stealth public key (keccak256 of uncompressed pubkey, last 20 bytes)
               const uncompressedPubKey = secp.ProjectivePoint.fromHex(stealthPubKey).toRawBytes(false).slice(1);
-              // Use simple hash for address derivation (in real impl, use keccak256)
-              const addressHash = sha256(uncompressedPubKey);
+              // Use Web Crypto SHA-256 for address derivation
+              const addressHash = await sha256(uncompressedPubKey);
               const stealthAddress = '0x' + this._bytesToHex(addressHash).slice(-40);
 
               return {
