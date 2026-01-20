@@ -202,11 +202,11 @@ export default function DocsPage() {
   const sections = [
     { id: 'why-arcpay', label: 'Why ArcPay?', icon: '✨', isHighlight: true },
     { id: 'getting-started', label: 'Getting Started', icon: '🚀' },
+    { id: 'hackathon', label: 'Hackathon Features', icon: '🏆' },
     { id: 'core', label: 'Core Modules', icon: '💰' },
-    { id: 'contacts', label: 'Contacts & Subs', icon: '📇', isNew: true },
-    { id: 'ai-voice', label: 'AI & Voice', icon: '🤖', isNew: true },
-    { id: 'tools', label: 'Payment Tools', icon: '🛠️', isNew: true },
-    { id: 'hackathon', label: 'Hackathon Features', icon: '🏆', isNew: true },
+    { id: 'contacts', label: 'Contacts & Subs', icon: '📇' },
+    { id: 'ai-voice', label: 'AI & Voice', icon: '🤖' },
+    { id: 'tools', label: 'Payment Tools', icon: '🛠️' },
     { id: 'advanced', label: 'Advanced', icon: '⚡' },
     { id: 'contracts', label: 'Contracts', icon: '📜' },
   ];
@@ -233,9 +233,6 @@ export default function DocsPage() {
                 >
                   <span>{section.icon}</span>
                   <span className="font-medium">{section.label}</span>
-                  {section.isNew && (
-                    <span className="ml-auto text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">NEW</span>
-                  )}
                 </button>
               ))}
             </div>

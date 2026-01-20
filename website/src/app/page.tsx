@@ -77,30 +77,30 @@ export default function Home() {
           </motion.p>
 
           <motion.p variants={fadeIn} className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
-            Voice commands, AI agents, escrow, streaming, micropayments, privacy—everything you need in one SDK.
+            Build autonomous financial agents with voice, vision, and 28 powerful modules.
           </motion.p>
 
-          {/* Tech Badges Row */}
+          {/* Tech Badges Row - Clickable */}
           <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-3 mb-8">
             {[
-              { label: 'TypeScript', color: 'blue' },
-              { label: 'Arc Network', color: 'cyan' },
-              { label: 'USDC', color: 'green' },
-              { label: 'Gemini AI', color: 'blue' },
-              { label: 'ERC-4337', color: 'orange' },
+              { label: 'Voice & Vision', color: 'cyan', href: '/playground' },
+              { label: 'AI Agents', color: 'blue', href: '/docs' },
+              { label: '5 Contracts', color: 'green', href: '/docs' },
+              { label: 'Gemini 3 Flash', color: 'blue', href: '/playground' },
+              { label: '28 Modules', color: 'orange', href: '/docs' },
             ].map((badge) => (
-              <span
+              <Link
                 key={badge.label}
-                className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm border ${
-                  badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                  badge.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
-                  badge.color === 'green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                  badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                  'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                href={badge.href}
+                className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm border transition-all hover:scale-105 cursor-pointer ${
+                  badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' :
+                  badge.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/20' :
+                  badge.color === 'green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' :
+                  'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20'
                 }`}
               >
                 {badge.label}
-              </span>
+              </Link>
             ))}
           </motion.div>
 
@@ -368,18 +368,18 @@ export default function Home() {
           >
             {[
               { icon: '🤖', title: 'AI Agent', desc: 'Voice + Vision payments', tag: 'Gemini' },
-              { icon: '🎤', title: 'Voice', desc: 'Speech-to-payment', tag: 'NEW' },
-              { icon: '📸', title: 'Vision', desc: 'Invoice & receipt AI', tag: 'NEW' },
+              { icon: '🎤', title: 'Voice', desc: 'Speech-to-payment', tag: '' },
+              { icon: '📸', title: 'Vision', desc: 'Invoice & receipt AI', tag: '' },
               { icon: '🔒', title: 'Escrow', desc: 'Multi-party + Arbiter', tag: '' },
               { icon: '💸', title: 'Streaming', desc: 'Per-second payments', tag: '' },
               { icon: '⚡', title: 'Channels', desc: 'x402 micropayments', tag: 'x402' },
               { icon: '🔐', title: 'Privacy', desc: 'Stealth addresses', tag: '' },
-              { icon: '📇', title: 'Contacts', desc: 'Pay by name', tag: 'NEW' },
-              { icon: '📋', title: 'Templates', desc: 'Reusable payments', tag: 'NEW' },
-              { icon: '🔗', title: 'Links', desc: 'Shareable pay links', tag: 'NEW' },
-              { icon: '📨', title: 'Requests', desc: 'Request payments', tag: 'NEW' },
-              { icon: '➗', title: 'Split', desc: 'Split bills', tag: 'NEW' },
-              { icon: '⛽', title: 'Gasless', desc: 'Sponsor user gas', tag: 'x402' },
+              { icon: '📇', title: 'Contacts', desc: 'Pay by name', tag: '' },
+              { icon: '📋', title: 'Templates', desc: 'Reusable payments', tag: '' },
+              { icon: '🔗', title: 'Links', desc: 'Shareable pay links', tag: '' },
+              { icon: '📨', title: 'Requests', desc: 'Request payments', tag: '' },
+              { icon: '➗', title: 'Split', desc: 'Split bills', tag: '' },
+              { icon: '⛽', title: 'Gasless', desc: 'Sponsor user gas', tag: '' },
               { icon: '🌉', title: 'Bridge', desc: 'Cross-chain USDC', tag: '' },
               { icon: '💱', title: 'FX Swap', desc: 'USDC ↔ EURC', tag: '' },
               { icon: '🛡️', title: 'Compliance', desc: 'KYC/AML checks', tag: '' },
@@ -394,7 +394,6 @@ export default function Home() {
                 <p className="text-gray-400 text-sm mb-2">{feature.desc}</p>
                 {feature.tag && (
                   <span className={`text-xs px-2 py-1 rounded ${
-                    feature.tag.includes('NEW') ? 'bg-cyan-500/20 text-cyan-400' :
                     feature.tag.includes('Gemini') ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-800 text-gray-500'
                   }`}>
                     {feature.tag}
@@ -593,7 +592,6 @@ await agent.payInvoice(img);
                 <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full">Best Trustless AI Agent</span>
                 <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full">Best Gemini Use</span>
               </div>
-              <p className="text-gray-500 mt-6">Made with ❤️ by Himess</p>
             </div>
           </motion.div>
         </div>

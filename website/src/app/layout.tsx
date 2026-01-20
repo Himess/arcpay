@@ -34,8 +34,8 @@ export default function RootLayout({
                   <Image
                     src="/logo.png"
                     alt="ArcPay Logo"
-                    width={48}
-                    height={48}
+                    width={56}
+                    height={56}
                     className="rounded-lg"
                   />
                 </a>
@@ -77,9 +77,6 @@ export default function RootLayout({
               <div className="text-center md:text-left">
                 <p className="text-gray-500">
                   Built for Arc Hackathon 2026 - Best Dev Tools • Best Trustless AI Agent • Best Gemini Use
-                </p>
-                <p className="text-gray-600 text-sm mt-1">
-                  Made with ❤️ by Himess
                 </p>
               </div>
               <div className="flex items-center space-x-6">
