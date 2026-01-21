@@ -100,39 +100,54 @@ export default function PlaygroundPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Code state - default code template
-  const getDefaultCode = () => `// ArcPay Interactive Playground
-// Enter your code and click "Run" to execute
+  const getDefaultCode = () => `// ArcPay SDK Playground - Real Onchain Operations
+// Set your private key in Settings (gear icon) to enable transactions
 
-// Connect to Arc Testnet
-const client = createPublicClient({
-  chain: {
-    id: ${DEMO_CONFIG.chainId},
-    name: 'Arc Testnet',
-    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-    rpcUrls: { default: { http: ['${DEMO_CONFIG.rpcUrl}'] } },
-  },
-  transport: http(),
+// Initialize ArcPay SDK
+const arc = await ArcPay.init({
+  privateKey: process.env.PRIVATE_KEY,  // Set in Settings
+  network: 'arc-testnet',
 });
 
-// Get block number
-const blockNumber = await client.getBlockNumber();
-console.log('Current block:', blockNumber);
+console.log('Wallet:', arc.address);
 
-// Check USDC balance (replace with your address)
-const balance = await client.readContract({
-  address: '${DEMO_CONFIG.usdcAddress}',
-  abi: [{
-    name: 'balanceOf',
-    type: 'function',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-  }],
-  functionName: 'balanceOf',
-  args: ['0xF505e2E71df58D7244189072008f25f6b6aaE5ae'],
-});
+// Check your USDC balance
+const balance = await arc.getBalance();
+console.log('Balance:', balance, 'USDC');
 
-console.log('USDC Balance:', formatUnits(balance, 6));
+// === MORE EXAMPLES ===
+// Uncomment any section below to try it
+
+// --- Send Payment ---
+// const result = await arc.sendUSDC('0x...recipient', '1.00');
+// console.log('Sent! TX:', result.txHash);
+
+// --- Create Escrow ---
+// const escrow = await arc.escrow.create({
+//   beneficiary: '0x...address',
+//   amount: '10.00',
+//   description: 'Payment for services',
+// });
+// console.log('Escrow created:', escrow.txHash);
+
+// --- Create Payment Stream ---
+// const stream = await arc.streams.create({
+//   recipient: '0x...address',
+//   amount: '100.00',
+//   duration: 30 * 24 * 60 * 60,  // 30 days
+// });
+// console.log('Stream ID:', stream.streamId);
+
+// --- Privacy (Stealth Addresses) ---
+// const keys = await arc.privacy.generateKeyPair();
+// console.log('Stealth meta-address:', keys.metaAddress);
+
+// --- x402 Micropayments ---
+// const weather = await arc.micropayments.pay(
+//   '/api/x402/weather?city=Istanbul',
+//   { maxPrice: '0.01' }
+// );
+// console.log('Weather data:', weather);
 `;
   const [code, setCode] = useState(getDefaultCode);
   const [codeOutput, setCodeOutput] = useState<string[]>([]);
@@ -1119,7 +1134,7 @@ Only return valid JSON, no markdown or explanation.`;
         addVoiceLog('info', '');
         addVoiceLog('info', 'GASLESS & YIELD');
         addVoiceLog('info', '  "Send 10 gasless to Bob"');
-        addVoiceLog('info', '  "Deposit 100 to yield" / "Check my yield"');
+        addVoiceLog('info', '  "Check my yield balance"');
         addVoiceLog('info', '');
         addVoiceLog('info', 'MICROPAYMENTS');
         addVoiceLog('info', '  "Pay for API access"');
@@ -1634,8 +1649,8 @@ Return JSON only, no markdown:
         { name: 'markClaimed', type: 'function', inputs: [{ name: 'announcementId', type: 'bytes32' }], outputs: [], stateMutability: 'nonpayable' },
       ] as const;
 
-      // Create ArcPay that works in browser with REAL on-chain calls
-      const createArcPayMock = (config: any) => {
+      // Create ArcPay SDK instance that works in browser with REAL on-chain calls
+      const createBrowserArcPay = (config: any) => {
         const rpcUrl = 'https://rpc.testnet.arc.network';
 
         const publicClient = createPublicClient({
@@ -3400,11 +3415,11 @@ Return JSON only, no markdown:
             },
 
             async screenAddress(address: string) {
-              // Simulated sanctions screening
+              // Basic blocklist screening - integrate with Chainalysis/TRM for production
               return {
                 address,
                 isBlocked: this.isBlocked(address),
-                riskLevel: 'low',
+                riskLevel: this.isBlocked(address) ? 'high' : 'low',
                 screenedAt: new Date().toISOString(),
               };
             },
@@ -3596,27 +3611,28 @@ Return JSON only, no markdown:
               return signature.startsWith('sha256=') && secret.startsWith('whsec_');
             },
 
-            simulateEvent(eventType: string, data: any) {
+            testEvent(eventType: string, data: any) {
+              // Test which endpoints would receive an event (for debugging)
               const matchingEndpoints = this._endpoints.filter(e => e.events.includes(eventType));
               return {
                 eventType,
                 data,
                 sentTo: matchingEndpoints.map(e => e.url),
-                message: `Would send to ${matchingEndpoints.length} endpoint(s)`,
+                matchCount: matchingEndpoints.length,
               };
             },
           },
         };
       };
 
-      // ArcPay class mock
+      // ArcPay SDK - Browser-compatible interface
       const ArcPay = {
         async init(config: any) {
-          return createArcPayMock(config);
+          return createBrowserArcPay(config);
         }
       };
 
-      // Simple API mocks
+      // Helper functions for code examples
       const configure = (config: any) => { /* stored globally */ };
       const pay = async (to: string, amount: string) => {
         const arc = await ArcPay.init({ privateKey: privateKey || undefined });
@@ -3631,7 +3647,7 @@ Return JSON only, no markdown:
       // Create a function that runs the code
       const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 
-      // Mock process.env for browser
+      // Browser environment polyfills
       const process = {
         env: {
           PRIVATE_KEY: privateKey || undefined,
