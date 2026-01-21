@@ -23,22 +23,73 @@ function getCircleClient() {
 }
 
 // POST /api/circle/gasless - Gasless transaction (Gas Station sponsored)
+// Supports both token transfers and contract execution
 export async function POST(request: NextRequest) {
   try {
-    const { walletId, to, amount, tokenId = 'USDC' } = await request.json();
+    const body = await request.json();
+    const { walletId, type = 'transfer' } = body;
 
     // Use env wallet ID as fallback
     const effectiveWalletId = walletId || process.env.CIRCLE_WALLET_ID;
 
-    if (!effectiveWalletId || !to || !amount) {
+    if (!effectiveWalletId) {
       return NextResponse.json({
-        error: 'walletId, to, and amount are required',
+        error: 'walletId is required',
       }, { status: 400 });
     }
 
     const client = getCircleClient();
 
-    // For SCA wallets, Gas Station automatically sponsors gas fees
+    // Contract execution for gasless - Gas Station sponsors gas for contract calls
+    if (type === 'contractExecution') {
+      const { contractAddress, callData, value = '0' } = body;
+
+      if (!contractAddress || !callData) {
+        return NextResponse.json({
+          error: 'contractAddress and callData are required for contract execution',
+        }, { status: 400 });
+      }
+
+      const response = await client.createContractExecutionTransaction({
+        walletId: effectiveWalletId,
+        contractAddress,
+        callData,
+        amount: value, // Native value to send (in wei string)
+        fee: {
+          type: 'level',
+          config: {
+            feeLevel: 'MEDIUM',
+          },
+        },
+      });
+
+      const txData = response.data as any;
+      const transactionId = txData?.id || txData?.transactionId;
+      const txHash = txData?.txHash || txData?.transactionHash;
+      const state = txData?.state || txData?.status;
+
+      return NextResponse.json({
+        success: true,
+        type: 'contractExecution',
+        transactionId,
+        txHash,
+        state,
+        sponsored: true,
+        explorerUrl: txHash
+          ? `https://testnet.arcscan.app/tx/${txHash}`
+          : null,
+      });
+    }
+
+    // Token transfer (original behavior) - Note: May not work for native tokens
+    const { to, amount, tokenId = 'USDC' } = body;
+
+    if (!to || !amount) {
+      return NextResponse.json({
+        error: 'to and amount are required for transfer',
+      }, { status: 400 });
+    }
+
     const response = await client.createTransaction({
       walletId: effectiveWalletId,
       tokenId,
@@ -52,7 +103,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // SDK returns different response structure
     const txData = response.data as any;
     const transactionId = txData?.id || txData?.transactionId;
     const txHash = txData?.txHash || txData?.transactionHash;
@@ -68,19 +118,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      type: 'transfer',
       transactionId,
       txHash,
       state,
-      sponsored: true, // Gas Station sponsored
+      sponsored: true,
       explorerUrl: txHash
         ? `https://testnet.arcscan.app/tx/${txHash}`
         : null,
     });
   } catch (error: any) {
     console.error('Gasless transaction error:', error);
+    // Extract detailed error for debugging
+    const errorDetails = error.response?.data || error.response || null;
     return NextResponse.json({
       success: false,
       error: error.message || 'Gasless transaction failed',
+      details: errorDetails,
     }, { status: 500 });
   }
 }
@@ -134,9 +188,13 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('Gas Station status error:', error);
+    // Extract detailed error info from Axios errors
+    const errorDetails = error.response?.data || error.response || null;
+    console.error('Error response data:', JSON.stringify(errorDetails, null, 2));
     return NextResponse.json({
       success: false,
       error: error.message,
+      details: errorDetails,
       gasStationEnabled: false,
     }, { status: 500 });
   }

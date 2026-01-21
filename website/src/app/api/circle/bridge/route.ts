@@ -123,14 +123,30 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/circle/bridge?transferId=xxx - Get bridge transfer status
+// GET /api/circle/bridge - Get bridge status or transfer status
+// Without transferId: Returns supported chains and domains
+// With transferId: Returns specific transfer status
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const transferId = searchParams.get('transferId');
 
+    // If no transferId, return bridge status and supported chains
     if (!transferId) {
-      return NextResponse.json({ error: 'transferId is required' }, { status: 400 });
+      return NextResponse.json({
+        success: true,
+        bridgeEnabled: true,
+        protocol: 'CCTP (Cross-Chain Transfer Protocol)',
+        supportedChains: Object.keys(CCTP_DOMAINS),
+        domains: CCTP_DOMAINS,
+        arcTestnet: {
+          chainId: 'arc-testnet',
+          domain: 26,
+          attestationTime: '~0.5 seconds',
+          usdcType: 'native',
+        },
+        note: 'Arc Testnet uses native USDC with Domain ID 26',
+      });
     }
 
     const client = await getCircleClient();
