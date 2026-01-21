@@ -48,3 +48,41 @@ const chains = bridge.getSupportedChains();
 2. Circle attestation service confirms burn
 3. Mint USDC on destination chain
 4. Native USDC appears in recipient wallet
+
+## Arc Testnet CCTP (Domain 26)
+
+Arc Testnet is registered as **Domain 26** in Circle's CCTP network.
+
+### Supported Routes
+
+| Source | Destination | Domain |
+|--------|-------------|--------|
+| Ethereum Sepolia | Arc Testnet | 0 → 26 |
+| Arbitrum Sepolia | Arc Testnet | 3 → 26 |
+| Base Sepolia | Arc Testnet | 6 → 26 |
+
+### API Endpoint
+
+```
+POST /api/circle/bridge
+```
+
+### Request
+
+```json
+{
+  "sourceChain": "ethereum-sepolia",
+  "amount": "100",
+  "recipientAddress": "0x..."
+}
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "transactionHash": "0x...",
+  "destinationDomain": 26,
+  "estimatedTime": "10-15 minutes"
+}

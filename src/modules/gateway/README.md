@@ -45,6 +45,32 @@ preferredChain: 'fastest'   // Minimize time
 preferredChain: 'auto'      // SDK decides
 ```
 
+## Circle Gateway API
+
+### Endpoint
+
+```
+GET /api/circle/gateway
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "balances": {
+    "arc": "150.00",
+    "ethereum": "500.00",
+    "arbitrum": "250.00"
+  },
+  "totalBalance": "900.00"
+}
+```
+
+### Integration
+
+The Gateway module connects to Circle's unified balance service to aggregate USDC holdings across all supported chains. This enables seamless multi-chain payment experiences.
+
 ## Use Cases
 
 - Multi-chain dApps

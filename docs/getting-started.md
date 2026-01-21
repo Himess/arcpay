@@ -166,7 +166,7 @@ https://rpc.testnet.arc.network
 
 Arc testnet can sometimes be slow. Wait a few minutes or check the explorer:
 ```
-https://testnet.arcscan.io
+https://testnet.arcscan.app
 ```
 
 ## Support

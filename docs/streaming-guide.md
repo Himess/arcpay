@@ -200,7 +200,7 @@ await agent.stopStream(streamId);
 
 The stream payment contract is deployed at:
 ```
-0x4aC6108858A2ba9C715d3E1694d413b01919A043
+0x4678D992De548bddCb5Cd4104470766b5207A855
 ```
 
 ### Key Functions

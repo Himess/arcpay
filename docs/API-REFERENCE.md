@@ -926,7 +926,7 @@ Check Gas Station status.
   "gasStationEnabled": true,
   "wallet": {
     "id": "...",
-    "address": "0x46c5...A855",
+    "address": "0x4cc4...5a1a",
     "accountType": "SCA",
     "state": "LIVE"
   },
@@ -1012,11 +1012,11 @@ Bridge USDC cross-chain via Circle CCTP.
 
 | Contract | Address |
 |----------|---------|
-| Escrow | `0x84E9F5D7c89ADfEe7C8946a21Cc4Ea69F7A96AAa` |
-| Stream Payment | `0x21a2F4c86102cCe59B2D02B4d00F59C8cDF61c42` |
-| Stealth Registry | `0x2E55cC9E0e5dE96FFce5bdfEC4fE93aa98D71F63` |
+| Escrow | `0x0a982E2250F1C66487b88286e14D965025dD89D2` |
+| Stream Payment | `0x4678D992De548bddCb5Cd4104470766b5207A855` |
+| Stealth Registry | `0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B` |
 | Payment Channel | `0x3FF7bC1C52e7DdD2B7B915bDAdBe003037B0FA2E` |
-| Agent Registry | `0xb3B8F8E19a8e42CB0fcc10EDc1cBe1Ca35B9403B` |
+| Agent Registry | `0x5E3ef9A91AD33270f84B32ACFF91068Eea44c5ee` |
 | Gas Station | `0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25` |
 
 ---
@@ -1027,7 +1027,7 @@ Bridge USDC cross-chain via Circle CCTP.
 |----------|-------|
 | Chain ID | 5042002 |
 | RPC URL | https://rpc.testnet.arc.network |
-| Explorer | https://testnet.arcscan.io |
+| Explorer | https://testnet.arcscan.app |
 | Native Token | USDC (18 decimals, used for gas) |
 
 ---

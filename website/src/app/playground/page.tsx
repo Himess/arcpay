@@ -211,7 +211,7 @@ export default function PlaygroundPage() {
   // Wallet mode: 'circle-wallet' for gasless, 'private-key' for traditional
   type WalletMode = 'circle-wallet' | 'private-key';
   const [walletMode, setWalletMode] = useState<WalletMode>('circle-wallet');
-  const [circleWalletAddress, setCircleWalletAddress] = useState('0x46c5cC31e8609BFeFc5d8C8c9A14A855');
+  const [circleWalletAddress, setCircleWalletAddress] = useState('0x4cc48ea31173c5f14999222962a900ae2e945a1a');
   const [showSettings, setShowSettings] = useState(false);
 
   // Voice state
@@ -1032,7 +1032,7 @@ Only return valid JSON, no markdown or explanation.`;
 
           // For gasless escrow, we need to encode the createAndFundEscrow call
           // This may not be fully supported by Gas Station yet
-          const escrowContract = '0x84E9F5D7c89ADfEe7C8946a21Cc4Ea69F7A96AAa'; // Escrow contract
+          const escrowContract = '0x0a982E2250F1C66487b88286e14D965025dD89D2'; // Escrow contract
           const amountWei = BigInt(Math.floor(parseFloat((amount || 0.1).toString()) * 1e18)).toString();
           const expiresAt = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 1 week
 
@@ -4129,7 +4129,7 @@ Return JSON only, no markdown:
                     <span className="ml-auto px-2 py-0.5 bg-green-600/30 rounded text-xs text-green-300">Gasless</span>
                   </div>
                   <p className="text-gray-400 text-sm">
-                    Address: <code className="text-cyan-400">0x46c5...A855</code>
+                    Address: <code className="text-cyan-400">0x4cc4...5a1a</code>
                   </p>
                   <p className="text-gray-500 text-xs mt-2">
                     Gas fees sponsored by Circle Gas Station (ERC-4337)

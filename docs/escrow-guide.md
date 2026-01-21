@@ -242,7 +242,7 @@ await refundEscrow(escrowId);
 
 The escrow contract is deployed at:
 ```
-0x02291A7116B07D50794EcAC97bBeE1b956610135
+0x0a982E2250F1C66487b88286e14D965025dD89D2
 ```
 
 ### Key Functions

@@ -654,7 +654,7 @@ All contracts are deployed on **Arc Testnet** (Chain ID: 5042002):
 |----------|-------|
 | **Chain ID** | 5042002 |
 | **RPC URL** | https://rpc.testnet.arc.network |
-| **Explorer** | https://testnet.arcscan.io |
+| **Explorer** | https://testnet.arcscan.app |
 | **Faucet** | https://faucet.arc.network |
 | **Native Token** | USDC (used for gas) |
 

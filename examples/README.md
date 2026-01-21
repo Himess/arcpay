@@ -83,7 +83,7 @@ Off-chain micropayments:
 All examples run on Arc Testnet:
 - Chain ID: 5042002
 - RPC: https://rpc.testnet.arc.network
-- Explorer: https://testnet.arcscan.io
+- Explorer: https://testnet.arcscan.app
 
 ## Need Help?
 
