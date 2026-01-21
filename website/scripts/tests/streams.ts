@@ -261,5 +261,114 @@ export async function runStreamTests(): Promise<TestResult[]> {
     };
   }));
 
+  // TEST_4_8: Gasless Stream Claim (Additional) via Circle Wallet
+  results.push(await runTest('TEST_4_8', 'Gasless Stream Multi-Claim (Circle)', 'Streams', async () => {
+    const apiBaseUrl = 'https://website-beige-six-15.vercel.app';
+
+    // Find streams where Circle wallet is recipient and has claimable amount
+    const circleStreams = await streamContract.getRecipientStreams(ctx.circleWallet.address);
+    console.log(`     Found ${circleStreams.length} streams for Circle wallet`);
+
+    let claimableStreamId = '';
+    let claimableAmount = BigInt(0);
+
+    for (const streamId of circleStreams.slice(0, 10)) {
+      try {
+        const stream = await streamContract.getStream(streamId);
+        const state = stream.state !== undefined ? Number(stream.state) : Number(stream[10]);
+        // State 0 = Active
+        if (state === 0) {
+          const amount = await streamContract.getClaimableAmount(streamId);
+          if (amount > BigInt(0)) {
+            claimableStreamId = streamId;
+            claimableAmount = amount;
+            console.log(`     Found claimable: ${formatUSDC(amount)} USDC`);
+            break;
+          }
+        }
+      } catch {
+        // Skip errored streams
+      }
+    }
+
+    if (!claimableStreamId || claimableAmount === BigInt(0)) {
+      // Create a new stream for Circle to claim
+      console.log('     Creating new stream for gasless claim...');
+      const streamAmount = parseUSDC('0.008');
+      const createTx = await streamContract.createStream(
+        ctx.circleWallet.address,
+        streamAmount,
+        120, // 2 minutes
+        { value: streamAmount }
+      );
+      const receipt = await waitForTx(provider, createTx.hash);
+
+      const streamEvent = receipt.logs.find((log: any) => {
+        try {
+          const parsed = streamContract.interface.parseLog(log);
+          return parsed?.name === 'StreamCreated';
+        } catch {
+          return false;
+        }
+      });
+
+      if (streamEvent) {
+        const parsed = streamContract.interface.parseLog(streamEvent);
+        claimableStreamId = parsed?.args[0];
+        console.log(`     Stream created: ${claimableStreamId.slice(0, 18)}...`);
+        console.log(`     Create TX: ${createTx.hash}`);
+
+        // Wait for some amount to accumulate
+        console.log('     Waiting 5s for stream accumulation...');
+        await sleep(5000);
+        claimableAmount = await streamContract.getClaimableAmount(claimableStreamId);
+      }
+    }
+
+    if (!claimableStreamId) {
+      throw new Error('No stream available for claim');
+    }
+
+    // Claim via Circle wallet (gasless)
+    const claimCallData = streamContract.interface.encodeFunctionData('claim', [claimableStreamId]);
+
+    console.log('     Claiming via Circle Wallet (gasless)...');
+
+    const response = await fetch(`${apiBaseUrl}/api/circle/gasless`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contractExecution',
+        contractAddress: ctx.contracts.streamPayment,
+        callData: claimCallData,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Gasless claim failed');
+    }
+
+    let txHash = result.txHash;
+    if (!txHash && result.transactionId) {
+      console.log('     Waiting for claim TX...');
+      const txResult = await waitForCircleTransaction(result.transactionId, apiBaseUrl);
+      txHash = txResult.txHash;
+    }
+
+    console.log(`     ✅ Gasless claim complete! TX: ${txHash}`);
+
+    return {
+      txHash,
+      details: {
+        streamId: claimableStreamId.slice(0, 18) + '...',
+        claimedAmount: formatUSDC(claimableAmount) + ' USDC',
+        claimedBy: ctx.circleWallet.address,
+        gasSponsored: true,
+      },
+    };
+  }));
+
   return results;
 }

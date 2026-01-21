@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import { randomBytes } from 'crypto';
 import * as secp from '@noble/secp256k1';
 import { TestResult, runTest, formatUSDC, parseUSDC, waitForTx } from './types';
-import { getTestContext, getProvider, getSigner, STEALTH_ABI } from './config';
+import { getTestContext, getProvider, getSigner, STEALTH_ABI, waitForCircleTransaction } from './config';
 
 // Helper to generate random private key
 function randomPrivateKey(): Uint8Array {
@@ -195,6 +195,79 @@ export async function runPrivacyTests(): Promise<TestResult[]> {
         to: stealthAddress,
         amount: '0.001 USDC',
         gasUsed: receipt.gasUsed.toString(),
+      },
+    };
+  }));
+
+  // TEST_5_7: Gasless Stealth Payment via Circle Wallet
+  results.push(await runTest('TEST_5_7', 'Gasless Stealth Payment (Circle)', 'Privacy', async () => {
+    const apiBaseUrl = 'https://website-beige-six-15.vercel.app';
+
+    // Check Circle wallet balance
+    const circleBalance = await provider.getBalance(ctx.circleWallet.address);
+    const transferAmount = parseUSDC('0.001');
+
+    console.log(`     Circle wallet balance: ${formatUSDC(circleBalance)} USDC`);
+
+    if (circleBalance < transferAmount) {
+      throw new Error(`Circle wallet insufficient: ${formatUSDC(circleBalance)} USDC`);
+    }
+
+    // Generate a stealth address for the payment
+    const ephemeralPrivKey = randomPrivateKey();
+    const ephemeralPubKey = secp.getPublicKey(ephemeralPrivKey, true);
+
+    // Generate a random stealth address
+    const randomKey = randomPrivateKey();
+    const randomPubKey = secp.getPublicKey(randomKey, false);
+    const stealthAddress = ethers.getAddress(
+      '0x' + ethers.keccak256(randomPubKey.slice(1)).slice(-40)
+    );
+
+    console.log(`     Stealth address: ${stealthAddress}`);
+
+    // Encode sendStealthPayment call
+    const callData = stealthContract.interface.encodeFunctionData('sendStealthPayment', [
+      stealthAddress,
+      '0x' + Buffer.from(ephemeralPubKey).toString('hex'),
+      '0x', // Empty memo
+    ]);
+
+    console.log('     Sending gasless stealth payment...');
+
+    const response = await fetch(`${apiBaseUrl}/api/circle/gasless`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contractExecution',
+        contractAddress: ctx.contracts.stealthRegistry,
+        callData: callData,
+        value: transferAmount.toString(), // Native USDC value
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Gasless stealth payment failed');
+    }
+
+    let txHash = result.txHash;
+    if (!txHash && result.transactionId) {
+      console.log('     Waiting for stealth TX...');
+      const txResult = await waitForCircleTransaction(result.transactionId, apiBaseUrl);
+      txHash = txResult.txHash;
+    }
+
+    console.log(`     ✅ Gasless stealth payment complete! TX: ${txHash}`);
+
+    return {
+      txHash,
+      details: {
+        from: ctx.circleWallet.address,
+        to: stealthAddress,
+        amount: '0.001 USDC',
+        gasSponsored: true,
       },
     };
   }));
