@@ -12,6 +12,7 @@
 - [Privacy](#privacy)
 - [AI Agent](#ai-agent)
 - [On-Chain Agent Registry](#on-chain-agent-registry)
+- [Circle Integration](#circle-integration) *(Gasless, Gateway, CCTP)*
 - [Compliance](#compliance)
 - [Subscriptions](#subscriptions)
 - [Invoices](#invoices)
@@ -873,15 +874,150 @@ txLogger.info('Processing...');  // Includes txId in all logs
 
 ---
 
+## Circle Integration
+
+ArcPay integrates with Circle's infrastructure for gasless transactions and unified USDC management.
+
+### Gasless Transactions
+
+#### POST /api/circle/gasless
+
+Execute a gasless transaction via Circle Gas Station.
+
+**Request (Transfer):**
+```json
+{
+  "type": "transfer",
+  "to": "0x...",
+  "amount": "10.00"
+}
+```
+
+**Request (Contract Execution):**
+```json
+{
+  "type": "contractExecution",
+  "contractAddress": "0x...",
+  "callData": "0x...",
+  "value": "0"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "transactionId": "...",
+  "txHash": "0x...",
+  "state": "COMPLETE",
+  "sponsored": true,
+  "explorerUrl": "https://testnet.arcscan.app/tx/0x..."
+}
+```
+
+#### GET /api/circle/gasless
+
+Check Gas Station status.
+
+**Response:**
+```json
+{
+  "success": true,
+  "gasStationEnabled": true,
+  "wallet": {
+    "id": "...",
+    "address": "0x46c5...A855",
+    "accountType": "SCA",
+    "state": "LIVE"
+  },
+  "limits": {
+    "dailyLimit": "50 USDC",
+    "perTransaction": "No limit (testnet)"
+  }
+}
+```
+
+---
+
+### Circle Gateway
+
+#### GET /api/circle/gateway
+
+Get unified USDC balance across chains.
+
+**Response:**
+```json
+{
+  "success": true,
+  "balances": {
+    "arc": "150.00",
+    "ethereum": "500.00",
+    "arbitrum": "250.00"
+  },
+  "totalBalance": "900.00"
+}
+```
+
+---
+
+### Transaction Status
+
+#### GET /api/circle/transaction/[id]
+
+Get Circle transaction status.
+
+**Response:**
+```json
+{
+  "success": true,
+  "transactionId": "...",
+  "state": "COMPLETE",
+  "txHash": "0x...",
+  "explorerUrl": "https://testnet.arcscan.app/tx/0x..."
+}
+```
+
+---
+
+### CCTP Bridge
+
+#### POST /api/circle/bridge
+
+Bridge USDC cross-chain via Circle CCTP.
+
+**Request:**
+```json
+{
+  "amount": "100.00",
+  "sourceChain": "ethereum-sepolia",
+  "destinationChain": "arc-testnet",
+  "destinationAddress": "0x..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "transactionId": "...",
+  "sourceDomain": 0,
+  "destinationDomain": 26,
+  "estimatedArrival": "~15 minutes"
+}
+```
+
+---
+
 ## Contract Addresses (Arc Testnet)
 
 | Contract | Address |
 |----------|---------|
-| Escrow | `0x0a982E2250F1C66487b88286e14D965025dD89D2` |
-| Stream Payment | `0x4678D992DE548BDdCb5cd4104470766b5207A855` |
-| Stealth Registry | `0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B` |
+| Escrow | `0x84E9F5D7c89ADfEe7C8946a21Cc4Ea69F7A96AAa` |
+| Stream Payment | `0x21a2F4c86102cCe59B2D02B4d00F59C8cDF61c42` |
+| Stealth Registry | `0x2E55cC9E0e5dE96FFce5bdfEC4fE93aa98D71F63` |
 | Payment Channel | `0x3FF7bC1C52e7DdD2B7B915bDAdBe003037B0FA2E` |
-| Agent Registry | `0x5E3ef9A91AD33270f84B32ACFF91068Eea44c5ee` |
+| Agent Registry | `0xb3B8F8E19a8e42CB0fcc10EDc1cBe1Ca35B9403B` |
+| Gas Station | `0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25` |
 
 ---
 

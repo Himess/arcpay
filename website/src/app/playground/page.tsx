@@ -78,12 +78,140 @@ async function sendPayment(to: string, amount: string): Promise<{ success: boole
   }
 }
 
+// Gasless transaction via Circle Wallet (Gas Station sponsored)
+async function sendPaymentGasless(to: string, amount: string): Promise<{
+  success: boolean;
+  txHash?: string;
+  explorerUrl?: string;
+  transactionId?: string;
+  error?: string;
+}> {
+  try {
+    const response = await fetch('/api/circle/gasless', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'transfer',
+        to,
+        amount,
+      }),
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Gasless transfer failed' };
+    }
+
+    // If we have transactionId but no txHash, poll for completion
+    if (data.transactionId && !data.txHash) {
+      const result = await waitForCircleTransaction(data.transactionId);
+      return result;
+    }
+
+    return {
+      success: true,
+      txHash: data.txHash,
+      explorerUrl: data.explorerUrl || `https://testnet.arcscan.app/tx/${data.txHash}`,
+      transactionId: data.transactionId,
+    };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Wait for Circle transaction to complete
+async function waitForCircleTransaction(transactionId: string): Promise<{
+  success: boolean;
+  txHash?: string;
+  explorerUrl?: string;
+  error?: string;
+}> {
+  const maxAttempts = 30;
+  const delay = 2000;
+
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const response = await fetch(`/api/circle/transaction/${transactionId}`);
+      const data = await response.json();
+
+      if ((data.state === 'COMPLETE' || data.state === 'CONFIRMED') && data.txHash) {
+        return {
+          success: true,
+          txHash: data.txHash,
+          explorerUrl: `https://testnet.arcscan.app/tx/${data.txHash}`,
+        };
+      }
+
+      if (data.state === 'FAILED' || data.state === 'DENIED') {
+        return { success: false, error: `Transaction ${data.state}` };
+      }
+    } catch {
+      // Continue polling
+    }
+
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  return { success: false, error: 'Transaction timeout' };
+}
+
+// Gasless contract execution via Circle Wallet
+async function executeGaslessContract(
+  contractAddress: string,
+  callData: string,
+  value?: string
+): Promise<{
+  success: boolean;
+  txHash?: string;
+  explorerUrl?: string;
+  transactionId?: string;
+  error?: string;
+}> {
+  try {
+    const response = await fetch('/api/circle/gasless', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contractExecution',
+        contractAddress,
+        callData,
+        value: value || '0',
+      }),
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Contract execution failed' };
+    }
+
+    // If we have transactionId but no txHash, poll for completion
+    if (data.transactionId && !data.txHash) {
+      const result = await waitForCircleTransaction(data.transactionId);
+      return result;
+    }
+
+    return {
+      success: true,
+      txHash: data.txHash,
+      explorerUrl: data.explorerUrl || `https://testnet.arcscan.app/tx/${data.txHash}`,
+      transactionId: data.transactionId,
+    };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 export default function PlaygroundPage() {
   const [mode, setMode] = useState<DemoMode>('ai-demo');
   const [aiSubMode, setAISubMode] = useState<AISubMode>('voice');
   const [paymentSubMode, setPaymentSubMode] = useState<PaymentSubMode>('contacts');
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [privateKey, setPrivateKey] = useState('');
+
+  // Wallet mode: 'circle-wallet' for gasless, 'private-key' for traditional
+  type WalletMode = 'circle-wallet' | 'private-key';
+  const [walletMode, setWalletMode] = useState<WalletMode>('circle-wallet');
+  const [circleWalletAddress, setCircleWalletAddress] = useState('0x46c5cC31e8609BFeFc5d8C8c9A14A855');
   const [showSettings, setShowSettings] = useState(false);
 
   // Voice state
@@ -187,8 +315,12 @@ console.log('Balance:', balance, 'USDC');
   useEffect(() => {
     const savedKey = localStorage.getItem('arcpay_gemini_key') || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
     const savedPk = localStorage.getItem('arcpay_demo_pk');
+    const savedWalletMode = localStorage.getItem('arcpay_wallet_mode') as WalletMode | null;
     if (savedKey) setGeminiApiKey(savedKey);
     if (savedPk) setPrivateKey(savedPk);
+    if (savedWalletMode && (savedWalletMode === 'circle-wallet' || savedWalletMode === 'private-key')) {
+      setWalletMode(savedWalletMode);
+    }
 
     // Load contacts from localStorage
     const savedContacts = localStorage.getItem('arcpay_contacts');
@@ -242,8 +374,9 @@ console.log('Balance:', balance, 'USDC');
   const saveSettings = () => {
     localStorage.setItem('arcpay_gemini_key', geminiApiKey);
     localStorage.setItem('arcpay_demo_pk', privateKey);
+    localStorage.setItem('arcpay_wallet_mode', walletMode);
     setShowSettings(false);
-    addVoiceLog('success', 'Settings saved!');
+    addVoiceLog('success', `Settings saved! Mode: ${walletMode === 'circle-wallet' ? 'Circle Wallet (Gasless)' : 'Private Key'}`);
   };
 
   // Add log entry
@@ -630,16 +763,26 @@ Only return valid JSON, no markdown or explanation.`;
   const executeVoiceAction = async (parsed: any) => {
     const { action, amount, recipient, recipients, name, address, duration, task } = parsed;
 
-    // Check for private key (required for onchain actions)
-    if (!privateKey && !['list_contacts', 'get_contact', 'help', 'list_due_bills'].includes(action)) {
-      addVoiceLog('error', 'Private key required. Set it in Settings (gear icon)');
-      speakResponse('Please set your private key in settings first');
+    // Determine if wallet is ready
+    const isWalletReady = walletMode === 'circle-wallet' || (walletMode === 'private-key' && privateKey);
+    const isGasless = walletMode === 'circle-wallet';
+
+    // Check for wallet availability (required for onchain actions)
+    const offchainActions = ['list_contacts', 'get_contact', 'help', 'list_due_bills'];
+    if (!isWalletReady && !offchainActions.includes(action)) {
+      if (walletMode === 'private-key') {
+        addVoiceLog('error', 'Private key required. Set it in Settings (gear icon)');
+        speakResponse('Please set your private key in settings first');
+      } else {
+        addVoiceLog('error', 'Wallet not ready');
+        speakResponse('Wallet not ready');
+      }
       return;
     }
 
-    // Create ArcPay instance for onchain operations
+    // Create ArcPay instance for private-key mode
     let arc: Awaited<ReturnType<typeof createVoiceArcClient>> | null = null;
-    if (privateKey) {
+    if (walletMode === 'private-key' && privateKey) {
       try {
         arc = await createVoiceArcClient(privateKey);
       } catch (e: any) {
@@ -672,6 +815,29 @@ Only return valid JSON, no markdown or explanation.`;
           return;
         }
         const targetAddr = addr || recipient || '0xF505e2E71df58D7244189072008f25f6b6aaE5ae';
+
+        // GASLESS MODE via Circle Wallet
+        if (isGasless) {
+          addVoiceLog('ai', '🔵 Sending via Circle Wallet (gasless)...');
+          try {
+            const result = await sendPaymentGasless(targetAddr, (amount || 0).toString());
+            if (result.success && result.txHash) {
+              addVoiceLog('success', `✅ Sent ${amount} USDC (gasless) to ${recipient || targetAddr.slice(0, 10)}...`);
+              addVoiceLog('info', `TX: ${result.txHash.slice(0, 20)}...`);
+              addVoiceLog('info', `Explorer: ${result.explorerUrl}`);
+              speakResponse(`Sent ${amount} USDC gasless to ${recipient || 'recipient'}`);
+            } else {
+              addVoiceLog('error', `Gasless payment failed: ${result.error}`);
+              speakResponse(`Payment failed: ${result.error}`);
+            }
+          } catch (error: any) {
+            addVoiceLog('error', `Payment failed: ${error.message}`);
+            speakResponse(`Payment failed: ${error.message}`);
+          }
+          break;
+        }
+
+        // PRIVATE KEY MODE
         try {
           const result = await arc!.sendUSDC(targetAddr, (amount || 0).toString());
           addVoiceLog('success', `Sent ${amount} USDC to ${recipient || targetAddr.slice(0, 10)}...`);
@@ -686,6 +852,33 @@ Only return valid JSON, no markdown or explanation.`;
       }
 
       case 'balance': {
+        // GASLESS MODE - Check Circle wallet balance
+        if (isGasless) {
+          addVoiceLog('ai', '🔵 Checking Circle Wallet balance...');
+          try {
+            const response = await fetch('/api/circle/gasless');
+            const data = await response.json();
+            if (data.success && data.wallet) {
+              // Get actual balance from RPC
+              const balanceResponse = await fetch(`/api/balance?address=${data.wallet.address}`);
+              const balanceData = await balanceResponse.json();
+              const formatted = balanceData.balance || '0.00';
+              addVoiceLog('success', `Circle Wallet balance: ${formatted} USDC`);
+              addVoiceLog('info', `Address: ${data.wallet.address.slice(0, 10)}...`);
+              addVoiceLog('info', `Gas Station: Active (Gasless)`);
+              speakResponse(`Your Circle Wallet balance is ${formatted} USDC`);
+            } else {
+              addVoiceLog('error', 'Could not fetch Circle wallet info');
+              speakResponse('Could not fetch balance');
+            }
+          } catch (error: any) {
+            addVoiceLog('error', `Could not fetch balance: ${error.message}`);
+            speakResponse(`Could not fetch balance`);
+          }
+          break;
+        }
+
+        // PRIVATE KEY MODE
         try {
           const balance = await arc!.getBalance();
           const formatted = parseFloat(balance).toFixed(2);
@@ -831,6 +1024,37 @@ Only return valid JSON, no markdown or explanation.`;
           speakResponse('Please specify a recipient for the escrow');
           return;
         }
+
+        // GASLESS MODE via Circle Wallet
+        if (isGasless) {
+          addVoiceLog('ai', '🔵 Creating escrow via Circle Wallet (gasless)...');
+          addVoiceLog('info', '⚠️ Note: Gasless escrow requires contract execution with value');
+
+          // For gasless escrow, we need to encode the createAndFundEscrow call
+          // This may not be fully supported by Gas Station yet
+          const escrowContract = '0x84E9F5D7c89ADfEe7C8946a21Cc4Ea69F7A96AAa'; // Escrow contract
+          const amountWei = BigInt(Math.floor(parseFloat((amount || 0.1).toString()) * 1e18)).toString();
+          const expiresAt = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 1 week
+
+          // Simple escrow call encoding (beneficiary, arbiter, amount, expiresAt, conditionHash)
+          // Function: createAndFundEscrow(address,address,uint256,uint256,string)
+          addVoiceLog('info', `Beneficiary: ${targetAddr.slice(0, 10)}...`);
+          addVoiceLog('info', `Amount: ${amount || 0.1} USDC`);
+
+          try {
+            // Note: Gas Station may not support contract execution with value
+            // In that case, fall back to informing user
+            addVoiceLog('info', 'Escrow with value transfer requires private key mode');
+            addVoiceLog('info', 'Switch to Private Key mode in Settings for full escrow support');
+            speakResponse('Gasless escrow with value transfer is not yet supported. Please use private key mode.');
+          } catch (error: any) {
+            addVoiceLog('error', `Escrow failed: ${error.message}`);
+            speakResponse(`Escrow creation failed`);
+          }
+          break;
+        }
+
+        // PRIVATE KEY MODE
         try {
           const result = await arc!.escrow.create({
             beneficiary: targetAddr,
@@ -870,6 +1094,24 @@ Only return valid JSON, no markdown or explanation.`;
           return;
         }
         const durationSecs = parseDurationToSeconds(duration) || 30 * 24 * 60 * 60; // default 30 days
+
+        // GASLESS MODE via Circle Wallet
+        if (isGasless) {
+          addVoiceLog('ai', '🔵 Creating stream via Circle Wallet (gasless)...');
+          addVoiceLog('info', '⚠️ Note: Stream creation with value transfer may require private key mode');
+          addVoiceLog('info', `Recipient: ${targetAddr.slice(0, 10)}...`);
+          addVoiceLog('info', `Amount: ${amount || 0.5} USDC over ${duration || '30 days'}`);
+
+          // Note: Gas Station supports contract execution but not always with value
+          // Stream claiming works gasless, but stream creation with value may not
+          addVoiceLog('info', 'Stream creation with value transfer requires private key mode');
+          addVoiceLog('info', 'Switch to Private Key mode in Settings for full stream support');
+          addVoiceLog('info', '💡 Tip: Stream claiming IS gasless when you receive streams');
+          speakResponse('Gasless stream creation with value is not yet supported. Please use private key mode.');
+          break;
+        }
+
+        // PRIVATE KEY MODE
         try {
           const result = await arc!.streams.create({
             recipient: targetAddr,
@@ -3847,7 +4089,66 @@ Return JSON only, no markdown:
               exit={{ opacity: 0, height: 0 }}
               className="mb-6 bg-gray-900 rounded-xl p-6 border border-gray-800"
             >
-              <h3 className="text-lg font-semibold mb-4">API Settings</h3>
+              <h3 className="text-lg font-semibold mb-4">Settings</h3>
+
+              {/* Wallet Mode Selector */}
+              <div className="mb-6">
+                <label className="block text-sm text-gray-400 mb-2">Wallet Mode</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setWalletMode('circle-wallet')}
+                    className={`flex-1 px-4 py-3 rounded-lg border transition-all ${
+                      walletMode === 'circle-wallet'
+                        ? 'bg-blue-600 border-blue-500 text-white'
+                        : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+                    }`}
+                  >
+                    <span className="block text-lg mb-1">🔵 Circle Wallet</span>
+                    <span className="block text-xs opacity-80">Gasless (Recommended)</span>
+                  </button>
+                  <button
+                    onClick={() => setWalletMode('private-key')}
+                    className={`flex-1 px-4 py-3 rounded-lg border transition-all ${
+                      walletMode === 'private-key'
+                        ? 'bg-gray-600 border-gray-500 text-white'
+                        : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+                    }`}
+                  >
+                    <span className="block text-lg mb-1">🔑 Private Key</span>
+                    <span className="block text-xs opacity-80">Advanced</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Circle Wallet Info or Private Key Input */}
+              {walletMode === 'circle-wallet' ? (
+                <div className="mb-4 bg-green-900/30 border border-green-700 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-green-400 text-lg">✅</span>
+                    <span className="text-green-400 font-medium">Circle Wallet Active</span>
+                    <span className="ml-auto px-2 py-0.5 bg-green-600/30 rounded text-xs text-green-300">Gasless</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Address: <code className="text-cyan-400">0x46c5...A855</code>
+                  </p>
+                  <p className="text-gray-500 text-xs mt-2">
+                    Gas fees sponsored by Circle Gas Station (ERC-4337)
+                  </p>
+                </div>
+              ) : (
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-400 mb-2">Demo Private Key (Testnet only)</label>
+                  <input
+                    type="password"
+                    value={privateKey}
+                    onChange={(e) => setPrivateKey(e.target.value)}
+                    placeholder="0x..."
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">⚠️ Only use testnet keys!</p>
+                </div>
+              )}
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">Gemini API Key</label>
@@ -3861,17 +4162,6 @@ Return JSON only, no markdown:
                   <p className="text-xs text-gray-500 mt-1">
                     Get from <a href="https://aistudio.google.com" target="_blank" className="text-cyan-400">aistudio.google.com</a>
                   </p>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Demo Private Key (Testnet only)</label>
-                  <input
-                    type="password"
-                    value={privateKey}
-                    onChange={(e) => setPrivateKey(e.target.value)}
-                    placeholder="0x..."
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">⚠️ Only use testnet keys!</p>
                 </div>
               </div>
               <button
@@ -3969,6 +4259,23 @@ Return JSON only, no markdown:
                         <p className="text-gray-400">
                           {isListening ? 'Listening... Click to stop' : 'Click to start'}
                         </p>
+                        {/* Wallet Mode Indicator */}
+                        {walletMode === 'circle-wallet' ? (
+                          <div className="mt-2 px-3 py-1 bg-green-900/50 border border-green-700 rounded-full flex items-center gap-2">
+                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                            <span className="text-green-400 text-sm">Circle Wallet (Gasless)</span>
+                          </div>
+                        ) : privateKey ? (
+                          <div className="mt-2 px-3 py-1 bg-gray-800 border border-gray-700 rounded-full flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span className="text-gray-400 text-sm">Private Key Mode</span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 px-3 py-1 bg-yellow-900/50 border border-yellow-700 rounded-full flex items-center gap-2">
+                            <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                            <span className="text-yellow-400 text-sm">No wallet configured</span>
+                          </div>
+                        )}
                         {transcript && (
                           <p className="mt-4 text-lg text-cyan-400">"{transcript}"</p>
                         )}

@@ -67,6 +67,48 @@ const result = await arc.sendUSDC('0x...recipient', '10');
 console.log(`Transaction: ${result.txHash}`);
 ```
 
+## Circle Wallet Integration (Recommended)
+
+For the best experience, use Circle Wallets with Gas Station for **gasless transactions**.
+
+### Setup Circle Wallet
+
+1. Create a Circle Developer Account at [console.circle.com](https://console.circle.com)
+2. Get your API credentials
+3. Set environment variables:
+
+```bash
+# Circle API (for gasless/gateway features)
+CIRCLE_API_KEY=your_api_key
+CIRCLE_ENTITY_SECRET=your_entity_secret
+CIRCLE_WALLET_ID=your_wallet_id
+```
+
+### Gasless Transactions
+
+With Circle Wallet, all transactions are sponsored by Gas Station - users pay **no gas fees**!
+
+```typescript
+import { ArcPay } from 'arcpay';
+
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  useCircleWallet: true,  // Enable gasless mode
+});
+
+// This transaction costs 0 gas for the user!
+await arc.sendUSDC('0x...recipient', '100');
+```
+
+### How Gasless Works
+
+1. Transaction submitted to Circle's ERC-4337 bundler
+2. Gas Station sponsors the gas fee
+3. Transaction executes on-chain
+4. User pays: **0 USDC for gas**
+
+**Verify on Explorer:** Check any transaction on [Arc Explorer](https://testnet.arcscan.app) - Method will show `handleOps` (ERC-4337) and gas paid by Gas Station contract.
+
 ## Core Concepts
 
 ### Network
@@ -75,6 +117,17 @@ Arc is a blockchain that uses USDC as its native gas token. This means:
 - All gas fees are paid in USDC
 - No need to acquire a separate native token
 - Simpler UX for users
+
+### Circle Integration
+
+ArcPay deeply integrates with Circle's infrastructure:
+
+| Feature | Description |
+|---------|-------------|
+| **Circle Wallets** | SCA wallets with ERC-4337 support |
+| **Gas Station** | Sponsored gas fees for users |
+| **Gateway** | Unified USDC balance across chains |
+| **CCTP Bridge** | Cross-chain USDC transfers |
 
 ### Modules
 

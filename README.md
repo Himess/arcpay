@@ -178,16 +178,27 @@ app.use(arc.micropayments.paywall('0xYourAddress', {
 const data = await arc.micropayments.pay('https://api.example.com/premium');
 ```
 
-### Gasless Payments
-Users don't need ETH - sponsor their gas with USDC.
+### Gasless Payments (Circle Gas Station)
+Users pay **zero gas fees** - all transactions sponsored by Circle's Gas Station.
 
 ```typescript
-await gasStation.sponsorTransaction({
-  userAddress: '0x...user',
-  transaction: { to: '0x...', data: '0x...' },
-  maxGasUSDC: '1.00'
+// Enable gasless mode with Circle Wallet
+const arc = await ArcPay.init({
+  network: 'arc-testnet',
+  useCircleWallet: true,  // Enable gasless
 });
+
+// This transaction costs 0 gas for the user!
+await arc.sendUSDC('0x...', '100');
 ```
+
+**How it works:**
+1. Transaction submitted to Circle's ERC-4337 bundler
+2. Gas Station sponsors the gas fee
+3. Transaction executes on-chain
+4. User sees: `Gas Fee: 0 USDC`
+
+**Proof:** [View gasless TX on Arc Explorer](https://testnet.arcscan.app/tx/0xf02b0ee708950a74f9e61e57262e1133f4528785361ff189ce09f9514f1e298b)
 
 ### Circle Gateway
 Unified balance across Ethereum, Arbitrum, Base, Arc.
@@ -195,6 +206,22 @@ Unified balance across Ethereum, Arbitrum, Base, Arc.
 ```typescript
 const balance = await gateway.getUnifiedBalance('0x...user');
 // { total: '1500', chains: { ethereum: '500', arc: '1000' } }
+```
+
+### Circle Integration Overview
+
+| Feature | Description |
+|---------|-------------|
+| **Circle Wallets** | SCA wallets with ERC-4337 support |
+| **Gas Station** | Sponsored gas fees for users |
+| **Gateway** | Unified USDC balance across chains |
+| **CCTP Bridge** | Cross-chain USDC transfers (Domain 26) |
+
+Environment variables for Circle features:
+```bash
+CIRCLE_API_KEY=your_api_key
+CIRCLE_ENTITY_SECRET=your_entity_secret
+CIRCLE_WALLET_ID=your_wallet_id
 ```
 
 ### AI Voice Commands

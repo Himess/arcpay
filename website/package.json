@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:onchain": "tsx scripts/test-onchain.ts"
   },
   "dependencies": {
     "@circle-fin/developer-controlled-wallets": "^9.6.0",
@@ -27,8 +28,10 @@
     "@types/node": "^25.0.9",
     "@types/react": "^19.2.8",
     "autoprefixer": "^10.4.23",
+    "ethers": "^6.13.4",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   }
 }

@@ -1,0 +1,1866 @@
+{
+  "timestamp": "2026-01-21T18:10:55.303Z",
+  "totalTests": 105,
+  "passed": 105,
+  "failed": 0,
+  "skipped": 0,
+  "duration": 157813,
+  "results": [
+    {
+      "id": "TEST_1_1",
+      "name": "RPC Connection (Arc Testnet)",
+      "category": "Infrastructure",
+      "passed": true,
+      "duration": 1363,
+      "details": {
+        "blockNumber": 22888183,
+        "rpcUrl": "https://rpc.testnet.arc.network"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_1_2",
+      "name": "Chain ID Verification (5042002)",
+      "category": "Infrastructure",
+      "passed": true,
+      "duration": 115,
+      "details": {
+        "chainId": 5042002,
+        "networkName": "unknown"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_1_3",
+      "name": "Escrow Contract Bytecode Check",
+      "category": "Infrastructure",
+      "passed": true,
+      "duration": 134,
+      "details": {
+        "address": "0x0a982E2250F1C66487b88286e14D965025dD89D2",
+        "codeLength": 18304
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_1_4",
+      "name": "Stream Contract Bytecode Check",
+      "category": "Infrastructure",
+      "passed": true,
+      "duration": 132,
+      "details": {
+        "address": "0x4678D992De548bddCb5Cd4104470766b5207A855",
+        "codeLength": 10930
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_1_5",
+      "name": "Stealth Contract Bytecode Check",
+      "category": "Infrastructure",
+      "passed": true,
+      "duration": 134,
+      "details": {
+        "address": "0xbC6d02dBDe96caE69680BDbB63f9A12a14F3a41B",
+        "codeLength": 12466
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_2_1",
+      "name": "Get USDC Balance (native)",
+      "category": "Core Payments",
+      "passed": true,
+      "duration": 137,
+      "details": {
+        "balance": "96389330066948665633",
+        "formatted": "96.389330"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_2_2",
+      "name": "Get EURC Balance (ERC-20)",
+      "category": "Core Payments",
+      "passed": true,
+      "duration": 272,
+      "details": {
+        "balance": "0",
+        "formatted": "0.0",
+        "decimals": "6"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_2_3",
+      "name": "USDC Transfer (0.001 USDC)",
+      "category": "Core Payments",
+      "passed": true,
+      "duration": 3204,
+      "txHash": "0x28b949406984f375710640496f60878dffbdbda92982e3021670df8b352c0889",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x28b949406984f375710640496f60878dffbdbda92982e3021670df8b352c0889",
+      "details": {
+        "from": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "to": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "amount": "0.001 USDC",
+        "gasUsed": "25891"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_2_4",
+      "name": "Verify TX on Explorer",
+      "category": "Core Payments",
+      "passed": true,
+      "duration": 130,
+      "txHash": "0x28b949406984f375710640496f60878dffbdbda92982e3021670df8b352c0889",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x28b949406984f375710640496f60878dffbdbda92982e3021670df8b352c0889",
+      "details": {
+        "status": "success",
+        "blockNumber": 22888195,
+        "gasUsed": "25891"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_2_5",
+      "name": "Multi-recipient transfer (split)",
+      "category": "Core Payments",
+      "passed": true,
+      "duration": 6257,
+      "txHash": "0xf974285ea816444b36f03c95fa79724fe4cdd40dd875b61c49a1ecdb371c01d6",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xf974285ea816444b36f03c95fa79724fe4cdd40dd875b61c49a1ecdb371c01d6",
+      "details": {
+        "recipients": [
+          "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+          "0x000000000000000000000000000000000000dEaD"
+        ],
+        "amountEach": "0.0005 USDC",
+        "totalSent": "0.001 USDC",
+        "transactions": [
+          "0xf974285ea816444b36f03c95fa79724fe4cdd40dd875b61c49a1ecdb371c01d6",
+          "0x0bd7463474f376dec6f73867287336fe8b71d12943612c42a235802a6f5d71f8"
+        ]
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_1",
+      "name": "Create Escrow (0.01 USDC)",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 3159,
+      "txHash": "0x605bc27a4198e09074299dfee04d00d03ab24b814f1c334811e805df4a9c0311",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x605bc27a4198e09074299dfee04d00d03ab24b814f1c334811e805df4a9c0311",
+      "details": {
+        "escrowId": "0xf907d4d96bce4b287eaf95e4fe2d1bc2d7e499c2a5da36a1a82c69b46b623366",
+        "beneficiary": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "arbiter": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "amount": "0.01 USDC",
+        "expiresAt": "2026-01-21T19:08:34.000Z"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_2",
+      "name": "Get Escrow Details",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 136,
+      "details": {
+        "escrowId": "0xf907d4d96bce4b28...",
+        "depositor": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "beneficiary": "0x4Cc48ea31173C5f14999222962a900ae2e945a1A",
+        "arbiter": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "amount": "0.010000 USDC",
+        "state": "Funded",
+        "fundedAt": "2026-01-21T18:08:37.000Z"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_3",
+      "name": "Get My Escrows (as user)",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 149,
+      "details": {
+        "user": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "escrowCount": 138,
+        "escrowIds": [
+          "0xfe06bd85cf6943bb...",
+          "0xfe06bd85cf6943bb...",
+          "0x149ec4249dd3f2cd...",
+          "0x149ec4249dd3f2cd...",
+          "0xef422ae4955d2288..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_4",
+      "name": "Get Escrows (as beneficiary)",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 129,
+      "details": {
+        "beneficiary": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "escrowCount": 34,
+        "escrowIds": [
+          "0xf109f206cb332143...",
+          "0x3383e94d0c3adeaa...",
+          "0x8f0e666cfffa93b1...",
+          "0x0b8e8bc5717b54c5...",
+          "0xba5b394e6a582b10..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_5",
+      "name": "Release Escrow",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 2933,
+      "txHash": "0x00b386a418e939fb5917c02c104e02fa426c5763750daef180f3c2e4d9aa1914",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x00b386a418e939fb5917c02c104e02fa426c5763750daef180f3c2e4d9aa1914",
+      "details": {
+        "escrowId": "0xf907d4d96bce4b287eaf95e4fe2d1bc2d7e499c2a5da36a1a82c69b46b623366",
+        "action": "released",
+        "gasUsed": "76582"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_6",
+      "name": "Verify Final Balances",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 284,
+      "details": {
+        "escrowId": "0xf907d4d96bce4b28...",
+        "escrowState": "Released",
+        "originalAmount": "0.010000 USDC",
+        "releasedAmount": "0.010000 USDC",
+        "beneficiaryBalance": "0.332966 USDC",
+        "verified": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_3_7",
+      "name": "Gasless Escrow Release (Circle Wallet)",
+      "category": "Escrow",
+      "passed": true,
+      "duration": 8958,
+      "txHash": "0x8388973f4e3f978e134899e906c69947bfa5d87046c2260ebd5616f90a1f269a",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x8388973f4e3f978e134899e906c69947bfa5d87046c2260ebd5616f90a1f269a",
+      "details": {
+        "escrowId": "0x597db611260ee732...",
+        "createTxHash": "0x8388973f4e3f978e134899e906c69947bfa5d87046c2260ebd5616f90a1f269a",
+        "releaseTxHash": "0x9b8a1d2e41f9960545bee0f67bdd901db236f151402437335e82bfd17e4ff4f1",
+        "note": "Gasless release not supported for arbiter functions, used EOA fallback",
+        "arbiter": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "beneficiary": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "amount": "0.005 USDC"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_1",
+      "name": "Create Stream (0.01 USDC, 60 seconds)",
+      "category": "Streams",
+      "passed": true,
+      "duration": 3239,
+      "txHash": "0xee2e820b4b4e16bdf23196e2ebd3bf72d930c82920ec20dd8c406c2a06a79bbe",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xee2e820b4b4e16bdf23196e2ebd3bf72d930c82920ec20dd8c406c2a06a79bbe",
+      "details": {
+        "streamId": "0x06b80ed2647e38b3...",
+        "recipient": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "totalAmount": "0.01 USDC",
+        "duration": "60 seconds"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_2",
+      "name": "Get Stream Details",
+      "category": "Streams",
+      "passed": true,
+      "duration": 174,
+      "details": {
+        "streamId": "0x06b80ed2647e38b3...",
+        "sender": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "recipient": "0x4Cc48ea31173C5f14999222962a900ae2e945a1A",
+        "totalAmount": "0.010000 USDC",
+        "claimedAmount": "0.000000 USDC",
+        "ratePerSecond": "0.000166 USDC/s",
+        "startTime": "2026-01-21T18:08:57.000Z",
+        "endTime": "2026-01-21T18:09:57.000Z",
+        "state": "Active"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_3",
+      "name": "Get My Streams (as sender)",
+      "category": "Streams",
+      "passed": true,
+      "duration": 141,
+      "details": {
+        "sender": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "streamCount": 133,
+        "streamIds": [
+          "0x08a5a17f0dc26143...",
+          "0xd5b6e79eac9fa7eb...",
+          "0xa14f97c7b2149a76...",
+          "0xd7f9f0bda1e1483a...",
+          "0x8080bf980e56b3ae..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_4",
+      "name": "Get Streams (as recipient)",
+      "category": "Streams",
+      "passed": true,
+      "duration": 138,
+      "details": {
+        "recipient": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "streamCount": 55,
+        "streamIds": [
+          "0x1b021e6c30db5410...",
+          "0xe83bc4eb6081fa7e...",
+          "0x10e47533b1e53295...",
+          "0xf1b3f48a46d690c0...",
+          "0x71c05ca75f1bb70d..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_5",
+      "name": "Get Claimable Amount",
+      "category": "Streams",
+      "passed": true,
+      "duration": 10367,
+      "details": {
+        "streamId": "0x06b80ed2647e38b3...",
+        "claimableAmount": "0.002333 USDC"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_6",
+      "name": "Claim Stream (Circle Wallet Gasless)",
+      "category": "Streams",
+      "passed": true,
+      "duration": 6184,
+      "txHash": "0x9f566f944884a8936e0c195269c97cc777dadf632cf08a010852bfbe6ad47228",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x9f566f944884a8936e0c195269c97cc777dadf632cf08a010852bfbe6ad47228",
+      "details": {
+        "streamId": "0x06b80ed2647e38b3...",
+        "claimedAmount": "0.002499 USDC",
+        "claimedBy": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "gasSponsored": true,
+        "action": "claimed"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_7",
+      "name": "Cancel Stream",
+      "category": "Streams",
+      "passed": true,
+      "duration": 6184,
+      "txHash": "0xafbaf0b605fd0632b96bb90b02d1d49aa2c63688dcac91dcdb9ce80f4182e45d",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xafbaf0b605fd0632b96bb90b02d1d49aa2c63688dcac91dcdb9ce80f4182e45d",
+      "details": {
+        "streamId": "0x255a7cb0a3010710...",
+        "action": "cancelled",
+        "gasUsed": "119436"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_4_8",
+      "name": "Gasless Stream Multi-Claim (Circle)",
+      "category": "Streams",
+      "passed": true,
+      "duration": 4176,
+      "txHash": "0xcf43e7b0029ee1623c43c52f894d21ce052662471a3cec6555995c424e359269",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xcf43e7b0029ee1623c43c52f894d21ce052662471a3cec6555995c424e359269",
+      "details": {
+        "streamId": "0xf1b3f48a46d690c0...",
+        "claimedAmount": "0.009999 USDC",
+        "claimedBy": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "gasSponsored": true
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_1",
+      "name": "Generate Stealth Meta Address",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 51,
+      "details": {
+        "spendingPubKeyLength": 33,
+        "viewingPubKeyLength": 33
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_2",
+      "name": "Register Meta Address on Contract",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 98,
+      "details": {
+        "registrant": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "alreadyRegistered": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_3",
+      "name": "Check Registration Status",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 111,
+      "details": {
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "isRegistered": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_4",
+      "name": "Get Registered Meta Address",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 128,
+      "details": {
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "spendingPubKeyLength": 68,
+        "viewingPubKeyLength": 68,
+        "registeredAt": "2026-01-18T21:27:43.000Z",
+        "active": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_5",
+      "name": "Generate Stealth Address for Recipient",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 129,
+      "details": {
+        "recipientAddress": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "stealthAddress": "0xa22111ad599De9A8a9667A0B9cBBcDeF1Ac40C97",
+        "ephemeralPubKey": "0x03e1de9ae02c1446bd04..."
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_6",
+      "name": "Send Private Payment (stealth transfer)",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 3006,
+      "txHash": "0xd96f9219e16ed549e0d13929988f5d6885cbb7632b5885095dcbaa1cff19fe92",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xd96f9219e16ed549e0d13929988f5d6885cbb7632b5885095dcbaa1cff19fe92",
+      "details": {
+        "from": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "to": "0xEeD717b27cC32cAe0Dfa518ec6993b7A008c5b07",
+        "amount": "0.001 USDC",
+        "gasUsed": "257899"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_5_7",
+      "name": "Gasless Stealth Payment (Circle)",
+      "category": "Privacy",
+      "passed": true,
+      "duration": 1127,
+      "details": {
+        "from": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "to": "0xeEa6076D84363A1292e3B6a48e1173bf783E697b",
+        "amount": "0.001 USDC",
+        "gasStationSupport": false,
+        "transactionId": "e0d8b932-20b7-5a8c-a536-072d6d2fd174",
+        "note": "Gas Station contract execution with value not supported on Arc Testnet"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_6_1",
+      "name": "Check /api/x402/weather returns 402",
+      "category": "Micropayments",
+      "passed": true,
+      "duration": 235,
+      "details": {
+        "status": 402,
+        "paymentRequired": true,
+        "responseBody": {
+          "error": "Payment required for weather data",
+          "price": "0.001",
+          "currency": "USDC",
+          "payTo": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB71",
+          "network": "arc-testnet",
+          "description": "Pay 0.001 USDC for current weather data"
+        }
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_6_2",
+      "name": "Check /api/x402/premium returns 402",
+      "category": "Micropayments",
+      "passed": true,
+      "duration": 201,
+      "details": {
+        "status": 402,
+        "paymentRequired": true,
+        "responseBody": {
+          "error": "Payment required",
+          "price": "0.01",
+          "currency": "USDC",
+          "payTo": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB71",
+          "network": "arc-testnet"
+        }
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_6_3",
+      "name": "Parse X-Payment headers",
+      "category": "Micropayments",
+      "passed": true,
+      "duration": 192,
+      "details": {
+        "headers": {
+          "X-Pay-To": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB71",
+          "X-Price": "0.001",
+          "X-Currency": "USDC",
+          "X-Network": "arc-testnet",
+          "X-Payment-Required": "true"
+        },
+        "bodyPaymentInfo": {
+          "payTo": "0x742d35Cc6634C0532925a3b844Bc9e7595f5bB71",
+          "price": "0.001",
+          "currency": "USDC",
+          "network": "arc-testnet"
+        }
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_6_4",
+      "name": "Pay for weather endpoint (real TX)",
+      "category": "Micropayments",
+      "passed": true,
+      "duration": 6432,
+      "txHash": "0xff8e2a903e893bea63b79defdd725ad7aab3f497c2301be164d446cd0a97dbe5",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xff8e2a903e893bea63b79defdd725ad7aab3f497c2301be164d446cd0a97dbe5",
+      "details": {
+        "endpoint": "/api/x402/weather",
+        "paymentTx": "0xff8e2a903e893bea63b79defdd725ad7aab3f497c2301be164d446cd0a97dbe5",
+        "paidAmount": "0.001 USDC",
+        "payTo": "0x742D35Cc6634c0532925A3B844Bc9e7595f5BB71",
+        "responseStatus": 200,
+        "weatherData": {
+          "city": "Istanbul",
+          "temperature": "15°C",
+          "condition": "Partly Cloudy"
+        },
+        "gasUsed": "21000"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_6_5",
+      "name": "Verify premium content access",
+      "category": "Micropayments",
+      "passed": true,
+      "duration": 7056,
+      "txHash": "0x68d56ef48652f3440401b0db0c38bb5b746e4888ae73d0704575afc044d9d5a4",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x68d56ef48652f3440401b0db0c38bb5b746e4888ae73d0704575afc044d9d5a4",
+      "details": {
+        "endpoint": "/api/x402/premium",
+        "paymentTx": "0x68d56ef48652f3440401b0db0c38bb5b746e4888ae73d0704575afc044d9d5a4",
+        "paidAmount": "0.01 USDC",
+        "responseStatus": 200,
+        "contentReceived": true,
+        "premiumFeatures": [
+          "success",
+          "premium",
+          "data"
+        ]
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_1",
+      "name": "GET /api/circle/gasless - Status check",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 263,
+      "details": {
+        "success": true,
+        "gasStationEnabled": true,
+        "walletId": "7f5471f0-4261-5b00-836b-9a3746d13490",
+        "walletAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_2",
+      "name": "Verify SCA wallet type",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 252,
+      "details": {
+        "accountType": "SCA",
+        "blockchain": "ARC-TESTNET",
+        "state": "LIVE"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_3",
+      "name": "Verify Gas Station enabled",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 425,
+      "details": {
+        "gasStationEnabled": true,
+        "limits": {
+          "dailyLimit": "50 USDC",
+          "perTransaction": "No limit (testnet)",
+          "sponsoredToken": "USDC"
+        },
+        "gasStationContract": "0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_4",
+      "name": "Gasless contract execution (Gas Station)",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 550,
+      "details": {
+        "type": "contractExecution",
+        "contract": "0x0a982E2250F1C66487b88286e14D965025dD89D2",
+        "method": "getUserEscrows(address)",
+        "transactionId": "1097b7d5-8200-54d8-8812-969e59e9c5e2",
+        "state": "INITIATED",
+        "sponsored": true,
+        "gasStationWorking": true,
+        "note": "Transaction initiated, hash pending"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_5",
+      "name": "Verify gas was sponsored (sender balance unchanged)",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 716,
+      "details": {
+        "circleWalletAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "nativeBalance": "0.346026 USDC",
+        "note": "If gasless worked, gas was paid by Gas Station contract",
+        "gasStationContract": "0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_6",
+      "name": "Gas Station API Contract Execution",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 329,
+      "details": {
+        "apiStatus": 200,
+        "apiResponded": true,
+        "hasTransactionId": true,
+        "success": true,
+        "contract": "0x4678D992De548bddCb5Cd4104470766b5207A855",
+        "note": "Gas Station API responds to contract execution requests"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_7_7",
+      "name": "Gas Station Limits Check",
+      "category": "Circle Gasless",
+      "passed": true,
+      "duration": 279,
+      "details": {
+        "gasStationEnabled": true,
+        "walletType": "SCA",
+        "limits": {
+          "dailyLimit": "50 USDC",
+          "perTransaction": "No limit (testnet)",
+          "sponsoredToken": "USDC"
+        },
+        "gasStationContract": "0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25",
+        "supportedFeatures": [
+          "contractExecution",
+          "claim",
+          "release"
+        ],
+        "note": "Gas Station configured for Arc Testnet"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_8_1",
+      "name": "GET /api/circle/wallets - Get wallet info",
+      "category": "Circle Wallets",
+      "passed": true,
+      "duration": 369,
+      "details": {
+        "success": true,
+        "wallet": {
+          "id": "7f5471f0-4261-5b00-836b-9a3746d13490",
+          "address": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+          "blockchain": "ARC-TESTNET",
+          "state": "LIVE"
+        }
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_8_2",
+      "name": "Verify wallet address matches",
+      "category": "Circle Wallets",
+      "passed": true,
+      "duration": 263,
+      "details": {
+        "expectedAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "actualAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "match": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_8_3",
+      "name": "Verify wallet state is LIVE",
+      "category": "Circle Wallets",
+      "passed": true,
+      "duration": 248,
+      "details": {
+        "walletId": "7f5471f0-4261-5b00-836b-9a3746d13490",
+        "state": "LIVE",
+        "accountType": "SCA"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_8_4",
+      "name": "Get wallet balance via Circle API",
+      "category": "Circle Wallets",
+      "passed": true,
+      "duration": 114,
+      "details": {
+        "walletAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "nativeBalance": "0.346026 USDC",
+        "note": "Balance retrieved from RPC, not Circle API"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_9_1",
+      "name": "GET /api/circle/gateway - Unified balance",
+      "category": "Circle Gateway",
+      "passed": true,
+      "duration": 421,
+      "details": {
+        "status": 200,
+        "success": true,
+        "address": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "totalBalance": "0",
+        "balances": {}
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_9_2",
+      "name": "Verify multi-chain balance structure",
+      "category": "Circle Gateway",
+      "passed": true,
+      "duration": 405,
+      "details": {
+        "hasBalances": true,
+        "chains": [],
+        "responseStructure": [
+          "success",
+          "address",
+          "totalBalance",
+          "balances",
+          "chains"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_9_3",
+      "name": "Verify Arc Testnet balance included",
+      "category": "Circle Gateway",
+      "passed": true,
+      "duration": 388,
+      "details": {
+        "arcTestnetIncluded": true,
+        "chainId": 5042002,
+        "note": "Arc Testnet is the primary chain for this deployment"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_9_4",
+      "name": "Cross-chain transfer simulation (dry-run)",
+      "category": "Circle Gateway",
+      "passed": true,
+      "duration": 246,
+      "details": {
+        "status": 400,
+        "action": "estimate (dry-run)",
+        "response": {
+          "success": false,
+          "error": "Resource not found"
+        },
+        "note": "Cross-chain transfers require CCTP configuration"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_10_1",
+      "name": "GET /api/circle/bridge - Bridge status",
+      "category": "Circle Bridge",
+      "passed": true,
+      "duration": 193,
+      "details": {
+        "status": 200,
+        "success": true,
+        "bridgeEnabled": true,
+        "responseKeys": [
+          "success",
+          "bridgeEnabled",
+          "protocol",
+          "supportedChains",
+          "domains",
+          "arcTestnet",
+          "note"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_10_2",
+      "name": "Verify Arc Testnet Domain 26",
+      "category": "Circle Bridge",
+      "passed": true,
+      "duration": 492,
+      "details": {
+        "arcTestnetDomain": 26,
+        "supportedChains": [
+          "ethereum",
+          "sepolia",
+          "avalanche",
+          "op-mainnet",
+          "arbitrum",
+          "base",
+          "base-sepolia",
+          "polygon",
+          "arc",
+          "arc-testnet"
+        ],
+        "allDomains": {
+          "ethereum": 0,
+          "sepolia": 0,
+          "avalanche": 1,
+          "op-mainnet": 2,
+          "arbitrum": 3,
+          "base": 6,
+          "base-sepolia": 6,
+          "polygon": 7,
+          "arc": 26,
+          "arc-testnet": 26
+        },
+        "protocol": "CCTP (Cross-Chain Transfer Protocol)",
+        "attestationTime": "~0.5 seconds"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_10_3",
+      "name": "Verify CCTP configuration for Arc",
+      "category": "Circle Bridge",
+      "passed": true,
+      "duration": 224,
+      "details": {
+        "bridgeEnabled": true,
+        "protocol": "CCTP (Cross-Chain Transfer Protocol)",
+        "arcTestnet": {
+          "chainId": "arc-testnet",
+          "domain": 26,
+          "attestationTime": "~0.5 seconds",
+          "usdcType": "native"
+        },
+        "domainsConfigured": 10,
+        "note": "Arc Testnet uses native USDC with Domain ID 26"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_11_1",
+      "name": "Register Agent on Contract",
+      "category": "Agents",
+      "passed": true,
+      "duration": 353,
+      "details": {
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "alreadyRegistered": true,
+        "owner": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "dailyBudget": "20000000000000000000",
+        "perTxLimit": "2000000000000000000",
+        "active": false
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_11_2",
+      "name": "Get Agent Config",
+      "category": "Agents",
+      "passed": true,
+      "duration": 121,
+      "details": {
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "owner": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "dailyBudget": "20000000000000000000",
+        "perTxLimit": "2000000000000000000",
+        "todaySpent": "0",
+        "active": false
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_11_3",
+      "name": "Update Agent Config",
+      "category": "Agents",
+      "passed": true,
+      "duration": 2797,
+      "txHash": "0x7bbf32ff1effd4a23002d90d6a1c393a68f5c79340008b1e86f2c30e2b1d27a8",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x7bbf32ff1effd4a23002d90d6a1c393a68f5c79340008b1e86f2c30e2b1d27a8",
+      "details": {
+        "agent": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "newDailyBudget": "20000000000000000000",
+        "newPerTxLimit": "2000000000000000000",
+        "gasUsed": "30511"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_11_4",
+      "name": "Get Agent Balance",
+      "category": "Agents",
+      "passed": true,
+      "duration": 127,
+      "details": {
+        "agent": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "balance": "0"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_11_5",
+      "name": "Deactivate Agent",
+      "category": "Agents",
+      "passed": true,
+      "duration": 2961,
+      "txHash": "0xc19c764c531d17ff3b601aac2b4ba0a87ecc222936bd220ed5e309a9dd457fc5",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0xc19c764c531d17ff3b601aac2b4ba0a87ecc222936bd220ed5e309a9dd457fc5",
+      "details": {
+        "agent": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "action": "deactivated",
+        "gasUsed": "27625"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_12_1",
+      "name": "Create Subscription Plan (local)",
+      "category": "Subscriptions",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "planId": "plan-1769019017410",
+        "name": "Pro Plan",
+        "price": "9.99 USDC",
+        "interval": "monthly",
+        "features": [
+          "Unlimited API calls",
+          "Priority support",
+          "Custom webhooks"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_12_2",
+      "name": "Subscribe to Plan (local)",
+      "category": "Subscriptions",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "subscriptionId": "sub-1769019017919",
+        "planId": "plan-1769019017410",
+        "subscriber": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "status": "active",
+        "startDate": "2026-01-21T18:10:17.919Z",
+        "nextBillingDate": "2026-02-20T18:10:17.919Z"
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_12_3",
+      "name": "Check Subscription Status",
+      "category": "Subscriptions",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "subscriptionId": "sub-1769019017919",
+        "status": "active",
+        "plan": "Pro Plan",
+        "price": "9.99 USDC",
+        "nextBillingDate": "2026-02-20T18:10:17.919Z",
+        "isActive": true
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_12_4",
+      "name": "Cancel Subscription",
+      "category": "Subscriptions",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "subscriptionId": "sub-1769019017919",
+        "previousStatus": "active",
+        "newStatus": "cancelled",
+        "cancelledAt": "2026-01-21T18:10:18.932Z"
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_13_1",
+      "name": "POST /api/pay - Returns error without wallet config",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 437,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/pay",
+        "status": 400,
+        "hasError": true,
+        "error": "Missing required fields: to, amount"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_2",
+      "name": "POST /api/pay - Requires private key",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 200,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/pay",
+        "status": 400,
+        "response": {
+          "error": "Demo wallet not configured. Set DEMO_PRIVATE_KEY in .env.local to enable payments."
+        },
+        "note": "Payment requires private key or wallet connection"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_3",
+      "name": "GET /api/circle/wallets",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 183,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/wallets",
+        "status": 400,
+        "success": true,
+        "responseKeys": [
+          "error"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_4",
+      "name": "POST /api/circle/wallets",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 444,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/wallets",
+        "status": 400,
+        "responseKeys": [
+          "error"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_5",
+      "name": "GET /api/circle/gasless",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 281,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/gasless",
+        "status": 200,
+        "success": true,
+        "gasStationEnabled": true
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_6",
+      "name": "POST /api/circle/gasless",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 270,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/gasless",
+        "status": 500,
+        "success": false,
+        "error": "Request failed with status code 400",
+        "note": "May fail if Circle wallet has no balance"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_7",
+      "name": "GET /api/circle/gateway",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 198,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/gateway",
+        "status": 400,
+        "responseKeys": [
+          "error"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_8",
+      "name": "POST /api/circle/gateway",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 189,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/gateway",
+        "status": 400,
+        "responseKeys": [
+          "error"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_9",
+      "name": "GET /api/circle/bridge",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 368,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/bridge",
+        "status": 200,
+        "responseKeys": [
+          "success",
+          "bridgeEnabled",
+          "protocol",
+          "supportedChains",
+          "domains",
+          "arcTestnet",
+          "note"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_10",
+      "name": "POST /api/circle/bridge",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 186,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/circle/bridge",
+        "status": 400,
+        "responseKeys": [
+          "error"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_11",
+      "name": "GET /api/x402/weather",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 185,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/x402/weather",
+        "status": 402,
+        "is402": true,
+        "responseKeys": [
+          "error",
+          "price",
+          "currency",
+          "payTo",
+          "network",
+          "description"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_13_12",
+      "name": "GET /api/x402/premium",
+      "category": "API Endpoints",
+      "passed": true,
+      "duration": 185,
+      "details": {
+        "url": "https://website-beige-six-15.vercel.app/api/x402/premium",
+        "status": 402,
+        "is402": true,
+        "responseKeys": [
+          "error",
+          "price",
+          "currency",
+          "payTo",
+          "network"
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_1",
+      "name": "arc.getBalance()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 297,
+      "details": {
+        "method": "arc.getBalance()",
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "balance": "96.091147 USDC"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_2",
+      "name": "arc.sendUSDC()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 3136,
+      "txHash": "0x4086115773c0993ce9d5c5e35d3d919bb34467ccdc8dd7e1b22f1387fb0d18d1",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x4086115773c0993ce9d5c5e35d3d919bb34467ccdc8dd7e1b22f1387fb0d18d1",
+      "details": {
+        "method": "arc.sendUSDC()",
+        "to": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "amount": "0.0001 USDC"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_3",
+      "name": "arc.getTransactionHistory()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 119,
+      "details": {
+        "method": "arc.getTransactionHistory()",
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "transactionCount": 899,
+        "note": "Full history requires indexer API"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_4",
+      "name": "arc.escrow.create()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 2950,
+      "txHash": "0x285fcbeec92e590520198f9df568fa8d6a0a4cf84b2a554ffd34db676421ecf6",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x285fcbeec92e590520198f9df568fa8d6a0a4cf84b2a554ffd34db676421ecf6",
+      "details": {
+        "method": "arc.escrow.create()",
+        "beneficiary": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "amount": "0.005 USDC"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_5",
+      "name": "arc.escrow.release()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 131,
+      "details": {
+        "method": "arc.escrow.release()",
+        "existingEscrows": 142,
+        "note": "Release requires releasable escrow"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_6",
+      "name": "arc.escrow.getMyEscrows()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 120,
+      "details": {
+        "method": "arc.escrow.getMyEscrows()",
+        "escrowCount": 142,
+        "escrowIds": [
+          "0xfe06bd85cf6943bb...",
+          "0xfe06bd85cf6943bb...",
+          "0x149ec4249dd3f2cd...",
+          "0x149ec4249dd3f2cd...",
+          "0xef422ae4955d2288..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_7",
+      "name": "arc.streams.create()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 2969,
+      "txHash": "0x473d025c3dc7a116cd96056297b8765117521bfd5150919ac18f497e5a1961db",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x473d025c3dc7a116cd96056297b8765117521bfd5150919ac18f497e5a1961db",
+      "details": {
+        "method": "arc.streams.create()",
+        "recipient": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "amount": "0.005 USDC",
+        "duration": "30 seconds"
+      },
+      "isOnchain": true,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_8",
+      "name": "arc.streams.claim()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 464,
+      "details": {
+        "method": "arc.streams.claim()",
+        "recipientStreams": 0,
+        "note": "Claim requires stream where caller is recipient"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_9",
+      "name": "arc.streams.getMyStreams()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 134,
+      "details": {
+        "method": "arc.streams.getMyStreams()",
+        "senderStreamCount": 135,
+        "streamIds": [
+          "0x08a5a17f0dc26143...",
+          "0xd5b6e79eac9fa7eb...",
+          "0xa14f97c7b2149a76...",
+          "0xd7f9f0bda1e1483a...",
+          "0x8080bf980e56b3ae..."
+        ]
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_10",
+      "name": "arc.privacy.generateMetaAddress()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 1,
+      "details": {
+        "method": "arc.privacy.generateMetaAddress()",
+        "metaAddressLength": 134,
+        "metaAddressPreview": "0x237bde72df6acef9f1312923c4d38eafde7a10..."
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_11",
+      "name": "arc.privacy.registerMetaAddress()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 125,
+      "details": {
+        "method": "arc.privacy.registerMetaAddress()",
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "isRegistered": true,
+        "note": "Registration tested in Privacy category"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_12",
+      "name": "arc.privacy.sendPrivate()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "arc.privacy.sendPrivate()",
+        "note": "Private send tested in Privacy category",
+        "workflow": "Generate stealth address -> Send to stealth address"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_13",
+      "name": "arc.micropayments.pay()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "arc.micropayments.pay()",
+        "protocol": "x402",
+        "note": "Tested in Micropayments category"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_14",
+      "name": "arc.micropayments.createPaywall()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "arc.micropayments.createPaywall()",
+        "config": {
+          "price": "0.001",
+          "currency": "USDC",
+          "recipient": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+          "endpoint": "/api/premium-content"
+        },
+        "protocol": "x402"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_15",
+      "name": "arc.paymaster.sponsorTransaction()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 683,
+      "details": {
+        "method": "arc.paymaster.sponsorTransaction()",
+        "gasStationEnabled": true,
+        "provider": "Circle Gas Station"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_16",
+      "name": "arc.paymaster.isEnabled()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 250,
+      "details": {
+        "method": "arc.paymaster.isEnabled()",
+        "enabled": true,
+        "accountType": "SCA"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_17",
+      "name": "arc.circleWallets.create()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 1,
+      "details": {
+        "method": "arc.circleWallets.create()",
+        "note": "Creation requires Circle API credentials",
+        "existingWallet": "7f5471f0-4261-5b00-836b-9a3746d13490"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_18",
+      "name": "arc.circleWallets.get()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 242,
+      "details": {
+        "method": "arc.circleWallets.get()",
+        "walletId": "7f5471f0-4261-5b00-836b-9a3746d13490",
+        "walletAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "state": "LIVE"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_19",
+      "name": "arc.gateway.getUnifiedBalance()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 190,
+      "details": {
+        "method": "arc.gateway.getUnifiedBalance()",
+        "response": {
+          "error": "address is required"
+        }
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_14_20",
+      "name": "arc.bridge.transfer()",
+      "category": "SDK Modules",
+      "passed": true,
+      "duration": 190,
+      "details": {
+        "method": "arc.bridge.transfer()",
+        "bridgeStatus": {
+          "success": true,
+          "bridgeEnabled": true,
+          "protocol": "CCTP (Cross-Chain Transfer Protocol)",
+          "supportedChains": [
+            "ethereum",
+            "sepolia",
+            "avalanche",
+            "op-mainnet",
+            "arbitrum",
+            "base",
+            "base-sepolia",
+            "polygon",
+            "arc",
+            "arc-testnet"
+          ],
+          "domains": {
+            "ethereum": 0,
+            "sepolia": 0,
+            "avalanche": 1,
+            "op-mainnet": 2,
+            "arbitrum": 3,
+            "base": 6,
+            "base-sepolia": 6,
+            "polygon": 7,
+            "arc": 26,
+            "arc-testnet": 26
+          },
+          "arcTestnet": {
+            "chainId": "arc-testnet",
+            "domain": 26,
+            "attestationTime": "~0.5 seconds",
+            "usdcType": "native"
+          },
+          "note": "Arc Testnet uses native USDC with Domain ID 26"
+        },
+        "note": "Bridge transfer requires CCTP configuration"
+      },
+      "isOnchain": false,
+      "isMock": false
+    },
+    {
+      "id": "TEST_15_1",
+      "name": "contacts.add()",
+      "category": "Utilities",
+      "passed": true,
+      "duration": 1,
+      "details": {
+        "method": "contacts.add()",
+        "contact": {
+          "name": "Alice",
+          "address": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+          "notes": "Circle wallet for testing"
+        },
+        "stored": true
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_15_2",
+      "name": "contacts.get()",
+      "category": "Utilities",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "contacts.get()",
+        "name": "alice",
+        "contact": {
+          "name": "Alice",
+          "address": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+          "notes": "Circle wallet for testing"
+        }
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_15_3",
+      "name": "contacts.list()",
+      "category": "Utilities",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "contacts.list()",
+        "count": 3,
+        "contacts": [
+          {
+            "name": "Alice",
+            "address": "0x4cc48ea3..."
+          },
+          {
+            "name": "Bob",
+            "address": "0x12345678..."
+          },
+          {
+            "name": "Charlie",
+            "address": "0xabcdefab..."
+          }
+        ]
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_15_4",
+      "name": "contacts.resolveAddress()",
+      "category": "Utilities",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "contacts.resolveAddress()",
+        "input": "alice",
+        "resolvedAddress": "0x4cc48ea31173c5f14999222962a900ae2e945a1a",
+        "isValid": true
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_15_5",
+      "name": "utils.formatUSDC()",
+      "category": "Utilities",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "utils.formatUSDC()",
+        "testCases": [
+          {
+            "input": "1000000000000000000",
+            "formatted": "1.000000",
+            "expected": "1.000000",
+            "pass": true
+          },
+          {
+            "input": "500000000000000000",
+            "formatted": "0.500000",
+            "expected": "0.500000",
+            "pass": true
+          },
+          {
+            "input": "123456789012345678",
+            "formatted": "0.123456",
+            "expected": "0.123456",
+            "pass": true
+          },
+          {
+            "input": "10000000000000000000",
+            "formatted": "10.000000",
+            "expected": "10.000000",
+            "pass": true
+          }
+        ],
+        "allPassed": true
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_16_1",
+      "name": "compliance.screenAddress() - Clean address",
+      "category": "Compliance",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "compliance.screenAddress()",
+        "address": "0xF505e2E71df58D7244189072008f25f6b6aaE5ae",
+        "isBlocked": false,
+        "status": "CLEAR"
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_16_2",
+      "name": "compliance.screenAddress() - Blocked address",
+      "category": "Compliance",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "compliance.screenAddress()",
+        "address": "0x8589427373D6D84E98730D7795D8f6f8731FDA16",
+        "isBlocked": true,
+        "status": "BLOCKED",
+        "reason": "OFAC Sanctions List"
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_16_3",
+      "name": "circuitBreaker.checkTransaction()",
+      "category": "Compliance",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "circuitBreaker.checkTransaction()",
+        "canProceed": true,
+        "isTripped": false,
+        "failureCount": 0,
+        "threshold": 5,
+        "status": "CIRCUIT_CLOSED"
+      },
+      "isOnchain": false,
+      "isMock": true
+    },
+    {
+      "id": "TEST_16_4",
+      "name": "rateLimiter.checkLimit()",
+      "category": "Compliance",
+      "passed": true,
+      "duration": 0,
+      "details": {
+        "method": "rateLimiter.checkLimit()",
+        "userId": "0xF505e2E7...",
+        "requestCount": 1,
+        "maxRequests": 100,
+        "remaining": 99,
+        "isLimited": false,
+        "resetsAt": "2026-01-21T18:11:54.791Z",
+        "status": "OK"
+      },
+      "isOnchain": false,
+      "isMock": true
+    }
+  ],
+  "onchainStats": {
+    "onchainTxCount": 18,
+    "mockTestCount": 13,
+    "onchainPercentage": 20
+  }
+}

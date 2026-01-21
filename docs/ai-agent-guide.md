@@ -13,6 +13,50 @@ The AI Agent SDK provides a high-level API for agents to:
 - Create and manage escrow tasks
 - Stream payments continuously
 - Open payment channels for micropayments
+- **Execute gasless transactions** (via Circle Wallet)
+
+## Gasless AI Agents (Recommended)
+
+Create AI agents that operate without worrying about gas fees using Circle Wallet.
+
+```typescript
+import { createAgent } from 'arcpay';
+
+const agent = createAgent({
+  name: 'trading-bot',
+  useCircleWallet: true,  // Enable gasless mode
+  budget: {
+    daily: '1000',
+    perTransaction: '100'
+  }
+});
+
+// All payments are gasless - 0 gas fees!
+await agent.pay('0x...', '50');
+await agent.payForService('openai', '0.05');
+```
+
+### Voice Agent with Gasless
+
+```typescript
+import { createVoiceAgent } from 'arcpay';
+
+const voiceAgent = createVoiceAgent({
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  useCircleWallet: true,  // Gasless voice commands
+});
+
+// User says: "Send 25 USDC to Alice"
+// Agent executes gasless transaction via Circle Wallet
+await voiceAgent.executeVoiceCommand();
+```
+
+### Benefits of Gasless Agents
+
+- **Zero Gas Costs**: All transactions sponsored by Circle Gas Station
+- **Simplified UX**: Users don't need to manage gas tokens
+- **ERC-4337 Compatible**: Uses UserOperations for account abstraction
+- **Budget Still Enforced**: Budget controls work with gasless mode
 
 ## Creating an Agent
 
