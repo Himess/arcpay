@@ -526,16 +526,31 @@ Only return valid JSON, no markdown or explanation.`;
           return { txHash: hash, explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
         },
       },
-      // Gasless / Paymaster (sends regular tx, labeled as sponsored)
+      // Gasless / Paymaster (Circle Gas Station)
       paymaster: {
         async sponsorTransaction(request: { userAddress: string; to: string; value?: string }) {
-          const amountWei = parseUnits(request.value || '0', 18);
-          const hash = await walletClient.sendTransaction({
-            to: request.to as `0x${string}`,
-            value: amountWei,
+          // Use Circle Gas Station for gasless transactions
+          const response = await fetch('/api/circle/gasless', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: request.to,
+              amount: request.value || '0.1',
+            }),
           });
-          await publicClient.waitForTransactionReceipt({ hash });
-          return { success: true, txHash: hash, sponsoredAmount: '0.001', explorerUrl: `https://testnet.arcscan.app/tx/${hash}` };
+
+          const result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || 'Gasless transaction failed');
+          }
+
+          return {
+            success: true,
+            txHash: result.txHash || result.transactionId,
+            sponsoredAmount: '0 (Gas Station)',
+            explorerUrl: result.explorerUrl || `https://testnet.arcscan.app/tx/${result.txHash}`,
+          };
         },
       },
       // Yield Token (USYC) - Read-only (deposit/withdraw require Teller contract)
