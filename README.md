@@ -1,6 +1,8 @@
 # ArcPay SDK
 
-> **The Complete TypeScript SDK for Autonomous Commerce on Arc Blockchain**
+> **The Payment SDK for AI Agents**
+>
+> Voice-controlled, ERC-4337 gasless, 28 modules. Built for autonomous commerce on Arc.
 
 [![npm version](https://badge.fury.io/js/arcpay.svg)](https://www.npmjs.com/package/arcpay)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -14,11 +16,12 @@ ArcPay is a powerful SDK designed for building **autonomous commerce experiences
 
 | Feature | Description |
 |---------|-------------|
+| **ERC-4337 Gasless** | Zero gas fees for users via Circle Gas Station paymaster |
+| **Voice & Vision** | Natural language payments with Gemini AI integration |
 | **AI-First Design** | Purpose-built SDK for AI agents and autonomous systems |
 | **One-liner API** | Simple functions for common operations - `pay()`, `escrow()`, `stream()` |
 | **Real Smart Contracts** | 5 contracts deployed and verified on Arc Testnet |
 | **Privacy Built-in** | Stealth address support (EIP-5564) for private payments |
-| **Full Featured** | Escrow, streaming, payment channels, micropayments, and more |
 
 ---
 
@@ -117,12 +120,12 @@ console.log(`Balance: ${balance} USDC`);
 | **fx** | USDC ↔ EURC swaps |
 | **usyc** | Yield-bearing USDC |
 
-#### Infrastructure
+#### Infrastructure (ERC-4337 Gasless)
 | Module | Description |
 |--------|-------------|
-| **smart-wallet** | ERC-4337 account abstraction |
-| **gas-station** | Sponsor user gas fees |
-| **paymaster** | Gasless transactions |
+| **smart-wallet** | ERC-4337 Smart Contract Accounts |
+| **gas-station** | Circle Gas Station paymaster integration |
+| **paymaster** | Zero gas fees for all user transactions |
 | **compliance** | KYC/AML/Sanctions checks |
 | **micropayments** | x402 protocol server/client |
 
@@ -178,27 +181,40 @@ app.use(arc.micropayments.paywall('0xYourAddress', {
 const data = await arc.micropayments.pay('https://api.example.com/premium');
 ```
 
-### Gasless Payments (Circle Gas Station)
-Users pay **zero gas fees** - all transactions sponsored by Circle's Gas Station.
+### ERC-4337 Gasless Payments (Circle Gas Station)
+Users pay **zero gas fees** - all transactions sponsored by Circle's Gas Station paymaster.
 
 ```typescript
 // Enable gasless mode with Circle Wallet
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true,  // Enable gasless
+  useCircleWallet: true,  // Enable ERC-4337 gasless
 });
 
 // This transaction costs 0 gas for the user!
 await arc.sendUSDC('0x...', '100');
+
+// Gasless escrow release
+await arc.escrow.release(escrowId);  // 0 gas
+
+// Gasless stream claim
+await arc.streams.claim(streamId);   // 0 gas
 ```
 
-**How it works:**
-1. Transaction submitted to Circle's ERC-4337 bundler
-2. Gas Station sponsors the gas fee
-3. Transaction executes on-chain
-4. User sees: `Gas Fee: 0 USDC`
+**ERC-4337 Account Abstraction Flow:**
+```
+User Intent → Circle SCA Wallet → UserOperation
+                    ↓
+            ERC-4337 Bundler → EntryPoint Contract
+                    ↓
+         Gas Station Paymaster → Sponsors Gas Fee
+                    ↓
+              Transaction Executed (User pays $0)
+```
 
-**Proof:** [View gasless TX on Arc Explorer](https://testnet.arcscan.app/tx/0xf02b0ee708950a74f9e61e57262e1133f4528785361ff189ce09f9514f1e298b)
+**Verified Gasless Transactions:**
+- [Stream Claim TX](https://testnet.arcscan.app/tx/0x9f566f944884a8936e0c195269c97cc777dadf632cf08a010852bfbe6ad47228) - Gas paid by paymaster
+- [Contract Execution](https://testnet.arcscan.app/tx/0x98b231a56080bb62acff9558ff8d99a541a20b47f8774b526eb8851d432ce0ca) - Zero user gas
 
 ### Circle Gateway
 Unified balance across Ethereum, Arbitrum, Base, Arc.
@@ -212,8 +228,9 @@ const balance = await gateway.getUnifiedBalance('0x...user');
 
 | Feature | Description |
 |---------|-------------|
-| **Circle Wallets** | SCA wallets with ERC-4337 support |
-| **Gas Station** | Sponsored gas fees for users |
+| **ERC-4337 SCA Wallets** | Smart Contract Accounts with account abstraction |
+| **Gas Station Paymaster** | `0x7ceA357B5AC0639F89F9e378a1f03Aa5005C0a25` |
+| **EntryPoint** | `0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789` |
 | **Gateway** | Unified USDC balance across chains |
 | **CCTP Bridge** | Cross-chain USDC transfers (Domain 26) |
 

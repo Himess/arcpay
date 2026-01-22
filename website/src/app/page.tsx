@@ -73,26 +73,27 @@ export default function Home() {
           </motion.h1>
 
           <motion.p variants={fadeIn} className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
-            The All-in-One Payment SDK
+            The Payment SDK for AI Agents
           </motion.p>
 
           <motion.p variants={fadeIn} className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
-            Build autonomous financial agents with voice, vision, and 28 powerful modules.
+            Voice-controlled, ERC-4337 gasless, 28 modules. Built for autonomous commerce on Arc.
           </motion.p>
 
           {/* Tech Badges Row - Clickable */}
           <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-3 mb-8">
             {[
+              { label: 'ERC-4337 Gasless', color: 'purple', href: '/playground' },
               { label: 'Voice & Vision', color: 'cyan', href: '/playground' },
+              { label: 'Circle Gas Station', color: 'green', href: '/docs' },
               { label: 'AI Agents', color: 'blue', href: '/docs' },
-              { label: '5 Contracts', color: 'green', href: '/docs' },
-              { label: 'Gemini 3 Flash', color: 'blue', href: '/playground' },
               { label: '28 Modules', color: 'orange', href: '/docs' },
             ].map((badge) => (
               <Link
                 key={badge.label}
                 href={badge.href}
                 className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm border transition-all hover:scale-105 cursor-pointer ${
+                  badge.color === 'purple' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20' :
                   badge.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' :
                   badge.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/20' :
                   badge.color === 'green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' :
@@ -107,10 +108,10 @@ export default function Home() {
           {/* Stats Row */}
           <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-8 mb-12">
             {[
+              { value: '0', label: 'Gas Fees' },
               { value: '5', label: 'Smart Contracts' },
-              { value: '150+', label: 'APIs' },
               { value: '28', label: 'Modules' },
-              { value: '500+', label: 'Tests Passing' },
+              { value: '100+', label: 'Tests Passing' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold text-cyan-400">{stat.value}</div>

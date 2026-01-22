@@ -1207,6 +1207,13 @@ Only return valid JSON, no markdown or explanation.`;
 
       // === PRIVACY (REAL ONCHAIN) ===
       case 'pay_private': {
+        // Privacy requires private key mode - not supported with Circle Wallet
+        if (isGasless) {
+          addVoiceLog('error', 'Private payments not available in Circle Wallet mode');
+          addVoiceLog('info', 'Switch to Private Key mode in Settings for stealth payments');
+          speakResponse('Private payments require Private Key mode. Please switch in Settings.');
+          break;
+        }
         const addr = resolveAddr(recipient);
         const targetAddr = addr || recipient;
         if (!targetAddr) {
@@ -1239,6 +1246,12 @@ Only return valid JSON, no markdown or explanation.`;
       }
 
       case 'get_stealth_address': {
+        if (isGasless) {
+          addVoiceLog('error', 'Stealth addresses not available in Circle Wallet mode');
+          addVoiceLog('info', 'Switch to Private Key mode in Settings');
+          speakResponse('Stealth addresses require Private Key mode');
+          break;
+        }
         try {
           const stealthAddr = await arc!.privacy.getStealthAddress();
           addVoiceLog('info', `Your stealth address: ${stealthAddr.slice(0, 24)}...`);
@@ -1251,6 +1264,12 @@ Only return valid JSON, no markdown or explanation.`;
       }
 
       case 'register_stealth': {
+        if (isGasless) {
+          addVoiceLog('error', 'Stealth registration not available in Circle Wallet mode');
+          addVoiceLog('info', 'Switch to Private Key mode in Settings');
+          speakResponse('Stealth registration requires Private Key mode');
+          break;
+        }
         try {
           addVoiceLog('info', 'Registering for private payments...');
           const result = await arc!.privacy.registerMetaAddress();

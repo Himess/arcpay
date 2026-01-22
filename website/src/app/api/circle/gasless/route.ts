@@ -81,8 +81,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Token transfer (original behavior) - Note: May not work for native tokens
-    const { to, amount, tokenId = 'USDC' } = body;
+    // Native token transfer on Arc Testnet (USDC is native)
+    // Use createTransaction with tokenAddress: '' for native tokens
+    const { to, amount } = body;
 
     if (!to || !amount) {
       return NextResponse.json({
@@ -90,11 +91,14 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // For native token transfers, use tokenAddress: '' (empty) with blockchain specified
+    // According to Circle docs: "Blockchain address of the transferred token. Empty for native tokens."
     const response = await client.createTransaction({
       walletId: effectiveWalletId,
-      tokenId,
+      tokenAddress: '', // Empty = native token
+      blockchain: 'ARC-TESTNET' as any, // Specify blockchain for native transfers
       destinationAddress: to,
-      amount: [amount],
+      amount: [amount], // Amount in human readable format (not wei)
       fee: {
         type: 'level',
         config: {
@@ -118,11 +122,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      type: 'transfer',
+      type: 'nativeTransfer',
       transactionId,
       txHash,
       state,
       sponsored: true,
+      amount,
+      to,
+      blockchain: 'ARC-TESTNET',
       explorerUrl: txHash
         ? `https://testnet.arcscan.app/tx/${txHash}`
         : null,
