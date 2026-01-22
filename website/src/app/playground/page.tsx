@@ -4036,6 +4036,7 @@ Return JSON only, no markdown:
       const wrappedCode = `
         const { createPublicClient, createWalletClient, http, formatUnits, parseUnits, defineChain } = viem;
         const console = customConsole;
+        const PRIVATE_KEY = ${privateKey ? `'${privateKey}'` : 'undefined'};
         ${code}
       `;
 
