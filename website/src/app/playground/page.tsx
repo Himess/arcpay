@@ -229,53 +229,42 @@ export default function PlaygroundPage() {
 
   // Code state - default code template
   const getDefaultCode = () => `// ArcPay SDK Playground - Real Onchain Operations
-// Set your private key in Settings (gear icon) to enable transactions
+// Using Circle Wallet (ERC-4337 Gasless) by default - no private key needed!
 
-// Initialize ArcPay SDK
+// Initialize ArcPay SDK with Circle Wallet (gasless mode)
 const arc = await ArcPay.init({
-  privateKey: process.env.PRIVATE_KEY,  // Set in Settings
   network: 'arc-testnet',
+  useCircleWallet: true,  // ERC-4337 gasless via Circle Gas Station
 });
 
+console.log('Mode:', arc.mode);  // 'circle-wallet' = gasless
 console.log('Wallet:', arc.address);
+console.log('Gasless:', arc.gasless ? '✅ Yes - 0 gas fees!' : 'No');
 
 // Check your USDC balance
 const balance = await arc.getBalance();
 console.log('Balance:', balance, 'USDC');
 
-// === MORE EXAMPLES ===
-// Uncomment any section below to try it
+// === GASLESS PAYMENT EXAMPLE ===
+// Uncomment to send a gasless payment (0 gas fees!)
+// const result = await arc.sendUSDC('0xF505e2E71df58D7244189072008f25f6b6aaE5ae', '0.001');
+// console.log('✅ Sent gasless! TX:', result.txHash);
+// console.log('Gas paid by user: $0.00');
 
-// --- Send Payment ---
-// const result = await arc.sendUSDC('0x...recipient', '1.00');
-// console.log('Sent! TX:', result.txHash);
-
-// --- Create Escrow ---
-// const escrow = await arc.escrow.create({
-//   beneficiary: '0x...address',
-//   amount: '10.00',
-//   description: 'Payment for services',
-// });
-// console.log('Escrow created:', escrow.txHash);
-
-// --- Create Payment Stream ---
-// const stream = await arc.streams.create({
-//   recipient: '0x...address',
-//   amount: '100.00',
-//   duration: 30 * 24 * 60 * 60,  // 30 days
-// });
-// console.log('Stream ID:', stream.streamId);
-
-// --- Privacy (Stealth Addresses) ---
-// const keys = await arc.privacy.generateKeyPair();
-// console.log('Stealth meta-address:', keys.metaAddress);
-
-// --- x402 Micropayments ---
+// === x402 MICROPAYMENTS (GASLESS) ===
 // const weather = await arc.micropayments.pay(
 //   '/api/x402/weather?city=Istanbul',
 //   { maxPrice: '0.01' }
 // );
-// console.log('Weather data:', weather);
+// console.log('Weather:', weather);
+
+// === PRIVATE KEY MODE (for Privacy features) ===
+// Privacy/stealth requires private key - set in Settings
+// const arcPrivate = await ArcPay.init({
+//   privateKey: process.env.PRIVATE_KEY,
+//   network: 'arc-testnet',
+// });
+// const keys = await arcPrivate.privacy.generateKeyPair();
 `;
   const [code, setCode] = useState(getDefaultCode);
   const [codeOutput, setCodeOutput] = useState<string[]>([]);
@@ -1926,8 +1915,11 @@ Return JSON only, no markdown:
       ] as const;
 
       // Create ArcPay SDK instance that works in browser with REAL on-chain calls
+      // Supports both Circle Wallet (gasless) and Private Key modes
       const createBrowserArcPay = (config: any) => {
         const rpcUrl = 'https://rpc.testnet.arc.network';
+        const useCircleWallet = config.useCircleWallet !== false && !config.privateKey; // Default to Circle Wallet if no private key
+        const circleWalletAddress = '0x4cc48ea31173c5f14999222962a900ae2e945a1a'; // Default Circle Wallet
 
         const publicClient = createPublicClient({
           chain: arcTestnet,
@@ -1951,8 +1943,95 @@ Return JSON only, no markdown:
           });
         }
 
+        // Helper for gasless transactions via Circle Wallet API
+        const sendGasless = async (to: string, amount: string) => {
+          const response = await fetch('/api/circle/gasless', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'transfer', to, amount }),
+          });
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || 'Gasless transfer failed');
+          }
+
+          // Poll for transaction completion if needed
+          if (data.transactionId && !data.txHash) {
+            let attempts = 0;
+            while (attempts < 30) {
+              await new Promise(r => setTimeout(r, 2000));
+              const statusRes = await fetch(`/api/circle/status?transactionId=${data.transactionId}`);
+              const status = await statusRes.json();
+              if (status.txHash) {
+                return {
+                  success: true,
+                  txHash: status.txHash,
+                  gasless: true,
+                  explorerUrl: `https://testnet.arcscan.app/tx/${status.txHash}`
+                };
+              }
+              if (status.state === 'FAILED') {
+                throw new Error('Gasless transaction failed');
+              }
+              attempts++;
+            }
+            throw new Error('Transaction timeout');
+          }
+
+          return {
+            success: true,
+            txHash: data.txHash,
+            gasless: true,
+            explorerUrl: data.explorerUrl || `https://testnet.arcscan.app/tx/${data.txHash}`
+          };
+        };
+
+        // Helper for gasless contract execution
+        const executeGaslessContract = async (contractAddress: string, functionName: string, args: any[], value?: string) => {
+          const response = await fetch('/api/circle/gasless', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'contractExecution',
+              contractAddress,
+              functionName,
+              args,
+              value,
+            }),
+          });
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || 'Gasless contract execution failed');
+          }
+
+          // Poll for completion if needed
+          if (data.transactionId && !data.txHash) {
+            let attempts = 0;
+            while (attempts < 30) {
+              await new Promise(r => setTimeout(r, 2000));
+              const statusRes = await fetch(`/api/circle/status?transactionId=${data.transactionId}`);
+              const status = await statusRes.json();
+              if (status.txHash) {
+                return { success: true, txHash: status.txHash, gasless: true };
+              }
+              if (status.state === 'FAILED') {
+                throw new Error('Gasless contract execution failed');
+              }
+              attempts++;
+            }
+          }
+
+          return { success: true, txHash: data.txHash, gasless: true };
+        };
+
         const requireWallet = () => {
-          if (!walletClient || !account) throw new Error('Private key required. Set it in Settings (⚙️)');
+          if (!walletClient && !useCircleWallet) throw new Error('Private key or Circle Wallet required. Set useCircleWallet: true or provide privateKey.');
+        };
+
+        const requirePrivateKey = () => {
+          if (!walletClient || !account) throw new Error('This feature requires private key mode. Stealth/privacy features are not available with Circle Wallet.');
         };
 
         const approveUSDC = async (spender: `0x${string}`, amount: bigint) => {
@@ -1969,22 +2048,29 @@ Return JSON only, no markdown:
 
         return {
           network: { name: 'Arc Testnet', chainId: 5042002 },
-          address: account?.address || 'Read-only mode (no private key)',
+          address: account?.address || (useCircleWallet ? circleWalletAddress : 'Read-only mode'),
+          mode: useCircleWallet ? 'circle-wallet' : (account ? 'private-key' : 'read-only'),
+          gasless: useCircleWallet,
           contracts: CONTRACTS,
 
           // ==================== CORE ====================
           async getBalance(addr?: string) {
-            const target = (addr || account?.address) as `0x${string}`;
-            if (!target || target.includes('Read-only')) return '0';
+            const target = (addr || account?.address || (useCircleWallet ? circleWalletAddress : null)) as `0x${string}`;
+            if (!target) return '0';
             // On Arc, USDC is native - use getBalance for native balance (18 decimals)
             const balance = await publicClient.getBalance({ address: target });
             return formatUnits(balance, 18);
           },
 
           async sendUSDC(to: string, amount: string) {
+            // Use Circle Wallet (gasless) if no private key
+            if (useCircleWallet && !walletClient) {
+              console.log('[ArcPay] Sending via Circle Wallet (gasless)...');
+              return sendGasless(to, amount);
+            }
+
+            // Private key mode
             requireWallet();
-            // On Arc, USDC is the native gas token with 18 decimals
-            // Use native transfer instead of ERC-20 transfer for reliability
             const amountWei = parseUnits(amount, 18);
             const hash = await walletClient.sendTransaction({
               to: to as `0x${string}`,
@@ -2198,7 +2284,6 @@ Return JSON only, no markdown:
           // ==================== MICROPAYMENTS (x402 Protocol) - REAL ONCHAIN ====================
           micropayments: {
             async pay<T>(url: string, options?: { maxPrice?: string }): Promise<T> {
-              requireWallet();
               console.log(`[x402] Checking payment requirements for: ${url}`);
 
               try {
@@ -2228,13 +2313,22 @@ Return JSON only, no markdown:
 
                 console.log(`[x402] Paying ${price} ${currency} to ${payTo}`);
 
-                // 4. Send REAL USDC payment onchain
-                const amountWei = parseUnits(price, 18);
-                const hash = await walletClient.sendTransaction({
-                  to: payTo as `0x${string}`,
-                  value: amountWei,
-                });
-                const receipt = await publicClient.waitForTransactionReceipt({ hash });
+                // 4. Send payment - use Circle Wallet (gasless) or private key
+                let hash: string;
+                if (useCircleWallet && !walletClient) {
+                  console.log('[x402] Using Circle Wallet (gasless) for payment');
+                  const result = await sendGasless(payTo, price);
+                  hash = result.txHash!;
+                } else {
+                  requireWallet();
+                  const amountWei = parseUnits(price, 18);
+                  const txHash = await walletClient.sendTransaction({
+                    to: payTo as `0x${string}`,
+                    value: amountWei,
+                  });
+                  await publicClient.waitForTransactionReceipt({ hash: txHash });
+                  hash = txHash;
+                }
 
                 console.log(`[x402] Payment confirmed: ${hash}`);
 
@@ -2255,7 +2349,7 @@ Return JSON only, no markdown:
                 }
 
                 const data = await response.json();
-                return { ...data, _x402: { paid: price, txHash: hash } } as T;
+                return { ...data, _x402: { paid: price, txHash: hash, gasless: useCircleWallet } } as T;
               } catch (e: any) {
                 throw new Error(`x402 micropayment failed: ${e.message}`);
               }
@@ -2841,7 +2935,7 @@ Return JSON only, no markdown:
             },
 
             async registerOnChain() {
-              requireWallet();
+              requirePrivateKey(); // Privacy requires private key - not available with Circle Wallet
               if (!this._stealthKeys) {
                 await this.generateKeyPair();
               }
@@ -2924,7 +3018,7 @@ Return JSON only, no markdown:
             },
 
             async sendPrivate(params: { recipient: string; amount: string; memo?: string }) {
-              requireWallet();
+              requirePrivateKey(); // Privacy requires private key - not available with Circle Wallet
 
               // Get recipient's meta-address
               const meta = await this.getMetaAddress(params.recipient);
@@ -3911,13 +4005,20 @@ Return JSON only, no markdown:
       // Helper functions for code examples
       const configure = (config: any) => { /* stored globally */ };
       const pay = async (to: string, amount: string) => {
-        const arc = await ArcPay.init({ privateKey: privateKey || undefined });
+        // Use Circle Wallet (gasless) by default, or private key if set
+        const arc = await ArcPay.init({
+          privateKey: privateKey || undefined,
+          useCircleWallet: !privateKey, // Gasless if no private key
+        });
         return arc.sendUSDC(to, amount);
       };
       const balance = async () => {
-        const arc = await ArcPay.init({ privateKey: privateKey || undefined });
+        const arc = await ArcPay.init({
+          privateKey: privateKey || undefined,
+          useCircleWallet: !privateKey,
+        });
         const usdc = await arc.getBalance();
-        return { usdc, address: arc.address };
+        return { usdc, address: arc.address, mode: arc.mode };
       };
 
       // Create a function that runs the code
