@@ -29,12 +29,12 @@ export const API_CATEGORIES: APICategory[] = [
         name: 'pay',
         description: 'Pay for access to a paywalled API',
         params: ['url', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Pay for access to a paywalled endpoint
 const PAYWALLED_URL = 'https://api.example.com/premium-data';
@@ -52,12 +52,12 @@ console.log('URL:', result.url);`,
         name: 'fetch',
         description: 'Fetch data from paywalled URL with auto-payment',
         params: ['url', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Fetch from paywalled URL - automatically handles 402 payments
 const { data, response } = await arc.micropayments.fetch(
@@ -72,12 +72,12 @@ console.log('Data:', data);`,
         name: 'paywall',
         description: 'Create a paywall middleware (server-side)',
         params: ['payTo', 'routes'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create paywall middleware (for Express/Hono)
 const middleware = arc.micropayments.paywall(
@@ -102,12 +102,12 @@ console.log('Use with Express: app.use(middleware)');`,
         name: 'openChannel',
         description: 'Open payment channel for micropayments',
         params: ['recipient', 'deposit'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Opening channel from:', arc.address);
 
@@ -142,12 +142,12 @@ console.log('💡 Perfect for: API calls, streaming, gaming, IoT');`,
         name: 'getChannelBalance',
         description: 'Get channel balance',
         params: ['channelId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const CHANNEL_ID = '0x...';  // ← Your channel ID
@@ -161,12 +161,12 @@ console.log('Spent:', balance.spent, 'USDC');`,
         name: 'getChannel',
         description: 'Get channel details',
         params: ['channelId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const CHANNEL_ID = '0x...';  // ← Your channel ID
@@ -179,12 +179,12 @@ console.log('Channel details:', channel);`,
         name: 'closeChannel',
         description: 'Close channel and settle on-chain',
         params: ['channelId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const CHANNEL_ID = '0x...';  // ← Your channel ID
@@ -219,12 +219,12 @@ console.log('💡 Remaining funds returned to your wallet');`,
         name: 'getUnifiedBalance',
         description: 'Get unified balance across all chains',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get unified balance from all supported chains
 const balance = await arc.gateway.getUnifiedBalance();
@@ -243,12 +243,12 @@ Object.entries(balance.byChain).forEach(([chain, amount]) => {
         name: 'deposit',
         description: 'Deposit to Gateway wallet',
         params: ['amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Deposit USDC to Gateway wallet
 const result = await arc.gateway.deposit({
@@ -263,12 +263,12 @@ console.log('TX:', result.txHash);`,
         name: 'withdraw',
         description: 'Withdraw from Gateway to specific chain',
         params: ['chain', 'amount', 'recipient?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Withdraw USDC to Base Sepolia
 const result = await arc.gateway.withdraw({
@@ -285,12 +285,12 @@ console.log('Init TX:', result.initTxHash);`,
         name: 'getSupportedDomains',
         description: 'Get supported CCTP domains',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get CCTP domain IDs
 const domains = arc.gateway.getSupportedDomains();
@@ -311,12 +311,12 @@ Object.entries(domains).forEach(([name, id]) => {
         name: 'isSupported',
         description: 'Check if voice is supported',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Check voice support
 const supported = arc.voice.isSupported();
@@ -333,12 +333,12 @@ console.log('- "Create escrow for X USDC"');`,
         name: 'speak',
         description: 'Speak text (text-to-speech)',
         params: ['text', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Speak a message
 const result = await arc.voice.speak(
@@ -353,12 +353,12 @@ console.log('Text:', result.text);`,
         name: 'startListening',
         description: 'Start voice recognition',
         params: ['onResult', 'onError?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Voice recognition starting...');
 console.log('(Note: Requires microphone permission)');
@@ -389,12 +389,12 @@ try {
         name: 'registerAgent',
         description: 'Register an AI payment agent',
         params: ['dailyBudget', 'perTxLimit'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Registering agent:', arc.address);
 
@@ -415,12 +415,12 @@ console.log('TX:', result.txHash);`,
         name: 'depositToAgent',
         description: 'Deposit funds for agent to use',
         params: ['amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const AMOUNT = '1';  // USDC to deposit
@@ -434,12 +434,12 @@ console.log('TX:', result.txHash);`,
         name: 'agentPay',
         description: 'Agent makes a payment',
         params: ['to', 'amount', 'memo?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const RECIPIENT = '0xc01A5abCF3719C7Ed9021847E686087214edCefb';
@@ -460,12 +460,12 @@ console.log('TX:', result.txHash);`,
         name: 'getAgentConfig',
         description: 'Get agent configuration',
         params: ['address?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const config = await arc.agent.getConfig();
 console.log('Agent config:', config);`,
@@ -474,12 +474,12 @@ console.log('Agent config:', config);`,
         name: 'getAgentBalance',
         description: 'Get agent balance',
         params: ['address?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const balance = await arc.agent.getBalance();
 console.log('Agent balance:', balance, 'USDC');`,
@@ -500,7 +500,7 @@ console.log('Agent balance:', balance, 'USDC');`,
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const split = createSplitManager(arc);
@@ -530,7 +530,7 @@ result.recipients.forEach(r => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const split = createSplitManager(arc);
@@ -559,7 +559,7 @@ result.recipients.forEach(r => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const split = createSplitManager(arc);
@@ -585,7 +585,7 @@ result.recipients.forEach(r => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const split = createSplitManager(arc);
@@ -622,7 +622,7 @@ preview.recipients.forEach(r => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const links = createLinkManager(arc);
@@ -650,7 +650,7 @@ console.log('Expires:', link.expiresAt);`,
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const links = createLinkManager(arc);
@@ -674,7 +674,7 @@ if (result.success) {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const links = createLinkManager(arc);
@@ -700,7 +700,7 @@ active.forEach(link => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const links = createLinkManager(arc);
@@ -723,7 +723,7 @@ if (cancelled) {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const links = createLinkManager(arc);
@@ -886,7 +886,7 @@ console.log('\\nPersonal templates:', personal.map(t => t.name));`,
 // Note: Set your private key in Settings (⚙️) for write operations
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!, // from Settings, optional
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('Connected to:', arc.network.name);
@@ -902,7 +902,7 @@ console.log('Address:', arc.address);
         code: `// Initialize with your private key from Settings
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // Get YOUR balance (uses your address automatically)
@@ -918,7 +918,7 @@ console.log('Your Balance:', myBalance, 'USDC');`,
         code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('Sending from:', arc.address);
@@ -938,12 +938,12 @@ console.log('🔗 Explorer:', result.explorerUrl);`,
         description: 'Get EURC balance for an address',
         params: ['address?'],
         returns: 'string (balance)',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get EURC balance
 const eurcBalance = await arc.getEURCBalance();
@@ -955,12 +955,12 @@ console.log('EURC Balance:', eurcBalance);`,
         description: 'Send EURC to an address',
         params: ['to', 'amount'],
         returns: 'TransactionResult',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Sending from:', arc.address);
 
@@ -986,12 +986,12 @@ console.log('🔗 Explorer:', result.explorerUrl);`,
         description: 'Add a new contact',
         params: ['name', 'address', 'metadata?'],
         returns: 'Contact',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Add a contact
 const contact = await arc.contacts.add('ahmed', '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD78', {
@@ -1008,12 +1008,12 @@ console.log('Category:', contact.metadata.category);`,
         description: 'Search contacts by name (fuzzy match)',
         params: ['query'],
         returns: 'Contact[]',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Search for contacts
 const results = await arc.contacts.search('ahm');
@@ -1028,12 +1028,12 @@ results.forEach(contact => {
         description: 'Resolve contact name to address',
         params: ['nameOrAddress'],
         returns: 'string | undefined',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Resolve a contact name to address
 const address = await arc.contacts.resolve('ahmed');
@@ -1053,12 +1053,12 @@ console.log('Address pass-through:', addr2);`,
         description: 'Pay a contact by name',
         params: ['to', 'amount'],
         returns: 'TransactionResult',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // First add a contact
 await arc.contacts.add('bob', '0xc01A5abCF3719C7Ed9021847E686087214edCefb');
@@ -1077,12 +1077,12 @@ console.log('TX Hash:', result.txHash);`,
         description: 'List all contacts',
         params: [],
         returns: 'Contact[]',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // List all contacts
 const contacts = await arc.contacts.list();
@@ -1098,12 +1098,12 @@ contacts.forEach(c => {
         description: 'Delete a contact',
         params: ['name'],
         returns: 'boolean',
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Delete a contact
 const deleted = await arc.contacts.delete('ahmed');
@@ -1125,12 +1125,12 @@ if (deleted) {
         name: 'createEscrow',
         description: 'Create escrow with arbiter & fee (OTC trade ready)',
         params: ['beneficiary', 'amount', 'arbitrators?', 'feePercentage?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Creating escrow from:', arc.address);
 
@@ -1169,12 +1169,12 @@ console.log('  • Arbiter resolves → resolveDispute()');`,
         name: 'releaseEscrow',
         description: 'Release funds to beneficiary',
         params: ['escrowId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const ESCROW_ID = '0x...';  // ← Paste your ESCROW ID from createEscrow here!
@@ -1192,12 +1192,12 @@ console.log('Explorer:', result.explorerUrl);`,
         name: 'refundEscrow',
         description: 'Refund funds to depositor',
         params: ['escrowId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const ESCROW_ID = '0x...';  // ← Paste your ESCROW ID from createEscrow here!
@@ -1215,12 +1215,12 @@ console.log('Explorer:', result.explorerUrl);`,
         name: 'getEscrow',
         description: 'Get escrow details',
         params: ['escrowId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const ESCROW_ID = '0x...';  // ← Your escrow ID
@@ -1233,12 +1233,12 @@ console.log('Escrow details:', details);`,
         name: 'getUserEscrows',
         description: 'List all your escrows with IDs',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Fetching escrows for:', arc.address);
 
@@ -1260,12 +1260,12 @@ console.log('💡 Copy an Escrow ID above to use with release() or refund()');`,
         name: 'createDispute',
         description: 'Raise a dispute on escrow (buyer or seller)',
         params: ['escrowId', 'reason'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const ESCROW_ID = '0x...';  // ← Escrow ID
@@ -1294,7 +1294,7 @@ console.log('   Arbiter can release to seller OR refund to buyer');`,
         code: `// Initialize ArcPay (AS ARBITER)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!  // ← Must be arbiter's key!
+  privateKey: PRIVATE_KEY  // ← Must be arbiter's key!
 });
 
 // ============ EDIT BELOW ============
@@ -1329,12 +1329,12 @@ console.log('TX Hash:', result.txHash);`,
         name: 'getEscrowStats',
         description: 'Get your escrow statistics',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const stats = await arc.escrow.getStats();
 
@@ -1363,12 +1363,12 @@ console.log('⚠️ Dispute Rate:', (stats.disputeRate * 100).toFixed(2) + '%');
         name: 'createStream',
         description: 'Create a real-time payment stream (salary, subscription)',
         params: ['recipient', 'totalAmount', 'duration'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Creating stream from:', arc.address);
 
@@ -1411,12 +1411,12 @@ console.log('  • cancel() - Stop & refund remaining');`,
         name: 'claim',
         description: 'Claim available funds from stream',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID
@@ -1431,12 +1431,12 @@ console.log('🔗 Explorer:', result.explorerUrl);`,
         name: 'cancelStream',
         description: 'Cancel a stream and refund remaining',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID
@@ -1451,12 +1451,12 @@ console.log('🔗 Explorer:', result.explorerUrl);`,
         name: 'getClaimable',
         description: 'Get claimable amount for a stream',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID
@@ -1469,12 +1469,12 @@ console.log('Claimable now:', claimable, 'USDC');`,
         name: 'getStream',
         description: 'Get stream details',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID
@@ -1487,12 +1487,12 @@ console.log('Stream details:', stream);`,
         name: 'pauseStream',
         description: 'Pause a running stream (sender only)',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID
@@ -1514,12 +1514,12 @@ console.log('💡 Use resume() to continue streaming');`,
         name: 'resumeStream',
         description: 'Resume a paused stream (sender only)',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const STREAM_ID = '0x...';  // ← Your stream ID (must be paused)
@@ -1552,7 +1552,7 @@ console.log('💡 Stream is active again - funds accruing');`,
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1580,7 +1580,7 @@ console.log('Due:', req.dueDate);`,
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1609,7 +1609,7 @@ bulk.forEach(req => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1633,7 +1633,7 @@ if (result.success) {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1656,7 +1656,7 @@ if (declined) {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1679,7 +1679,7 @@ if (cancelled) {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1706,7 +1706,7 @@ pending.forEach(req => {
 
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 const requests = createRequestManager(arc);
@@ -1739,12 +1739,12 @@ console.log('\\nTotal you owe:', '$' + total);`,
         name: 'createPlan',
         description: 'Create a subscription plan',
         params: ['name', 'price', 'period'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create a subscription plan
 const plan = arc.subscriptions.createPlan({
@@ -1765,12 +1765,12 @@ console.log('Features:', plan.features.join(', '));`,
         name: 'subscribe',
         description: 'Subscribe to a plan',
         params: ['plan', 'merchant'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create an inline plan and subscribe
 const subscription = await arc.subscriptions.subscribe({
@@ -1792,12 +1792,12 @@ console.log('Next billing:', subscription.nextBillingDate);`,
         name: 'cancel',
         description: 'Cancel a subscription',
         params: ['subscriptionId', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // List active subscriptions
 const subs = arc.subscriptions.listSubscriptions({ status: 'active' });
@@ -1824,12 +1824,12 @@ if (subs.length > 0) {
         name: 'transfer',
         description: 'Bridge USDC to another chain',
         params: ['to', 'amount', 'recipient?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('=== Bridge Transfer ===');
 console.log('From:', arc.address);
@@ -1849,12 +1849,12 @@ console.log('Status:', result.success ? '✅ Initiated' : '❌ Failed');`,
         name: 'getStatus',
         description: 'Check bridge transfer status',
         params: ['transferId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Check status of a bridge transfer
 const TRANSFER_ID = 'bridge_123456789'; // Your transfer ID
@@ -1873,12 +1873,12 @@ if (status.mintTxHash) {
         name: 'getSupportedChains',
         description: 'Get list of supported bridge chains',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get supported chains for CCTP bridge
 const chains = arc.bridge.getSupportedChains();
@@ -1899,12 +1899,12 @@ chains.forEach(chain => {
         name: 'getQuote',
         description: 'Get FX quote for swap',
         params: ['from', 'to', 'amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get quote for USDC → EURC swap
 const quote = await arc.fx.getQuote({
@@ -1925,12 +1925,12 @@ console.log('Expires:', quote.expiry);`,
         name: 'swap',
         description: 'Execute FX swap with quote',
         params: ['quoteId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // First, get a quote
 const quote = await arc.fx.getQuote({
@@ -1956,12 +1956,12 @@ if (result.success) {
         name: 'getSupportedPairs',
         description: 'Get list of supported FX pairs',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get supported FX pairs
 const pairs = arc.fx.getSupportedPairs();
@@ -1991,7 +1991,7 @@ console.log('EURC:', arc.fx.getCurrencyAddress('EURC'));`,
         params: [],
         code: `// Initialize Privacy Module
 const privacy = createPrivacyModule({
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // Generate stealth key pair (spending + viewing keys)
@@ -2013,7 +2013,7 @@ console.log('Share ONLY the public keys to receive payments.');`,
         params: [],
         code: `// Initialize Privacy Module
 const privacy = createPrivacyModule({
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // First generate keys
@@ -2041,7 +2041,7 @@ console.log('✅ Others can now find your meta-address and send private payments
         params: ['recipient', 'amount'],
         code: `// Initialize Privacy Module
 const privacy = createPrivacyModule({
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // ============ EDIT BELOW ============
@@ -2078,7 +2078,7 @@ if (!isReg) {
         params: [],
         code: `// Initialize Privacy Module
 const privacy = createPrivacyModule({
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('=== Scanning for Stealth Payments ===');
@@ -2114,12 +2114,12 @@ if (total === 0) {
         name: 'deploy',
         description: 'Deploy a smart wallet',
         params: ['guardians?', 'threshold?', 'dailyLimit?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Deploy smart wallet with guardians
 const result = await arc.smartWallet.deploy({
@@ -2139,12 +2139,12 @@ console.log('TX:', result.txHash);`,
         name: 'execute',
         description: 'Execute transaction through smart wallet',
         params: ['to', 'value?', 'data?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // First deploy if not already
 await arc.smartWallet.deploy({ dailyLimit: '100' });
@@ -2168,12 +2168,12 @@ console.log('Spent today:', limits.spent);`,
         name: 'addGuardian',
         description: 'Add a guardian for recovery',
         params: ['guardian'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Deploy wallet first
 await arc.smartWallet.deploy();
@@ -2198,12 +2198,12 @@ console.log('Guardians:', result.guardians);`,
         name: 'aiWalletInfo',
         description: 'AI Wallet information',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const balance = await arc.getBalance();
 
@@ -2224,12 +2224,12 @@ console.log('💡 Try: "Send 10 USDC to 0x..." in Voice Mode!');`,
         name: 'checkBalance',
         description: 'Check wallet balance',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const usdc = await arc.getBalance();
 const eurc = await arc.getEURCBalance();
@@ -2244,12 +2244,12 @@ console.log('EURC:', eurc);`,
         name: 'quickPay',
         description: 'Quick payment',
         params: ['to', 'amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const RECIPIENT = '0xc01A5abCF3719C7Ed9021847E686087214edCefb';
@@ -2273,12 +2273,12 @@ console.log('TX:', result.txHash);`,
         name: 'create',
         description: 'Create a new invoice',
         params: ['to', 'amount', 'items?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create an invoice
 const invoice = await arc.invoices.create({
@@ -2300,12 +2300,12 @@ console.log('Due:', invoice.dueDate);`,
         name: 'pay',
         description: 'Pay an invoice',
         params: ['invoiceId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create and pay an invoice
 const invoice = await arc.invoices.create({
@@ -2327,12 +2327,12 @@ console.log('Explorer:', result.explorerUrl);`,
         name: 'list',
         description: 'List all invoices',
         params: ['filter?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create some demo invoices
 await arc.invoices.create({ to: '0x1111111111111111111111111111111111111111', items: [{ description: 'Service A', quantity: 1, unitPrice: '100' }] });
@@ -2362,12 +2362,12 @@ pending.forEach(inv => {
         name: 'parseIntent',
         description: 'Parse natural language command',
         params: ['command'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Example: parse a payment command
 const command = 'Send 50 USDC to 0xc01A5abCF3719C7Ed9021847E686087214edCefb';
@@ -2386,12 +2386,12 @@ console.log('💡 Use Voice Mode for full AI-powered parsing!');`,
         name: 'executeIntent',
         description: 'Execute parsed intent',
         params: ['recipient', 'amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // ============ EDIT BELOW ============
 const RECIPIENT = '0xc01A5abCF3719C7Ed9021847E686087214edCefb';
@@ -2415,12 +2415,12 @@ console.log('TX:', result.txHash);`,
         name: 'parseCommand',
         description: 'Parse a natural language payment command',
         params: ['text'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Parse natural language commands
 const commands = [
@@ -2443,12 +2443,12 @@ for (const cmd of commands) {
         name: 'explainTransaction',
         description: 'Explain a transaction in plain language',
         params: ['tx'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Explain a transaction
 const tx = {
@@ -2470,12 +2470,12 @@ console.log('Risk Level:', explanation.risk);`,
         name: 'chat',
         description: 'Chat with AI about payments',
         params: ['message'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Chat with AI
 const messages = [
@@ -2507,7 +2507,7 @@ for (const msg of messages) {
         code: `// Initialize ArcPay with private key
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('Connected as:', arc.address);
@@ -2528,7 +2528,7 @@ try {
         code: `// Initialize ArcPay with private key
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('Registering agent...');
@@ -2550,7 +2550,7 @@ console.log('Explorer:', result.explorerUrl);`,
         code: `// Initialize ArcPay with private key
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // Execute payment through agent registry
@@ -2570,7 +2570,7 @@ console.log('TX Hash:', result.txHash);`,
         code: `// Initialize ArcPay with private key
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 // Get agent configuration
@@ -2597,12 +2597,12 @@ console.log('\\nAgent Balance:', balance, 'USDC');`,
         name: 'setRules',
         description: 'Set compliance rules',
         params: ['rules'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Set compliance rules
 const rules = arc.compliance.setRules({
@@ -2618,12 +2618,12 @@ console.log(rules);`,
         name: 'checkTransaction',
         description: 'Check if transaction passes compliance',
         params: ['from', 'to', 'amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Set rules
 arc.compliance.setRules({ maxTransactionAmount: '1000' });
@@ -2644,12 +2644,12 @@ console.log('Checked at:', result.checkedAt);`,
         name: 'screenAddress',
         description: 'Screen address for sanctions',
         params: ['address'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Screen an address
 const result = await arc.compliance.screenAddress(
@@ -2666,12 +2666,12 @@ console.log('Screened at:', result.screenedAt);`,
         name: 'addToBlocklist',
         description: 'Add address to blocklist',
         params: ['address'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Add to blocklist
 const badAddress = '0xBADBADBADBADBADBADBADBADBADBADBADBADBAD1';
@@ -2702,12 +2702,12 @@ console.log('Issues:', check.issues);`,
         name: 'deposit',
         description: 'Deposit funds to gas station',
         params: ['amount'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Deposit to gas station for sponsoring user transactions
 const result = await arc.gasStation.deposit('10');
@@ -2720,12 +2720,12 @@ console.log('New Balance:', result.newBalance, 'USDC');`,
         name: 'getBalance',
         description: 'Check gas station balance',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get gas station balance
 const balance = arc.gasStation.getBalance();
@@ -2739,12 +2739,12 @@ console.log('This balance is used to sponsor gas for users.');`,
         name: 'sponsorGas',
         description: 'Sponsor gas for a user transaction',
         params: ['userTx'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // First, deposit some funds
 await arc.gasStation.deposit('1');
@@ -2772,12 +2772,12 @@ console.log('Remaining Balance:', result.remainingBalance, 'USDC');`,
         name: 'setRules',
         description: 'Set paymaster rules',
         params: ['rules'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Set paymaster rules
 arc.paymaster.setRules({
@@ -2793,12 +2793,12 @@ console.log(arc.paymaster.getRules());`,
         name: 'sponsorTransaction',
         description: 'Sponsor a user transaction',
         params: ['request'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Sponsor a transaction for a user
 const result = await arc.paymaster.sponsorTransaction({
@@ -2820,12 +2820,12 @@ if (result.success) {
         name: 'getUserStats',
         description: 'Get user spending stats',
         params: ['address'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get stats for a specific user
 const stats = arc.paymaster.getUserStats('0xUserAddress...');
@@ -2851,12 +2851,12 @@ console.log('Unique users:', overall.uniqueUsers);`,
         name: 'getBalance',
         description: 'Get USYC balance with yield info',
         params: ['address?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get USYC balance and accumulated yield
 const balance = await arc.usyc.getBalance();
@@ -2870,12 +2870,12 @@ console.log('Yield Earned:', balance.yield, 'USDC');`,
         name: 'subscribe',
         description: 'Convert USDC to USYC (start earning yield)',
         params: ['amount', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Check if allowlisted (required for USYC)
 const isAllowed = await arc.usyc.isAllowlisted();
@@ -2895,12 +2895,12 @@ if (isAllowed) {
         name: 'redeem',
         description: 'Convert USYC back to USDC (collect yield)',
         params: ['amount', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Check current balance
 const balance = await arc.usyc.getBalance();
@@ -2918,12 +2918,12 @@ console.log('TX:', result.txHash);`,
         name: 'getExchangeRate',
         description: 'Get current USYC to USDC exchange rate',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get current exchange rate
 const rate = await arc.usyc.getExchangeRate();
@@ -2945,12 +2945,12 @@ console.log('APY is based on short-term US Treasury rates.');`,
         name: 'comboInfo',
         description: 'Combo workflow information',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Combo Workflows');
 console.log('===============');
@@ -2975,12 +2975,12 @@ console.log('💡 Try Voice Mode or Image Mode in the sidebar!');`,
         name: 'getContractAddresses',
         description: 'Get deployed contract addresses',
         params: ['chainId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get all contract addresses for Arc Testnet
 const addresses = arc.getContractAddresses(5042002);
@@ -3000,12 +3000,12 @@ console.log('Agent Registry:', addresses.agentRegistry);`,
         name: 'areContractsDeployed',
         description: 'Check if contracts are deployed',
         params: ['chainId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Check Arc Testnet
 const arcTestnet = arc.areContractsDeployed(5042002);
@@ -3022,12 +3022,12 @@ console.log('Polygon (137):', polygon ? '✅ Deployed' : '❌ Not deployed');`,
         name: 'ABIs',
         description: 'Access contract ABIs',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Get contract addresses
 const addresses = arc.getContractAddresses();
@@ -3059,12 +3059,12 @@ console.log('  Agent:', addresses.agentRegistry);`,
         name: 'retry',
         description: 'Retry failed operations with backoff',
         params: ['fn', 'config?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Testing retry with exponential backoff...\\n');
 
@@ -3090,12 +3090,12 @@ console.log('\\nSuccess after', result.attempts, 'attempts');`,
         name: 'validateAddress',
         description: 'Validate Ethereum address',
         params: ['address'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Test addresses
 const addresses = [
@@ -3121,12 +3121,12 @@ addresses.forEach(addr => {
         name: 'formatAmount',
         description: 'Format amount with decimals',
         params: ['amount', 'decimals?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('=== Amount Formatting ===\\n');
 
@@ -3149,12 +3149,12 @@ console.log('Short (6):', arc.utils.shortenAddress(addr, 6));`,
         name: 'EventEmitter',
         description: 'Subscribe to SDK events',
         params: ['event', 'handler'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('=== Event System Demo ===\\n');
 
@@ -3194,7 +3194,7 @@ console.log('\\nEvent demo complete!');`,
         code: `// Initialize ArcPay (configure equivalent)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
 
 console.log('✅ Configured!');
@@ -3207,12 +3207,12 @@ console.log('Address:', arc.address);
         name: 'pay',
         description: 'Send payment in one line',
         params: ['to', 'amount', 'options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Sending from:', arc.address);
 
@@ -3231,12 +3231,12 @@ console.log('🔗 Explorer:', result.explorerUrl);`,
         name: 'balance',
         description: 'Get balance in one line',
         params: ['options?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 const usdc = await arc.getBalance();
 console.log('Address:', arc.address);
@@ -3253,12 +3253,12 @@ console.log('Balance:', usdc, 'USDC');`,
         name: 'multisigInfo',
         description: 'Multisig escrow information',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Multisig Escrow Module');
 console.log('======================');
@@ -3283,12 +3283,12 @@ console.log('💡 Create a regular escrow first with arc.escrow.create()');`,
         name: 'analyticsInfo',
         description: 'Analytics module information',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 console.log('Analytics Module');
 console.log('================');
@@ -3311,12 +3311,12 @@ console.log('- Time series data');`,
         name: 'createWebhookManager',
         description: 'Create webhook manager',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Register a webhook endpoint
 const result = arc.webhooks.register({
@@ -3338,12 +3338,12 @@ console.log('Status:', result.message);`,
         name: 'registerEndpoint',
         description: 'Register webhook endpoint',
         params: ['url', 'events'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Register webhook for payment events
 const result = arc.webhooks.register({
@@ -3361,12 +3361,12 @@ console.log('All webhooks:', allWebhooks);`,
         name: 'verifySignature',
         description: 'Verify webhook signature',
         params: ['payload', 'signature'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Demo: Verify webhook signature
 const payload = { type: 'payment.sent', amount: '100' };
@@ -3395,12 +3395,12 @@ console.log('Simulation:', simulation);`,
         name: 'createRateLimiter',
         description: 'Create rate limiter',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create a rate limiter (100 requests per minute)
 const limiter = arc.createRateLimiter({
@@ -3421,12 +3421,12 @@ console.log('Remaining requests:', check2.remaining);`,
         name: 'rateLimit',
         description: 'Rate limit decorator',
         params: ['fn', 'config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create rate limiter with low limit for demo
 const limiter = arc.createRateLimiter({
@@ -3448,12 +3448,12 @@ for (let i = 1; i <= 5; i++) {
         name: 'checkLimit',
         description: 'Check if rate limited',
         params: ['key'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create limiter
 const limiter = arc.createRateLimiter({
@@ -3487,12 +3487,12 @@ console.log('Limit reset for user_456');`,
         name: 'globalEventEmitter',
         description: 'Subscribe to SDK events',
         params: ['event', 'handler'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Subscribe to events
 arc.events.on('payment.sent', (event) => {
@@ -3520,12 +3520,12 @@ console.log('Event emitted successfully');`,
         name: 'TransactionWatcher',
         description: 'Watch transaction status',
         params: ['txHash'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Subscribe to transaction events
 arc.events.on('tx.pending', (e) => console.log('TX pending:', e.data));
@@ -3543,12 +3543,12 @@ console.log('Transaction watch demo complete');`,
         name: 'StreamWatcher',
         description: 'Watch stream events',
         params: ['streamId'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Subscribe to stream events
 arc.events.on('stream.created', (e) => console.log('Stream created:', e.data));
@@ -3573,12 +3573,12 @@ console.log('Stream watch demo complete');`,
         name: 'createEvent',
         description: 'Create custom event',
         params: ['type', 'data'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Subscribe with once (fires only once)
 arc.events.once('order.completed', (event) => {
@@ -3615,12 +3615,12 @@ arc.events.emit('order.completed', {
         name: 'createLogger',
         description: 'Create a named logger',
         params: ['name', 'config?'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Set log level to debug
 arc.logger.setLevel('debug');
@@ -3639,12 +3639,12 @@ console.log('\\nTotal logs:', logs.length);`,
         name: 'defaultLogger',
         description: 'Use the default logger',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Clear any previous logs
 arc.logger.clear();
@@ -3665,12 +3665,12 @@ arc.logger.getLogs().forEach(log => {
         name: 'loggers',
         description: 'Access all loggers',
         params: [],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Simulate a payment flow with logging
 arc.logger.info('=== Payment Flow Started ===');
@@ -3697,12 +3697,12 @@ console.log('\\nLog summary:', arc.logger.getLogs().length, 'entries');`,
         name: 'CircuitBreaker',
         description: 'Create circuit breaker for API calls',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Create circuit breaker (opens after 3 failures)
 const breaker = arc.createCircuitBreaker({
@@ -3733,12 +3733,12 @@ for (let i = 1; i <= 5; i++) {
         name: 'FallbackRPCManager',
         description: 'Manage multiple RPC endpoints with fallback',
         params: ['endpoints'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Circuit breaker can be used for RPC fallback
 const breaker = arc.createCircuitBreaker({
@@ -3764,12 +3764,12 @@ console.log('Circuit state:', breaker.state);`,
         name: 'batchExecute',
         description: 'Execute operations in batches',
         params: ['items', 'fn', 'options'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Demo recipients
 const recipients = [
@@ -3808,12 +3808,12 @@ console.log('Failed:', results.filter(r => !r.success).length);`,
         name: 'CommandParser',
         description: 'Parse payment commands',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Simple command parser demo
 const commands = [
@@ -3845,12 +3845,12 @@ commands.forEach(cmd => {
         name: 'TransactionExplainer',
         description: 'Explain transactions in plain language',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Demo: Explain a transaction
 const tx = {
@@ -3882,12 +3882,12 @@ console.log('  Network: Arc Testnet');`,
         name: 'SpendingAdvisor',
         description: 'AI-powered spending analysis',
         params: ['config'],
-        code: `// Initialize ArcPay with Circle Wallet (gasless)
+        code: `// Initialize with private key (set in Settings ⚙️)
 const arc = await ArcPay.init({
   network: 'arc-testnet',
-  useCircleWallet: true  // ERC-4337 gasless - no private key needed!
+  privateKey: PRIVATE_KEY  // From Settings
 });
-console.log('Mode:', arc.mode, '| Gasless:', arc.gasless);
+console.log('Wallet:', arc.address);
 
 // Demo: Analyze spending
 const transactions = [
